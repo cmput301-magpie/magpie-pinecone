@@ -22,13 +22,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MagpiepineconeTheme {
-                MagpiepineconeApp()
+                PineconeApp()
             }
         }
     }
