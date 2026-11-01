@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone
+package com.example.magpie_pinecone.frontend.entrantScreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,14 +17,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun SearchCampsiteScreen(navController: NavController) {
+fun NewUserScreen(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Search Campsites",
+            text = "New User",
             fontSize = 24.sp
         )
 
