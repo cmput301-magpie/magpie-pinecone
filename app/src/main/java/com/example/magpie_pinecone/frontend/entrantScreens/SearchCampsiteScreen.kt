@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone
+package com.example.magpie_pinecone.frontend.entrantScreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,14 +17,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun SearchCampsiteScreen(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Pinecone Home",
+            text = "Search Campsites",
             fontSize = 24.sp
         )
 
@@ -32,33 +32,13 @@ fun HomeScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate("newUser")
+                navController.navigate("home")
             },
-            modifier = Modifier.testTag("newUserButton") // for testing
+            modifier = Modifier.testTag("homeButton") // for testing
         ) {
-            Text("New User")
+            Text("Go Home")
         }
 
-        //        Navigate to driverscreen
 
-        Button(
-            onClick = {
-                navController.navigate("viewCampsite")
-            },
-            modifier = Modifier.testTag("viewCampsiteButton") // for testing
-        ) {
-            Text("View Campsites")
-
-        }
-
-        Button(
-            onClick = {
-                navController.navigate("searchCampsite")
-            },
-            modifier = Modifier.testTag("searchCampsiteButton") // for testing
-        ) {
-            Text("Search Campsites")
-
-        }
     }
 }
