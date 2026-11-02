@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
 
 import android.media.Image
+import java.util.Date
 
 /**
  * Stores the data associated with a campsite.
@@ -34,8 +35,8 @@ class Campsite(
     var rating: Float,
     var images: Image,
     var rulesAndPolicy: TBD,
-    var availableDates: ListOf<Dates>,
-    var bookedDates: ListOf<Date>,
+    var availableDates: List<Date>,
+    var bookedDates: List<Date>,
     var owner: String,
     var QRCode: QRCode,
     var description: String,

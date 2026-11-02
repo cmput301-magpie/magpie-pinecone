@@ -15,7 +15,9 @@ class OwnerHandler() {
     /**
      * Creates a campsite with properties defined by the Owner
      */
-    fun registerCampsite(campsites: CampsiteDB): Campsite {}
+    fun registerCampsite(campsites: CampsiteDB): Campsite {
+        return TODO("Provide the return value")
+    }
 
     /**
      * Updates the details of a Campsite set by Owner
@@ -25,7 +27,9 @@ class OwnerHandler() {
     /**
      * Creates a lottery
      */
-    fun createLottery(ListOf<Campsite>,lotteries: LotteryDB): Lottery {}
+    fun createLottery(campsites: List<Campsite>,lotteries: LotteryDB): Lottery {
+        return TODO("Provide the return value")
+    }
 
     /**
      * Updates a lottery created by Owner
@@ -45,5 +49,5 @@ class OwnerHandler() {
     /**
      * Sends a message to the Entrant
      */
-    fun sendMsg(message: Message, database: MessageDB, notification: Notification) {}
+    fun sendMsg(message: Message, database: MessageDB, notification: Notification): Unit {}
 }

@@ -19,11 +19,11 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 
 
 class Owner(
-    var campsites: ListOf<Campsite>,
-    var lotteries: ListOf<Lottery>,
-    var activeReservations: ListOf<Reservation>,
-    var cancelledReservations: ListOf<Reservation>,
-    var pastReservations: ListOf<Reservation>,
-    var sentNotifications: ListOf<Notification>
+    var campsites: List<Campsite>,
+    var lotteries: List<Lottery>,
+    var activeReservations: List<Reservation>,
+    var cancelledReservations: List<Reservation>,
+    var pastReservations: List<Reservation>,
+    var sentNotifications: List<Notification>
     ) {
 }
