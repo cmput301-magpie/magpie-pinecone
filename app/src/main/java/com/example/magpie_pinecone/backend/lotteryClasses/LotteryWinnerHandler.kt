@@ -5,12 +5,12 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 
 
 /**
- * Actions for LotteryWinners to either book the campsite or decline
+ * Actions for LotteryWinners to either book the campsite or to decline.
  */
 class LotteryWinnerHandler {
     /**
      * Gives the option for LotteryWinner to reserve or to decline the [lottery].
-     * @return the boolean value of reserve or decline
+     * @return The boolean value of reserve or decline
      */
     fun lotteryDecision(lottery: Lottery): Boolean{
         return TODO("Provide the return value")
@@ -19,7 +19,7 @@ class LotteryWinnerHandler {
 
     /**
      * Allows LotteryWinner to select one of the campsites in the [lottery] to reserve.
-     * @return campsite selected
+     * @return The selected campsite.
      */
     fun selectCampsite(lottery: Lottery): Campsite{
         return TODO("Provide the return value")

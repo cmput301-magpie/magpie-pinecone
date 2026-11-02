@@ -1,6 +1,5 @@
 package com.example.magpie_pinecone.backend.lotteryClasses
 
-import com.google.firebase.Firebase
 
 /**
  * Provides actions for interfacing with the lottery database.

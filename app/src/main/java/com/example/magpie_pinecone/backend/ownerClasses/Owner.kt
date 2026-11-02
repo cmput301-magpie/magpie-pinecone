@@ -11,13 +11,11 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
  * @property campsites The campsites listed by this owner
  * @property lotteries The lotteries associated with this owner’s campsites
  * @property activeReservations The active reservations associated with this owner’s campsites
- * @property cancelledReservations The cancelled reservations associated with this owner’s campsites
+ * @property cancelledReservations The canceled reservations associated with this owner’s campsites
  * @property pastReservations The past reservations of this owner’s campsites
  * @property sentNotifications The notifications sent by this owner
  * @constructor Creates an Owner class
  */
-
-
 class Owner(
     var campsites: List<Campsite>,
     var lotteries: List<Lottery>,
@@ -25,5 +23,4 @@ class Owner(
     var cancelledReservations: List<Reservation>,
     var pastReservations: List<Reservation>,
     var sentNotifications: List<Notification>
-    ) {
-}
+)

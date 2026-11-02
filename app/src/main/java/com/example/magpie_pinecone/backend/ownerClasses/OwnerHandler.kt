@@ -8,46 +8,46 @@ import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 
 /**
- * Provides actions for owners when interacting with the app
+ * Provides actions for owners when interacting with the app.
+ * @constructor Creates an OwnerHandler.
  */
-
 class OwnerHandler() {
     /**
-     * Creates a campsite with properties defined by the Owner
+     * Creates a campsite with properties defined by the Owner.
      */
     fun registerCampsite(campsites: CampsiteDB): Campsite {
         return TODO("Provide the return value")
     }
 
     /**
-     * Updates the details of a Campsite set by Owner
+     * Updates the details of a Campsite registered by the Owner.
      */
-    fun updateCampsiteDetails(campsite: Campsite): Unit {}
+    fun updateCampsiteDetails(campsite: Campsite): Unit { TODO() }
 
     /**
-     * Creates a lottery
+     * Creates a lottery.
      */
     fun createLottery(campsites: List<Campsite>,lotteries: LotteryDB): Lottery {
         return TODO("Provide the return value")
     }
 
     /**
-     * Updates a lottery created by Owner
+     * Updates a lottery created by the Owner.
      */
-    fun updateLottery(lottery: Lottery): Unit {}
+    fun updateLottery(lottery: Lottery): Unit { TODO() }
 
     /**
-     * Rejects a Reservation made by an Entrant
+     * Rejects a Reservation made by an Entrant.
      */
-    fun rejectReservation(reservation: Reservation): Unit {}
+    fun rejectReservation(reservation: Reservation): Unit { TODO() }
 
     /**
-     * Sends a notification to an Entrant
+     * Sends a notification to an Entrant.
      */
-    fun sendNotif(handler: NotificationHandler): Unit {}
+    fun sendNotif(handler: NotificationHandler): Unit { TODO() }
 
     /**
-     * Sends a message to the Entrant
+     * Sends a message to the Entrant.
      */
-    fun sendMsg(message: Message, database: MessageDB, notification: Notification): Unit {}
+    fun sendMsg(message: Message, database: MessageDB, notification: Notification): Unit { TODO() }
 }

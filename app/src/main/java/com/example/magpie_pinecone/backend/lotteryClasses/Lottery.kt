@@ -22,17 +22,17 @@ import java.sql.Time
  * @constructor Creates a Lottery class
  */
 
-class Lottery (val campsites: List<Campsite>,
-               val activeStartDate: Time,
-               val activeEndDate: Time,
-               val registrationStartDate: Time,
-               val registrationEndDate: Time,
-               val bookingStartDate: Time,
-               val bookingEndDate: Time,
-               val numberOfWinners: Int,
-               val waitlistCapacity: Int? = null,
-
-){
+class Lottery (
+    val campsites: List<Campsite>,
+    val activeStartDate: Time,
+    val activeEndDate: Time,
+    val registrationStartDate: Time,
+    val registrationEndDate: Time,
+    val bookingStartDate: Time,
+    val bookingEndDate: Time,
+    val numberOfWinners: Int,
+    val waitlistCapacity: Int? = null
+) {
     val waitlist = listOf<Entrant>()
     val winners = listOf<Entrant>()
 }
