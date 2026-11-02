@@ -7,7 +7,7 @@ package com.example.magpie_pinecone.backend.campsiteClasses
  */
 
 class CampsiteDB (
-    val campsiteRepository: ListOf<Campsite>
+    val campsiteRepository: List<Campsite>
 ) {
     /**
      * Adds a new [campsite] to the database
