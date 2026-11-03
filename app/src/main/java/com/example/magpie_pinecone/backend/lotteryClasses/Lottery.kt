@@ -2,12 +2,13 @@ package com.example.magpie_pinecone.backend.lotteryClasses
 
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import java.sql.Time
+import com.google.firebase.Timestamp
 
 
 /**
  * Stores the data associated with a lottery.
  *
+ * @property id The unique id of this lottery
  * @property campsites The campsites associated with this lottery.
  * @property waitlist The waitlist associated with this lottery.
  * @property activeStartDate The date that marks the start of the active period of this lottery.
@@ -22,17 +23,22 @@ import java.sql.Time
  * @constructor Creates a Lottery class
  */
 
-class Lottery (
-    val campsites: List<Campsite>,
-    val activeStartDate: Time,
-    val activeEndDate: Time,
-    val registrationStartDate: Time,
-    val registrationEndDate: Time,
-    val bookingStartDate: Time,
-    val bookingEndDate: Time,
-    val numberOfWinners: Int,
-    val waitlistCapacity: Int? = null
+data class Lottery (
+    var id: String = "",
+    val campsites: List<Campsite>? = null,
+    val activeStartDate: Timestamp? = null,
+    val activeEndDate: Timestamp? = null,
+    val registrationStartDate: Timestamp? = null,
+    val registrationEndDate: Timestamp? = null,
+    val bookingStartDate: Timestamp? = null,
+    val bookingEndDate: Timestamp? = null,
+    val numberOfWinners: Int? = null,
+    val waitlistCapacity: Int? = null,
+    val waitlist: List<Entrant>? = null,
+    val winners: List<Entrant>? = null,
 ) {
-    val waitlist = listOf<Entrant>()
-    val winners = listOf<Entrant>()
+
+    fun generateWinners(): List<Entrant>{
+        return TODO("Provide the return value")
+    }
 }
