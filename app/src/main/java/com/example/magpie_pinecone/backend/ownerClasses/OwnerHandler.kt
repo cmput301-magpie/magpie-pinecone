@@ -41,13 +41,13 @@ class OwnerHandler() {
      */
     fun rejectReservation(reservation: Reservation): Unit { TODO() }
 
-    /**
-     * Sends a notification to an Entrant.
-     */
-    fun sendNotif(handler: NotificationHandler): Unit { TODO() }
+//    /**
+//     * Sends a notification to an Entrant.
+//     */
+//    fun sendNotif(handler: NotificationHandler): Unit { TODO() }
 
-    /**
-     * Sends a message to the Entrant.
-     */
-    fun sendMsg(message: Message, database: MessageDB, notification: Notification): Unit { TODO() }
+//    /**
+//     * Sends a message to the Entrant.
+//     */
+//    fun sendMsg(message: Message, database: MessageDB, notification: Notification): Unit { TODO() }
 }

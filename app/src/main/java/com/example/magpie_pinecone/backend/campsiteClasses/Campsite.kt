@@ -29,19 +29,18 @@ import java.util.Date
 class Campsite(
     val ID: Int,
     var name: String,
-    var location: Location,
+    var location: String,
     var maxOccupancy: Int,
     var price: Float,
     var rating: Float,
     var images: Image,
-    var rulesAndPolicy: TBD,
+    var rulesAndPolicy: String,
     var availableDates: List<Date>,
     var bookedDates: List<Date>,
     var owner: String,
-    var QRCode: QRCode,
+//    var QRCode: QRCode,
     var description: String,
     var amenities: String,
-    var mapLocation: TBD,
-    var tags: TBD
-) {
-}
+//    var mapLocation: GeoPoint,
+    var tags: List<String>
+)
