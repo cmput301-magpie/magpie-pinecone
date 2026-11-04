@@ -32,12 +32,36 @@ class CampsiteDB {
     /**
      * Deletes a [campsite] from the database
      */
-    fun deleteCampsite(campsite: Campsite): Unit {}
+    fun deleteCampsite(campsite: Campsite) {
+
+        if (campsite.ID.isEmpty()) {
+            Log.e("CampsiteDB", "Cannot delete campsite with empty ID")
+            return
+        }
+
+        campsitesCollection.document(campsite.ID)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("CampsiteDB", "Campsite deleted: ${campsite.ID}")
+            }
+    }
 
     /**
      * Updates a [campsite] in the database with the details in the given [Campsite]
      */
-    fun updateCampsite(campsite: Campsite): Unit {}
+    fun updateCampsite(campsite: Campsite) {
+
+        if (campsite.ID.isEmpty()) {
+            Log.e("CampsiteDB", "Cannot update campsite with empty ID")
+            return
+        }
+
+        campsitesCollection.document(campsite.ID)
+            .set(campsite)
+            .addOnSuccessListener {
+                Log.d("CampsiteDB", "Campsite updated: ${campsite.ID}")
+            }
+    }
 
     /**
      * Fetch a [campsite] from the database
