@@ -16,6 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.magpie_pinecone.frontend.entrantScreens.HomeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 
+/**
+ * Provide destinations for the navigation bar at the bottom of the app.
+ */
 enum class EntrantDestination(
     val route: String,
     val label: String,
@@ -28,9 +31,14 @@ enum class EntrantDestination(
 @Composable
 fun EntrantApp() {
     val navController = rememberNavController()
+
+    // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
+    // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
+    // Screen is vertical (i.e. phone screen) -> bottom navbar
+    // Screen is horizontal (i.e. tablet screen) -> sidebar
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             EntrantDestination.entries.forEach { destination ->
@@ -42,14 +50,19 @@ fun EntrantApp() {
                         )
                     },
                     label = { Text(destination.label) },
+                    // Highlight the tab if the current screen belongs to it
                     selected = currentDestination?.hierarchy
                         ?.any { it.route == destination.route } == true,
                     onClick = {
+                        // Navigate to the correct screen
                         navController.navigate(destination.route) {
+                            // Removes screens above Home from the back stack to prevent long back stack
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                                saveState = true  // Saves state of the tab while leaving it.
                             }
+                            // Prevents duplicates of the same tab in the backstack when already on it.
                             launchSingleTop = true
+                            // Restore the state of the tab (i.e. scroll position)
                             restoreState = true
                         }
                     }
@@ -57,9 +70,10 @@ fun EntrantApp() {
             }
         }
     ) {
+        // Area where the screen of the current route is displayed.
         NavHost(
             navController = navController,
-            startDestination = EntrantDestination.HOME.route
+            startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
         ) {
             composable(EntrantDestination.HOME.route) { HomeScreen(navController) }
             composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }

@@ -18,6 +18,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Indicates the state of the app at startup.
+ */
 enum class StartState {
     LOADING,
     NONE,
@@ -28,29 +31,29 @@ enum class StartState {
 
 @Composable
 fun PineconeApp(androidId: String) {
-    var state by rememberSaveable { mutableStateOf(StartState.LOADING) }
+    var state by rememberSaveable { mutableStateOf(StartState.LOADING) }  // Remember the state of the app
 
     LaunchedEffect(androidId, state) {
         if (state == StartState.LOADING) {
-            state = try {
+            state = try {  // Try finding an Android ID match in the Firestore database
                 val doc = Firebase.firestore.collection("users").document(androidId).get().await()
                 when (doc.getString("accountType")) {
                     "owner" -> StartState.OWNER
                     "entrant" -> StartState.ENTRANT
                     else -> StartState.NONE
                 }
-            } catch (e: Exception) {
+            } catch (e: Exception) {  // An error occurred during searching
                 StartState.ERROR
             }
         }
     }
 
     when (state) {
-        StartState.LOADING -> Box(Modifier.fillMaxSize())
+        StartState.LOADING -> Box(Modifier.fillMaxSize())  // Empty screen while awaiting Firestore search
         StartState.NONE -> TODO("Must implement welcome page and new profile page.")
         StartState.ENTRANT -> EntrantApp()
         StartState.OWNER -> OwnerApp()
-        StartState.ERROR -> Column(
+        StartState.ERROR -> Column(  // Display simple page notifying user of error, with a button to try searching again.
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center ,
             horizontalAlignment = Alignment.CenterHorizontally

@@ -15,6 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MagpiepineconeTheme {
+                // Get the Android ID of the device, used for getting account type.
                 val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
                 PineconeApp(androidId)
             }
