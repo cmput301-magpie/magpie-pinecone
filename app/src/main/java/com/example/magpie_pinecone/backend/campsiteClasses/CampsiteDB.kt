@@ -42,5 +42,23 @@ class CampsiteDB {
     /**
      * Fetch a [campsite] from the database
      */
-    fun readCampsite(campsite: Campsite): Unit {}
-}
+    fun readCampsite(
+        campsiteID: String,
+        onResult: (Campsite?) -> Unit
+    ) {
+        val document = campsitesCollection.document(campsiteID)
+
+        document.get()
+            .addOnSuccessListener { snapshot ->
+
+                if (snapshot.exists()) {
+                    val campsite = snapshot.toObject(Campsite::class.java)
+                    onResult(campsite)
+                } else {
+                    onResult(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("CampsiteDB", "Failed to read campsite", exception)
+                onResult(null)
+            }}}
