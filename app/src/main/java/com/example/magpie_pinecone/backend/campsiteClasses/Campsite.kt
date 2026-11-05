@@ -1,7 +1,6 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
-
-import android.media.Image
 import java.util.Date
+import com.google.firebase.firestore.GeoPoint
 
 /**
  * Stores the data associated with a campsite.
@@ -27,20 +26,21 @@ import java.util.Date
 
 
 class Campsite(
-    val ID: Int,
-    var name: String,
-    var location: String,
-    var maxOccupancy: Int,
-    var price: Float,
-    var rating: Float,
-    var images: Image,
-    var rulesAndPolicy: String,
-    var availableDates: List<Date>,
-    var bookedDates: List<Date>,
-    var owner: String,
-//    var QRCode: QRCode,
-    var description: String,
-    var amenities: String,
-//    var mapLocation: GeoPoint,
-    var tags: List<String>
-)
+    var ID: String = "",
+    var name: String = "",
+    var location: String = "",
+    var maxOccupancy: Int = 0,
+    var price: Double = 0.0,
+    var rating: Double = 0.0,
+    var imageUrl: String? = null,
+    var rulesAndPolicy: String  = "",
+    var availableDates: List<Date> = emptyList(),
+    var bookedDates: List<Date> = emptyList(),
+    var ownerId: String = "",
+    //    var QRCode: QRCode,
+    var description: String  = "",
+    var amenities: String  = "",
+    var mapLocation: GeoPoint? = null,
+    var tags: List<String> = emptyList()
+
+    )
