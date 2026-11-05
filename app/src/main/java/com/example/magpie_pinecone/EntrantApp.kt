@@ -13,7 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.magpie_pinecone.frontend.entrantScreens.HomeScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.EntrantHomeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 
 /**
@@ -75,7 +75,7 @@ fun EntrantApp() {
             navController = navController,
             startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(EntrantDestination.HOME.route) { HomeScreen(navController) }
+            composable(EntrantDestination.HOME.route) { EntrantHomeScreen(navController) }
             composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }
         }
     }
