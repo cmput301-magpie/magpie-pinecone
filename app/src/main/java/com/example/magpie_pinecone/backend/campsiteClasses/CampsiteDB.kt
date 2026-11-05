@@ -85,4 +85,23 @@ class CampsiteDB {
             .addOnFailureListener { exception ->
                 Log.e("CampsiteDB", "Failed to read campsite", exception)
                 onResult(null)
-            }}}
+            }}
+/**
+ * Fetches all campsites from the database
+ */
+fun getAllCampsites(
+    onResult: (List<Campsite>) -> Unit
+) {
+    campsitesCollection.get()
+        .addOnSuccessListener { snapshot ->
+
+            val campsites = snapshot.documents.mapNotNull { document ->
+                document.toObject(Campsite::class.java)
+            }
+
+            onResult(campsites)
+        }
+
+
+}}
+
