@@ -61,7 +61,8 @@ import kotlin.math.exp
  * Implement Image Picking
  * Implement Map Location
  * Link Textfields to Campsite Data
- * Implement Save Campsite
+ * Implement Create/Save Campsite
+ * Implement switching between Creating and Saving Campsite
  */
 
 @Composable
@@ -90,7 +91,7 @@ fun EditCampsiteScreen(
                 // Title
                 Text(
                     modifier = Modifier.padding(20.dp),
-                    text = "Edit Campsite",
+                    text = "Create/Edit Campsite",
                     fontSize = 36.sp
                 )
 
@@ -129,7 +130,7 @@ fun EditCampsiteScreen(
 
             ExtendedFloatingActionButton(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(100.dp),
-                onClick = { TODO("Save Campsite") }
+                onClick = { TODO("Save/Create Campsite") }
             ) {
                 Text("Save Campsite")
             }
