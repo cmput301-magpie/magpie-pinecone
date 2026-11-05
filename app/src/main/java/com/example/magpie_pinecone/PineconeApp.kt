@@ -50,7 +50,7 @@ fun PineconeApp(androidId: String) {
 
     when (state) {
         StartState.LOADING -> Box(Modifier.fillMaxSize())  // Empty screen while awaiting Firestore search
-        StartState.NONE -> TODO("Must implement welcome page and new profile page.")
+        StartState.NONE -> Text("No account found") //Placeholder text before setting up Homepage
         StartState.ENTRANT -> EntrantApp()
         StartState.OWNER -> OwnerApp()
         StartState.ERROR -> Column(  // Display simple page notifying user of error, with a button to try searching again.
