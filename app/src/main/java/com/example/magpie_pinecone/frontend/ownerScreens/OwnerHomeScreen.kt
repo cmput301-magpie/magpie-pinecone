@@ -72,6 +72,7 @@ fun OwnerHomeScreen(
     ) {
         // Title, may switch owner out with user's actual name
         Text(
+            modifier = Modifier.padding(20.dp),
             text = "Welcome Back, Owner!",
             fontSize = 36.sp
         )

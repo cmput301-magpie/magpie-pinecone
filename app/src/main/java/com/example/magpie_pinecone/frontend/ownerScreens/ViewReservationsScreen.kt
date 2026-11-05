@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -65,12 +66,16 @@ fun ViewReservationsScreen() {
     ) {
         // Title
         Text(
+            modifier = Modifier.padding(20.dp),
             text = "View Reservations",
             fontSize = 36.sp
         )
 
         // Tabs
-        PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
+        PrimaryTabRow(
+            modifier = Modifier.padding(bottom = 16.dp),
+            selectedTabIndex = selectedTabIndex
+        ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
                     selected = selectedTabIndex == index,
