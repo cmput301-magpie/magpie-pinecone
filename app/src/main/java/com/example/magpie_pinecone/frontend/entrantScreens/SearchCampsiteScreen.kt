@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import androidx.compose.material3.OutlinedTextField
 
 /**
  * Displays a list of campsites that entrants can search through.
@@ -35,6 +36,9 @@ fun SearchCampsiteScreen(navController: NavController) {
     val campsiteDB = remember { CampsiteDB() } // Stores the campsites fetched from the campsite database
 
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
+
+    var searchText by remember { mutableStateOf("") }     // Stores the text entered into the campsite search bar
+
 
     LaunchedEffect(Unit) // Fetch campsites when the screen is first displayed
     {
@@ -55,9 +59,22 @@ fun SearchCampsiteScreen(navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            label = { Text("Search by campsite name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Filters campsites by their name using the entered search text
+        val filteredCampsites = campsites.filter { campsite ->
+            campsite.name.contains(searchText, ignoreCase = true)
+        }
 
         LazyColumn {
-            items(campsites) { campsite ->
+            items(filteredCampsites) { campsite ->
 
                 Column(
                     modifier = Modifier
