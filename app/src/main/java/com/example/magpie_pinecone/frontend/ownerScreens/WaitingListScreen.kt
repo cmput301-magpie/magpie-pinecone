@@ -55,39 +55,57 @@ import kotlinx.coroutines.selects.select
 import kotlin.math.exp
 
 @Composable
-fun WaitingListScreen() {
+fun WaitingListScreen(
+    onBack: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title
-        Text(
-            modifier = Modifier.padding(20.dp),
-            text = "Waiting List",
-            fontSize = 36.sp
-        )
+        Box() {
+            Button(
+                modifier = Modifier.align(Alignment.TopStart),
+                onClick = { onBack }
+            ) {
+                Text("<--")
+            }
 
-        LazyColumn() {
-            // Single placeholder entrant, change to iterate over list later
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth().border(width = 1.dp, color = Color.Black).padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Entrant",
-                        fontSize = 30.sp
-                    )
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Title
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = "Waiting List",
+                    fontSize = 36.sp
+                )
+
+                LazyColumn() {
+                    // Single placeholder entrant, change to iterate over list later
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                                .border(width = 1.dp, color = Color.Black).padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Entrant",
+                                fontSize = 30.sp
+                            )
+                        }
+                    }
                 }
             }
         }
+
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowWaitingListScreenPreview() {
-    WaitingListScreen()
+    WaitingListScreen({})
 }
