@@ -77,7 +77,9 @@ fun OwnerApp() {
             navController = navController,
             startDestination = OwnerDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(OwnerDestination.HOME.route) { OwnerHomeScreen() }  // Placeholder
+            composable(OwnerDestination.HOME.route) {
+                OwnerHomeScreen({}, {}, {}, {}, {}, {}, {})  // Placeholder
+            }
         }
     }
 }

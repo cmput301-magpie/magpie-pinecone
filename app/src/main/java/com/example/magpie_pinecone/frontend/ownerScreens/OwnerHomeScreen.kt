@@ -462,6 +462,6 @@ fun MyCampsites(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun ShowPreview() {
+fun ShowOwnerHomeScreenPreview() {
     OwnerHomeScreen({}, {}, {}, {}, {}, {}, {})
 }
