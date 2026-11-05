@@ -53,6 +53,11 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import kotlinx.coroutines.selects.select
 import kotlin.math.exp
 
+/**
+ * TO-DO
+ * Link actual reservation data to loop over (Active, Past, Cancelled)
+ */
+
 @Composable
 fun ViewReservationsScreen() {
     // Tab Navigation

@@ -50,6 +50,12 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import kotlinx.coroutines.selects.select
 import kotlin.math.exp
 
+/**
+ * TO-DO
+ * Link actual campsite data to loop over and display
+ * Link actual lottery data to loop over and display
+ */
+
 @Composable
 fun OwnerHomeScreen(
     onEditLottery: () -> Unit,
