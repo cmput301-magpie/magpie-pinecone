@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun EditLotteryScreen(
-    onBack: Boolean
+    onBack: () -> Boolean
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -40,7 +40,7 @@ fun EditLotteryScreen(
             contentAlignment = Alignment.Center) {
             Button(
                 modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack }
+                onClick = { onBack() }
             ) {
                 Text("<--")
             }
@@ -104,5 +104,5 @@ fun EditLotteryScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowEditLotteryScreenPreview() {
-    EditLotteryScreen(false)
+    EditLotteryScreen({ false })
 }

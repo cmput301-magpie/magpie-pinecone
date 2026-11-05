@@ -95,14 +95,22 @@ fun OwnerApp() {
             startDestination = OwnerDestination.HOME.route  // The first screen is set to HOME.
         ) {
             composable(OwnerDestination.HOME.route) {
-                OwnerHomeScreen({ navController.navigate(route = EditLottery) }, { navController.navigate(route = WaitingList) }, { navController.navigate(route = EditCampsite) }, { navController.navigate(route = ViewCampsite) }, { navController.navigate(route = DatesBooked) }, { navController.navigate(route = ViewReservations) })  // Placeholder
+                OwnerHomeScreen(
+                    { navController.navigate(route = EditLottery) },
+                    { navController.navigate(route = WaitingList) },
+                    { navController.navigate(route = EditCampsite) },
+                    { navController.navigate(route = ViewCampsite) },
+                    { navController.navigate(route = DatesBooked) },
+                    { navController.navigate(route = ViewReservations) })
             }
-            composable<DatesBooked> { DatesBookedScreen(navController.popBackStack()) }
-            composable<EditCampsite> { EditCampsiteScreen(navController.popBackStack()) }
-            composable<EditLottery> { EditLotteryScreen(navController.popBackStack()) }
-            composable<ViewCampsite> { ViewCampsiteScreen(navController.popBackStack()) }
+            composable<DatesBooked> { DatesBookedScreen({ navController.popBackStack() }) }
+            composable<EditCampsite> { EditCampsiteScreen({ navController.popBackStack() }) }
+            composable<EditLottery> { EditLotteryScreen({ navController.popBackStack() }) }
+            composable<ViewCampsite> { ViewCampsiteScreen({ navController.popBackStack() }) }
             composable<ViewReservations> { ViewReservationsScreen() }
-            composable<WaitingList> { WaitingListScreen(navController.popBackStack()) }
+            composable<WaitingList> {
+                WaitingListScreen({ navController.popBackStack() })
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ViewCampsiteScreen(
-    onBack: Boolean
+    onBack: () -> Boolean
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -35,7 +35,7 @@ fun ViewCampsiteScreen(
             contentAlignment = Alignment.Center) {
             Button(
                 modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack }
+                onClick = { onBack() }
             ) {
                 Text("<--")
             }
@@ -104,5 +104,5 @@ fun ViewCampsiteScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowViewCampsiteScreenPreview() {
-    ViewCampsiteScreen(false)
+    ViewCampsiteScreen({ false })
 }

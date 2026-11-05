@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 /**
  * TO-DO
  * Link actual reservation data to loop over (Active, Past, Cancelled)
+ * Implement view details to actually link to the view campsite screen
  */
 
 @Composable

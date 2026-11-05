@@ -173,7 +173,7 @@ fun MyLotteries(
                                     text = { Text(
                                         text = title
                                     ) },
-                                    onClick = { function }
+                                    onClick = { function() }
                                 )
                             }
                         }
@@ -248,7 +248,7 @@ fun MyLotteries(
                                     text = { Text(
                                         text = title
                                     ) },
-                                    onClick = { function }
+                                    onClick = { function() }
                                 )
                             }
                         }
@@ -344,7 +344,7 @@ fun MyCampsites(
                                                 text = title
                                             )
                                         },
-                                        onClick = { function }
+                                        onClick = { function() }
                                     )
                                 }
                             }
@@ -420,7 +420,7 @@ fun MyCampsites(
                                                 text = title
                                             )
                                         },
-                                        onClick = { function }
+                                        onClick = { function() }
                                     )
                                 }
                             }
@@ -436,14 +436,14 @@ fun MyCampsites(
             horizontalAlignment = Alignment.End
             ) {
             ExtendedFloatingActionButton(
-                onClick = { onEditCampsite }
+                onClick = { onEditCampsite() }
             ) {
                 Text("+ Campsite")
             }
 
             ExtendedFloatingActionButton(
                 modifier = Modifier.padding(top = 10.dp),
-                onClick = { onViewReservations }
+                onClick = { onViewReservations() }
             ) {
                 Text("Campsite Resv.")
             }

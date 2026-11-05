@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun DatesBookedScreen(
-    onBack: Boolean
+    onBack: () -> Boolean
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
@@ -30,7 +30,7 @@ fun DatesBookedScreen(
             contentAlignment = Alignment.Center) {
             Button(
                 modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack }
+                onClick = { onBack() }
             ) {
                 Text("<--")
             }
@@ -73,5 +73,5 @@ fun DatesBookedScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowDatesBookedScreenPreview() {
-    DatesBookedScreen(false)
+    DatesBookedScreen({ false })
 }

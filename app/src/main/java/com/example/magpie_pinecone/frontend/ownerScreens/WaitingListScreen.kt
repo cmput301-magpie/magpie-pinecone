@@ -26,17 +26,19 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun WaitingListScreen(
-    onBack: Boolean
+    onBack: () -> Boolean
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box() {
             Button(
                 modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack }
+                onClick = { onBack() }
             ) {
                 Text("<--")
             }
@@ -56,8 +58,10 @@ fun WaitingListScreen(
                     // Single placeholder entrant, change to iterate over list later
                     item {
                         Row(
-                            modifier = Modifier.fillMaxWidth()
-                                .border(width = 1.dp, color = Color.Black).padding(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(width = 1.dp, color = Color.Black)
+                                .padding(10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -77,5 +81,5 @@ fun WaitingListScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowWaitingListScreenPreview() {
-    WaitingListScreen(false)
+    WaitingListScreen({ false })
 }
