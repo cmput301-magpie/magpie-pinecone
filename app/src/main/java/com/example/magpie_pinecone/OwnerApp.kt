@@ -1,15 +1,11 @@
 package com.example.magpie_pinecone
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -17,7 +13,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.magpie_pinecone.frontend.ownerScreens.DatesBookedScreen
+import com.example.magpie_pinecone.frontend.ownerScreens.EditCampsiteScreen
+import com.example.magpie_pinecone.frontend.ownerScreens.EditLotteryScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.OwnerHomeScreen
+import com.example.magpie_pinecone.frontend.ownerScreens.ViewCampsiteScreen
+import com.example.magpie_pinecone.frontend.ownerScreens.ViewReservationsScreen
+import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
+import kotlinx.serialization.Serializable
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -29,6 +32,20 @@ enum class OwnerDestination(
 ) {
     HOME("ownerHome", "Home", R.drawable.ic_home),  // icons are temporary -Albert
 }
+
+// Objects to represent routes
+@Serializable
+object DatesBooked
+@Serializable
+object EditCampsite
+@Serializable
+object EditLottery
+@Serializable
+object ViewCampsite
+@Serializable
+object ViewReservations
+@Serializable
+object WaitingList
 
 @Composable
 fun OwnerApp() {
@@ -78,8 +95,14 @@ fun OwnerApp() {
             startDestination = OwnerDestination.HOME.route  // The first screen is set to HOME.
         ) {
             composable(OwnerDestination.HOME.route) {
-                OwnerHomeScreen({}, {}, {}, {}, {}, {}, {})  // Placeholder
+                OwnerHomeScreen({ navController.navigate(route = EditLottery) }, { navController.navigate(route = WaitingList) }, { navController.navigate(route = EditCampsite) }, { navController.navigate(route = ViewCampsite) }, { navController.navigate(route = DatesBooked) }, { navController.navigate(route = ViewReservations) })  // Placeholder
             }
+            composable<DatesBooked> { DatesBookedScreen(navController.popBackStack()) }
+            composable<EditCampsite> { EditCampsiteScreen(navController.popBackStack()) }
+            composable<EditLottery> { EditLotteryScreen(navController.popBackStack()) }
+            composable<ViewCampsite> { ViewCampsiteScreen(navController.popBackStack()) }
+            composable<ViewReservations> { ViewReservationsScreen() }
+            composable<WaitingList> { WaitingListScreen(navController.popBackStack()) }
         }
     }
 }
