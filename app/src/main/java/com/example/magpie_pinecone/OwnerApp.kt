@@ -77,13 +77,7 @@ fun OwnerApp() {
             navController = navController,
             startDestination = OwnerDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(OwnerDestination.HOME.route) { OwnerHomeScreen(navController) }  // Placeholder
+            composable(OwnerDestination.HOME.route) { OwnerHomeScreen() }  // Placeholder
         }
     }
-}
-
-// Placeholder - delete once the real owner screens exist.
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(title) }
 }
