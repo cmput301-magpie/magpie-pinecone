@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.magpie_pinecone.frontend.ownerScreens.OwnerHomeScreen
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -76,7 +77,7 @@ fun OwnerApp() {
             navController = navController,
             startDestination = OwnerDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(OwnerDestination.HOME.route) { PlaceholderScreen("Owner Home") }  // Placeholder
+            composable(OwnerDestination.HOME.route) { OwnerHomeScreen(navController) }  // Placeholder
         }
     }
 }
