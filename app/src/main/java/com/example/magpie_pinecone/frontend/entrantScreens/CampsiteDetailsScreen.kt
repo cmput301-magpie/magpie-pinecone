@@ -34,7 +34,9 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 @Composable
 fun CampsiteDetailsScreen(
     campsite: Campsite,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isWinner: Boolean = false,
+    onReserve: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -185,6 +187,15 @@ fun CampsiteDetailsScreen(
                 }
             }
 
+            ExtendedFloatingActionButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 70.dp),
+                    onClick = onSubmit
+
+            ) {
+                Text("Enter Lottery")
+            }
             // Lottery functionality will be connected later
             ExtendedFloatingActionButton(
                 modifier = Modifier
@@ -193,6 +204,18 @@ fun CampsiteDetailsScreen(
                 onClick = { }
             ) {
                 Text("Enter Lottery")
+            }
+
+            // Only lottery winners can go on to reserve dates
+            if (isWinner) {
+                ExtendedFloatingActionButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 130.dp),
+                    onClick = onReserve
+                ) {
+                    Text("Reserve")
+                }
             }
         }
     }
@@ -211,6 +234,7 @@ fun ShowCampsiteDetailsScreenPreview() {
             description = "A sample campsite used for previewing the details screen.",
             tags = listOf("Forest", "Camping", "Family")
         ),
-        onBack = { }
+        onBack = { },
+        onSubmit = { }
     )
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 
@@ -77,7 +78,7 @@ class LotteryDB {
         val document = lotteriesRef.document()
         lottery.id = document.id
 
-            document.set(lottery)
+        document.set(lottery)
             .addOnSuccessListener {
                 Log.d("LotteryDB", "Lottery added with ID: ${lottery.id}")
             }
@@ -134,6 +135,68 @@ class LotteryDB {
             }
 
             .addOnFailureListener { onResult(null) }
+    }
+
+    /**
+     * Get all lotteries in the Firestore.
+     */
+    fun getAllLotteries(onResult: (List<Lottery>) -> Unit) {
+        lotteriesRef.get()
+            .addOnSuccessListener { snapshot ->
+                onResult(snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Lottery::class.java)?.also { it.id = doc.id }
+                })
+            }
+            .addOnFailureListener { onResult(emptyList()) }
+    }
+
+    /**
+     * Get all lotteries associated with an owner in the Firestore.
+     */
+    fun getLotteriesByOwner(ownerId: String, onResult: (List<Lottery>) -> Unit) {
+        lotteriesRef
+            .whereEqualTo("ownerId", ownerId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val ownerLotteries = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Lottery::class.java)?.also { it.id = doc.id }
+                }
+                onResult(ownerLotteries)
+            }
+            .addOnFailureListener { onResult(emptyList()) }
+    }
+
+    /**
+     * Get all lotteries associated with an entrant in the Firestore.
+     */
+    fun getLotteriesByEntrant(entrantId: String, onResult: (List<Lottery>) -> Unit) {
+        // made the waitlist as a subcollection so getting by entrant id is more annoying, need to check every waitlist
+        db.collectionGroup("waitlistEntrants")
+            .whereEqualTo("id", entrantId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                // ids of the lotteries that have this entrantid in the waitlist
+                val lotteryIds = snapshot.documents.mapNotNull { it.reference.parent.parent?.id }
+
+                if (lotteryIds.isEmpty()) {
+                    onResult(emptyList())
+                    return@addOnSuccessListener
+                }
+                lotteriesRef
+                    // gets the lottery ids (capped at 30 at one time)
+                    .whereIn(FieldPath.documentId(), lotteryIds.take(30))
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        val entrantLotteries = snapshot.documents.mapNotNull { doc ->
+                            doc.toObject(Lottery::class.java)?.also { it.id = doc.id }
+                        }
+                        onResult(entrantLotteries)
+                    }
+                    .addOnFailureListener { onResult(emptyList()) }
+            }
+
+            .addOnFailureListener { onResult(emptyList()) }
     }
 
     fun addEntrant(lottery: Lottery, entrant: Entrant){

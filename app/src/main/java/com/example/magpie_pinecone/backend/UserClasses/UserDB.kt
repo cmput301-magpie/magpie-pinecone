@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.UserClasses
 
 import android.util.Log
+import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -114,6 +115,26 @@ class UserDB {
             }
             .addOnFailureListener { exception ->
                 Log.e("UserDB", "Failed to read user", exception)
+                onResult(null)
+            }
+    }
+
+    fun readEntrant(
+        entrantId: String,
+        onResult: (Entrant?) -> Unit
+    ) {
+        usersCollection.document(entrantId).get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val entrant = snapshot.toObject(Entrant::class.java)
+                    entrant?.id = snapshot.id
+                    onResult(entrant)
+                } else {
+                    onResult(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to read entrant", exception)
                 onResult(null)
             }
     }
