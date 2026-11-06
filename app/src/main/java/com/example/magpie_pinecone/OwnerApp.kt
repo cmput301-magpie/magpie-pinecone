@@ -128,6 +128,10 @@ fun OwnerApp(androidId: String) {
                         lotteryToEdit = lottery
                         navController.navigate(route = EditLottery)
                     },
+                    onCreateLottery = {
+                        lotteryToEdit = null
+                        navController.navigate(route = EditLottery)
+                    },
                     onViewWaitlist = { navController.navigate(route = WaitingList) },
                     onCreateCampsite = {
                         campsiteToEdit = null
