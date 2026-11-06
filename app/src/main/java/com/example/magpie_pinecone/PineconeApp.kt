@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.magpie_pinecone.frontend.userScreens.NewUserApp
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -38,8 +39,8 @@ fun PineconeApp(androidId: String) {
             state = try {  // Try finding an Android ID match in the Firestore database
                 val doc = Firebase.firestore.collection("users").document(androidId).get().await()
                 when (doc.getString("accountType")) {
-                    "owner" -> StartState.OWNER
-                    "entrant" -> StartState.ENTRANT
+                    "Owner" -> StartState.OWNER
+                    "Entrant" -> StartState.ENTRANT
                     else -> StartState.NONE
                 }
             } catch (e: Exception) {  // An error occurred during searching
@@ -50,9 +51,9 @@ fun PineconeApp(androidId: String) {
 
     when (state) {
         StartState.LOADING -> Box(Modifier.fillMaxSize())  // Empty screen while awaiting Firestore search
-        StartState.NONE -> Text("No account found") //Placeholder text before setting up Homepage
-        StartState.ENTRANT -> EntrantApp()
-        StartState.OWNER -> OwnerApp()
+        StartState.NONE -> NewUserApp(onUserSignedUp = { state = StartState.LOADING })
+        StartState.ENTRANT -> EntrantApp(onProfileDeleted = { state = StartState.LOADING })
+        StartState.OWNER -> OwnerApp(androidId)
         StartState.ERROR -> Column(  // Display simple page notifying user of error, with a button to try searching again.
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center ,

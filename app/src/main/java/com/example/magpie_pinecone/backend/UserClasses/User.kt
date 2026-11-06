@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.backend
+package com.example.magpie_pinecone.backend.UserClasses
 
 enum class AccountType {
     Entrant,
@@ -14,8 +14,14 @@ enum class AccountType {
  * @property email The email address of this user.
  * @property phoneNumber The phone number of this user.
  * @property accountType The type of this user (entrant, owner, or admin).
+ * @property rulesAccepted Whether this user has confirmed the campsite rules and policies.
  * @constructor Creates a user class.
  */
-open class User (var id: String, var name: String, var email: String, var phoneNumber: String, var accountType: AccountType) {
-
-}
+class User(
+    var id: String = "",
+    var name: String = "",
+    var email: String = "",
+    var phoneNumber: String = "",
+    var accountType: AccountType = AccountType.Entrant,
+    var rulesAccepted: Boolean = false
+)
