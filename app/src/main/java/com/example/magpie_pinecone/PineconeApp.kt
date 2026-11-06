@@ -38,8 +38,8 @@ fun PineconeApp(androidId: String) {
             state = try {  // Try finding an Android ID match in the Firestore database
                 val doc = Firebase.firestore.collection("users").document(androidId).get().await()
                 when (doc.getString("accountType")) {
-                    "owner" -> StartState.OWNER
-                    "entrant" -> StartState.ENTRANT
+                    "Owner" -> StartState.OWNER
+                    "Entrant" -> StartState.ENTRANT
                     else -> StartState.NONE
                 }
             } catch (e: Exception) {  // An error occurred during searching
