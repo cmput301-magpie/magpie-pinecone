@@ -35,6 +35,7 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 
 @Composable
 fun EditCampsiteScreen(
+    ownerId: String,
     isEdit: Boolean,
     campsite: Campsite,
     onBack: () -> Boolean,
@@ -140,6 +141,7 @@ fun EditCampsiteScreen(
                     .align(Alignment.BottomCenter)
                     .padding(100.dp),
                 onClick = {
+                    campsite.ownerId = ownerId
                     campsite.name = name
                     campsite.location = location
                     campsite.price = price.toDoubleOrNull() ?: 0.0
@@ -164,5 +166,5 @@ fun EditCampsiteScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowEditCampsiteScreenPreview() {
-    EditCampsiteScreen(isEdit = false, campsite = Campsite(), onBack = { false }, onSubmit = {},)
+    EditCampsiteScreen(ownerId = "", isEdit = false, campsite = Campsite(), onBack = { false }, onSubmit = {},)
 }

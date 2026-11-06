@@ -27,6 +27,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.graphics.Color
+import com.example.magpie_pinecone.AppPolicyGuidelines
 import com.example.magpie_pinecone.EditProfile
 
 /**
@@ -99,6 +100,15 @@ fun ProfileScreen(navController: NavController, curUser: User?, onProfileDeleted
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate(AppPolicyGuidelines)
+                },
+                modifier = Modifier.testTag("appPolicyButton") // for testing
+            ) {
+                Text("View App Policies and Guidelines")
+            }
 
             // Red delete link (US 01.08.01)
             TextButton(

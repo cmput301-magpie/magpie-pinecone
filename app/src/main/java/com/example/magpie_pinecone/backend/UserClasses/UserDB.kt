@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.UserClasses
 
 import android.util.Log
+import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -32,6 +33,7 @@ class UserDB {
                 Log.e("UserDB", "Failed to add user", exception)
             }
     }
+
     /**
      * Deletes a [user] from the database.
      */
@@ -115,5 +117,58 @@ class UserDB {
                 Log.e("UserDB", "Failed to read user", exception)
                 onResult(null)
             }
+    }
+
+    fun readEntrant(
+        entrantId: String,
+        onResult: (Entrant?) -> Unit
+    ) {
+        usersCollection.document(entrantId).get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val entrant = snapshot.toObject(Entrant::class.java)
+                    entrant?.id = snapshot.id
+                    onResult(entrant)
+                } else {
+                    onResult(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to read entrant", exception)
+                onResult(null)
+            }
+    }
+
+    /**
+     * Fetch several users from the database, given a list of their IDs.
+     * Calls onResult with the users that were found.
+     */
+    fun readUsers(
+        userIDs: List<String>,
+        onResult: (List<User>) -> Unit
+    ) {
+        // Nothing to look up, so return an empty list right away
+        if (userIDs.isEmpty()) {
+            onResult(emptyList())
+            return
+        }
+
+        val users = mutableListOf<User>()
+        var finished = 0
+
+        // Read each user one by one, using readUser
+        for (id in userIDs) {
+            readUser(id) { user ->
+                if (user != null) {
+                    users.add(user)
+                }
+                finished++
+
+                // When every read has come back, send the list out
+                if (finished == userIDs.size) {
+                    onResult(users)
+                }
+            }
+        }
     }
 }

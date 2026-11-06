@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.frontend.entrantScreens
+ package com.example.magpie_pinecone.frontend.entrantScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -28,14 +28,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.magpie_pinecone.EditLottery
 import com.example.magpie_pinecone.R
+import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-/**
+ /**
  * Display's Entrant's Home Screen
  * TO-DO
  * Link to entrant's actual lotteries to loop over
@@ -284,7 +286,15 @@ fun EntrantHomeScreenLotteryCard(wonLottery: Boolean, lottery: Lottery, modifier
             }
 
 
+            // My Reservations
+            ExtendedFloatingActionButton(
+                modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 30.dp),
+                onClick = { onMyReservations() }
+            ) {
+                Text("My Reservations")
+            }
         }
+
     }
 }
 

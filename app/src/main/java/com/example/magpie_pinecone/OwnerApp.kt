@@ -19,6 +19,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
+import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
 import com.example.magpie_pinecone.frontend.ownerScreens.DatesBookedScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.EditCampsiteScreen
@@ -58,12 +60,16 @@ object WaitingList
 fun OwnerApp(androidId: String) {
     val navController = rememberNavController()
     val campsiteDB = remember { CampsiteDB() }
+    val lotteryDB = remember { LotteryDB() }
     val ownerHandler = remember { OwnerHandler() }
 
     // null = creating a new campsite, not null = editing existing campsite
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
     var campsiteToView by remember { mutableStateOf<Campsite?>(null) }
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
+
+    var lotteryToEdit by remember { mutableStateOf<Lottery?>(null) }
+    var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -111,12 +117,21 @@ fun OwnerApp(androidId: String) {
             composable(OwnerDestination.HOME.route) {
                 // Runs every time the home screen is shown
                 LaunchedEffect(Unit) {
+                    lotteryDB.getLotteriesByOwner(ownerId = androidId) { lotteries = it }
                     campsiteDB.getCampsitesByOwner(ownerId = androidId) { campsites = it }
                 }
 
                 OwnerHomeScreen(
+                    lotteries = lotteries,
                     campsites = campsites,
-                    onEditLottery = { navController.navigate(route = EditLottery) },
+                    onEditLottery = { lottery ->
+                        lotteryToEdit = lottery
+                        navController.navigate(route = EditLottery)
+                    },
+                    onCreateLottery = {
+                        lotteryToEdit = null
+                        navController.navigate(route = EditLottery)
+                    },
                     onViewWaitlist = { navController.navigate(route = WaitingList) },
                     onCreateCampsite = {
                         campsiteToEdit = null
@@ -145,6 +160,7 @@ fun OwnerApp(androidId: String) {
                 }
 
                 EditCampsiteScreen(
+                    ownerId = androidId,
                     isEdit = isEdit,
                     campsite = campsite,
                     onBack = { navController.popBackStack() },
@@ -162,7 +178,25 @@ fun OwnerApp(androidId: String) {
                     }
                 )
             }
-            composable<EditLottery> { EditLotteryScreen({ navController.popBackStack() }) }
+            composable<EditLottery> {
+                val existing = lotteryToEdit
+                val lottery = remember { existing ?: Lottery() }
+
+                EditLotteryScreen(
+                    isEdit = existing != null,
+                    lottery = lottery,
+                    availableCampsites = campsites,
+                    onBack = { navController.popBackStack() },
+                    onSubmit = { submitted ->
+                        if (existing != null) {
+                            ownerHandler.updateLottery(lotteryDB, submitted)
+                        } else {
+                            ownerHandler.createLottery(lotteryDB, submitted)
+                        }
+                        navController.popBackStack(OwnerDestination.HOME.route, inclusive = false)
+                    }
+                )
+            }
             composable<ViewCampsite> {
                 val campsite = campsiteToView
                 if (campsite == null) {
