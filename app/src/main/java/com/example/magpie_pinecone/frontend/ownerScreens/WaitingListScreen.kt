@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,14 +19,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.magpie_pinecone.backend.UserClasses.User
 
 /**
+ * Shows the entrants who joined the waitlist of a campsite lottery.
  * TO-DO
- * Link actual entrant data to loop over
+ * Pass in the selected lottery's real waitlist
  */
 
 @Composable
 fun WaitingListScreen(
+    entrants: List<User>,
     onBack: () -> Boolean
 ) {
     Column(
@@ -54,9 +58,18 @@ fun WaitingListScreen(
                     fontSize = 36.sp
                 )
 
+                // Message when nobody has joined the waitlist
+                if (entrants.isEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(20.dp),
+                        text = "No entrants on the waitlist",
+                        fontSize = 20.sp
+                    )
+                }
+
                 LazyColumn() {
-                    // Single placeholder entrant, change to iterate over list later
-                    item {
+                    // One row per entrant, showing name and email to identify them
+                    items(entrants) { entrant ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -65,10 +78,10 @@ fun WaitingListScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "Entrant",
-                                fontSize = 30.sp
-                            )
+                            Column {
+                                Text(text = entrant.name, fontSize = 30.sp)
+                                Text(text = entrant.email, fontSize = 16.sp)
+                            }
                         }
                     }
                 }
@@ -81,5 +94,5 @@ fun WaitingListScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowWaitingListScreenPreview() {
-    WaitingListScreen({ false })
+    WaitingListScreen(listOf(User(name = "Sample Entrant", email = "sample@email.com")), { false })
 }
