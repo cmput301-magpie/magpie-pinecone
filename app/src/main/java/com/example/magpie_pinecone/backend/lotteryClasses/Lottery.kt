@@ -26,6 +26,7 @@ import java.util.Date
 
 data class Lottery (
     var id: String = "",
+    val ownerId: String = "",
     val campsites: MutableList<Campsite> = mutableListOf<Campsite>(),
     val activeStartDate: Date? = null,
     val activeEndDate: Date? = null,
