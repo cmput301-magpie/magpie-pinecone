@@ -55,7 +55,7 @@ object ViewReservations
 object WaitingList
 
 @Composable
-fun OwnerApp() {
+fun OwnerApp(androidId: String) {
     val navController = rememberNavController()
     val campsiteDB = remember { CampsiteDB() }
     val ownerHandler = remember { OwnerHandler() }
@@ -110,7 +110,7 @@ fun OwnerApp() {
             composable(OwnerDestination.HOME.route) {
                 // Runs every time the home screen is shown
                 LaunchedEffect(Unit) {
-                    campsiteDB.getAllCampsites { campsites = it }
+                    campsiteDB.getCampsitesByOwner(ownerId = androidId) { campsites = it }
                 }
 
                 OwnerHomeScreen(
