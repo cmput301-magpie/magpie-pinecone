@@ -17,7 +17,7 @@ enum class AccountType {
  * @property rulesAccepted Whether this user has confirmed the campsite rules and policies.
  * @constructor Creates a user class.
  */
-class User(
+open class User(
     var id: String = "",
     var name: String = "",
     var email: String = "",

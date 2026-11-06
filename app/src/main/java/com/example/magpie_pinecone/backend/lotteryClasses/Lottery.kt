@@ -2,12 +2,14 @@ package com.example.magpie_pinecone.backend.lotteryClasses
 
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import java.sql.Time
+
+import java.util.Date
 
 
 /**
  * Stores the data associated with a lottery.
  *
+ * @property id The unique id of this lottery
  * @property campsites The campsites associated with this lottery.
  * @property waitlist The waitlist associated with this lottery.
  * @property activeStartDate The date that marks the start of the active period of this lottery.
@@ -22,17 +24,30 @@ import java.sql.Time
  * @constructor Creates a Lottery class
  */
 
-class Lottery (
-    val campsites: List<Campsite>,
-    val activeStartDate: Time,
-    val activeEndDate: Time,
-    val registrationStartDate: Time,
-    val registrationEndDate: Time,
-    val bookingStartDate: Time,
-    val bookingEndDate: Time,
-    val numberOfWinners: Int,
-    val waitlistCapacity: Int? = null
+data class Lottery (
+    var id: String = "",
+    val campsites: MutableList<Campsite> = mutableListOf<Campsite>(),
+    val activeStartDate: Date? = null,
+    val activeEndDate: Date? = null,
+    val registrationStartDate: Date? = null,
+    val registrationEndDate: Date? = null,
+    val bookingStartDate: Date? = null,
+    val bookingEndDate: Date? = null,
+    val numberOfWinners: Int = 1,
+    val waitlistCapacity: Int = 100,
+    var waitlist: MutableList<Entrant> = mutableListOf<Entrant>(),
+    var winners: List<Entrant> = listOf<Entrant>(),
 ) {
-    val waitlist = listOf<Entrant>()
-    val winners = listOf<Entrant>()
+
+    /**
+     * Uses the waitlist attribute to generate the random order of winners, then select the first n (n is the number of winners)
+     * Updates the winners property to reflect the selection
+     */
+    fun generateWinners(): List<Entrant>{
+
+        val randomChoice = waitlist.shuffled().take(numberOfWinners)
+        winners = randomChoice
+        return randomChoice
+
+    }
 }
