@@ -136,6 +136,35 @@ class LotteryDB {
             .addOnFailureListener { onResult(null) }
     }
 
+    /**
+     * Get all lotteries in the Firestore.
+     */
+    fun getAllLotteries(onResult: (List<Lottery>) -> Unit) {
+        lotteriesRef.get()
+            .addOnSuccessListener { snapshot ->
+                onResult(snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Lottery::class.java)?.also { it.id = doc.id }
+                })
+            }
+            .addOnFailureListener { onResult(emptyList()) }
+    }
+
+    /**
+     * Get all lotteries associated with an owner in the Firestore.
+     */
+    fun getLotteriesByOwner(ownerId: String, onResult: (List<Lottery>) -> Unit) {
+        lotteriesRef
+            .whereEqualTo("ownerId", ownerId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val ownerLotteries = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Lottery::class.java)?.also { it.id = doc.id }
+                }
+                onResult(ownerLotteries)
+            }
+            .addOnFailureListener { onResult(emptyList()) }
+    }
+
     fun addEntrant(lottery: Lottery, entrant: Entrant){
 //        Makes a waitlist of entrants subcollection then stores (sets) an entrant
         lotteriesRef.document(lottery.id).collection("waitlistEntrants").document(entrant.id).set(entrant)
