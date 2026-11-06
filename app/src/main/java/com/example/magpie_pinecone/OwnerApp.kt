@@ -30,6 +30,8 @@ import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
 import kotlinx.serialization.Serializable
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -61,11 +63,16 @@ fun OwnerApp(androidId: String) {
     val navController = rememberNavController()
     val campsiteDB = remember { CampsiteDB() }
     val ownerHandler = remember { OwnerHandler() }
+    val reservationDB = remember { ReservationDB() }
 
     // null = creating a new campsite, not null = editing existing campsite
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
     var campsiteToView by remember { mutableStateOf<Campsite?>(null) }
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
+
+    // Reservation Variables
+    var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+
     val userDB = remember { UserDB() }
     // IDs of the entrants on the waitlist being viewed, and the users loaded from them
     var waitlistIds by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -188,7 +195,19 @@ fun OwnerApp(androidId: String) {
                     )
                 }
             }
-            composable<ViewReservations> { ViewReservationsScreen() }
+            composable<ViewReservations> {
+                // Grab active reservations everytime view reservations is loaded
+                LaunchedEffect(Unit) {
+                    reservationDB.getActiveReservationsByOwner(ownerID = androidId) {
+                        activeReservations = it
+                    }
+                }
+
+                ViewReservationsScreen(
+                    activeReservations = activeReservations,
+                    campsiteDB = campsiteDB
+                )
+            }
             composable<WaitingList> {
                 // Load the users on the waitlist each time this screen is shown
                 LaunchedEffect(Unit) {

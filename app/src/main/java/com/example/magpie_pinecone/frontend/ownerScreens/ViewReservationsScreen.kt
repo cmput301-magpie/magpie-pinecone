@@ -22,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 
 /**
  * TO-DO
@@ -30,7 +33,10 @@ import androidx.compose.ui.unit.sp
  */
 
 @Composable
-fun ViewReservationsScreen() {
+fun ViewReservationsScreen(
+    activeReservations: List<Reservation>,
+    campsiteDB: CampsiteDB
+) {
     // Tab Navigation
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("Active", "Past", "Cancelled")
@@ -69,7 +75,7 @@ fun ViewReservationsScreen() {
 
         // Body, depending on the tab
         when (selectedTabIndex) {
-            0 -> ActiveReservations()
+            0 -> ActiveReservations(activeReservations, campsiteDB)
             1 -> PastReservations()
             2 -> CancelledReservations()
         }
@@ -77,24 +83,33 @@ fun ViewReservationsScreen() {
 }
 
 @Composable
-fun ActiveReservations() {
+fun ActiveReservations(
+    activeReservations: List<Reservation>,
+    campsiteDB: CampsiteDB
+) {
     LazyColumn() {
         // Single placeholder campsite, change to iterate over list later
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth().border(width = 1.dp, color = Color.Black).padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Campsite",
-                    fontSize = 30.sp
-                )
-
-                Button(
-                    onClick = {}
+            activeReservations.forEach { reservation ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().border(width = 1.dp, color = Color.Black).padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("View Details")
+                    var campsite: Campsite? = Campsite(name = "Test")
+                    campsiteDB.readCampsite(reservation.campsiteID) { campsite = it }
+
+                    Text(
+                        text = campsite?.name ?: "Campsite",
+                        fontSize = 30.sp
+                    )
+
+                    Button(
+                        onClick = {
+                        }
+                    ) {
+                        Text("View Details")
+                    }
                 }
             }
         }
@@ -154,5 +169,5 @@ fun CancelledReservations() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowViewReservationsScreenPreview() {
-    ViewReservationsScreen()
+    ViewReservationsScreen(listOf(), campsiteDB = CampsiteDB())
 }

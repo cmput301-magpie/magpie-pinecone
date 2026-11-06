@@ -5,6 +5,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
@@ -25,9 +26,11 @@ import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
 import kotlinx.serialization.Serializable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -59,7 +62,9 @@ object EntrantViewReservations
 object EditProfile
 
 @Composable
-fun EntrantApp(onProfileDeleted: () -> Unit) {
+fun EntrantApp(onProfileDeleted: () -> Unit, androidId: String) {
+    val campsiteDB = remember { CampsiteDB() }
+    val reservationDB = remember { ReservationDB() }
     val navController = rememberNavController()
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
@@ -68,6 +73,9 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+
+    // Reservation Variables
+    var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
 
     // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
     // Screen is vertical (i.e. phone screen) -> bottom navbar
@@ -135,7 +143,18 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
             }
             composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
-            composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
+            composable<EntrantViewReservations> {
+                // Grab active reservations everytime view reservations is loaded
+                LaunchedEffect(Unit) {
+                    reservationDB.getActiveReservationsByEntrant(entrantID = androidId) {
+                        activeReservations = it
+                    }
+                }
+                EntrantViewReservationsScreen(
+                    activeReservations = activeReservations,
+                    campsiteDB = campsiteDB
+                )
+            }
             composable<Profile> { ProfileScreen(navController, onProfileDeleted) }
             composable<EditProfile> { EditProfileScreen(navController) }
         }
