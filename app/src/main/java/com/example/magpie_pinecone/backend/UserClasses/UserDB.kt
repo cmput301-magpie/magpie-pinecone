@@ -73,6 +73,26 @@ class UserDB {
     }
 
     /**
+     * Sets the rulesAccepted field of a [user] to the given [accepted] value
+     */
+    fun setRulesAccepted(userID: String, accepted: Boolean) {
+
+        if (userID.isEmpty()) {
+            Log.e("UserDB", "Cannot set rulesAccepted with empty ID")
+            return
+        }
+
+        usersCollection.document(userID)
+            .update("rulesAccepted", accepted)
+            .addOnSuccessListener {
+                Log.d("UserDB", "rulesAccepted set to $accepted for: $userID")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to set rulesAccepted", exception)
+            }
+    }
+
+    /**
      * Fetch a [user] from the database
      */
     fun readUser(
