@@ -12,7 +12,7 @@ class LotteryWinnerHandler {
      * Gives the option for LotteryWinner to reserve or to decline the [lottery].
      * @return The boolean value of reserve or decline
      */
-    fun lotteryDecision(lottery: Lottery): Boolean{
+    fun lotteryDecision(lottery: Lottery, ): Boolean{
         return TODO("Provide the return value")
     }
 

@@ -34,7 +34,7 @@ data class Lottery (
     val bookingEndDate: Timestamp? = null,
     val numberOfWinners: Int? = null,
     val waitlistCapacity: Int? = null,
-    val waitlist: List<Entrant>? = null,
+    val waitlist: List<Entrant> = listOf<Entrant>(),
     val winners: List<Entrant>? = null,
 ) {
 

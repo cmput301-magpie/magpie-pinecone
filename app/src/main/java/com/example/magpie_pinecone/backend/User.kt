@@ -16,6 +16,6 @@ enum class AccountType {
  * @property accountType The type of this user (entrant, owner, or admin).
  * @constructor Creates a user class.
  */
-class User (var id: Int, var name: String, var email: String, var phoneNumber: String, var accountType: AccountType) {
+open class User (var id: String, var name: String, var email: String, var phoneNumber: String, var accountType: AccountType) {
 
 }

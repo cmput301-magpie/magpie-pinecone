@@ -8,7 +8,7 @@ import com.example.magpie_pinecone.backend.entrantClasses.Entrant
  *
  * @property entrant The entrant that won the lottery.
  * @property lottery The lottery that the entrant won in.
- * @property winnerStatus Whether the winner has accepted the lottery reservation.
+ * @property winnerStatus Whether the winner has accepted (or rejected) the lottery reservation.
  * @property campsites The list of campsite that the winner won a reservation for.
  */
 

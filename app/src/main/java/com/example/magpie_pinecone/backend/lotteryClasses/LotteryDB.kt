@@ -1,8 +1,12 @@
 package com.example.magpie_pinecone.backend.lotteryClasses
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 
 
 /**
@@ -11,16 +15,6 @@ import com.google.firebase.firestore.firestore
  */
 class LotteryDB {
 
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * DOUBLE CHECK IF LOTTERY NEEDS ID
-     */
 
     private val db = Firebase.firestore     // db is the reference to the database
     private val lotteriesRef = db.collection("lotteries")       // lotteriesRef is the collection of lotteries
@@ -42,7 +36,7 @@ class LotteryDB {
                 // get the lottery class
                 val lottery = document.toObject(Lottery::class.java)
 
-                // asssign the fire store id to the lottery and add it to the local list
+                // assign the fire store id to the lottery and add it to the local list
                 if (lottery != null){
                     lottery.id = document.id
                     lotteries.add(lottery)
@@ -60,7 +54,7 @@ class LotteryDB {
     }
 
     /**
-     * Deletes the specified [lottery] based on firestore id from this lottery database. Only attempts deletion if the specified lottery currently exists in this lottery database.
+     * Deletes the specified [lottery] based on Firestore id from this lottery database. Only attempts deletion if the specified lottery currently exists in this lottery database.
      */
     fun deleteLottery(lottery: Lottery): Unit{
         lotteriesRef.document(lottery.id).delete()
@@ -69,14 +63,44 @@ class LotteryDB {
     /**
      * Replaces the specified [lottery]’s details in this lottery database. Only attempts replacement if the specified lottery currently exists in this lottery database.
      */
-    fun updateLottery(lottery: Lottery): Unit{}
+    fun updateLottery(oldLottery: Lottery, updatedLottery: Lottery): Unit{
+        lotteriesRef.document(oldLottery.id).set(updatedLottery)
+    }
 
-    /**
-     * Returns the details of the specified [lottery]
-     * @return The lottery instance.
-     */
-     fun readLottery(lottery: Lottery): String{
-         return ""
-     }
+    fun readLottery(lotteryId: String): Lottery {
+//        code from https://firebase.google.com/docs/firestore/query-data/get-data
 
+        var lottery = Lottery()
+
+//        .get() doesn't directly give the object or the item, so kotlin has a .toObject to convert back for classes
+        lotteriesRef.document(lotteryId).get()
+            .addOnSuccessListener { documentSnapshot ->
+
+//                This line turns it back into an actual object
+                val result = documentSnapshot.toObject<Lottery>()
+
+//                Making sure return is not null
+                if (result != null){
+                    lottery = result
+                }
+
+            }
+
+        return lottery
+    }
+
+    fun addEntrant(lottery: Lottery, entrant: Entrant){
+//        Makes a waitlist of entrants subcollection then stores (sets) an entrant
+        lotteriesRef.document(lottery.id).collection("waitlistEntrants").document(entrant.id).set(entrant)
+    }
+
+    fun removeEntrant(lottery: Lottery, entrant: Entrant){
+        lotteriesRef.document(lottery.id).collection("waitlistEntrants").document(entrant.id).delete()
+    }
+
+    fun viewEntrants(lotteryId: String): List<Entrant>{
+        val lottery = readLottery(lotteryId)
+
+        return lottery.waitlist
+    }
 }

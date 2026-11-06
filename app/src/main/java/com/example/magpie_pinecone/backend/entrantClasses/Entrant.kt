@@ -1,5 +1,7 @@
 package com.example.magpie_pinecone.backend.entrantClasses
 
+import com.example.magpie_pinecone.backend.AccountType
+import com.example.magpie_pinecone.backend.User
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 
 /**
@@ -11,8 +13,12 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
  * @constructor Creates an Entrant class.
  */
 class Entrant (
+    id: String = "",
+    name: String = "",
+    email: String = "",
+    phoneNumber: String = "",
     var activeReservations: List<Reservation>,
     var pastReservations: List<Reservation>,
     var notifOptOut: Boolean,
-) {
+): User(id, name, email, phoneNumber, accountType = AccountType.Entrant) {
 }
