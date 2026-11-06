@@ -167,7 +167,7 @@ class ReservationDB {
         val currentDate = Date()
 
         reservationCollection
-            .whereEqualTo("ownerID", entrantID)
+            .whereEqualTo("entrantID", entrantID)
             .whereLessThan("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
@@ -190,7 +190,7 @@ class ReservationDB {
         val currentDate = Date()
 
         reservationCollection
-            .whereEqualTo("ownerID", entrantID)
+            .whereEqualTo("entrantID", entrantID)
             .whereGreaterThanOrEqualTo("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->

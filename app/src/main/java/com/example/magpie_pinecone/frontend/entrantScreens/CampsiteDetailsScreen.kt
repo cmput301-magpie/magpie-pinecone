@@ -35,6 +35,7 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 fun CampsiteDetailsScreen(
     campsite: Campsite,
     onBack: () -> Unit,
+    onSubmit: () -> Unit = {},
     isWinner: Boolean = false,
     onReserve: () -> Unit = {}
 ) {
@@ -204,6 +205,15 @@ fun CampsiteDetailsScreen(
                 onClick = { }
             ) {
                 Text("Enter Lottery")
+            }
+            // Lottery functionality will be connected later
+                ExtendedFloatingActionButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 70.dp),
+                    onClick = { }
+                ) {
+                    Text("Enter Lottery")
             }
 
             // Only lottery winners can go on to reserve dates
