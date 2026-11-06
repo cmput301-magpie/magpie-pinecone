@@ -86,22 +86,41 @@ class CampsiteDB {
                 Log.e("CampsiteDB", "Failed to read campsite", exception)
                 onResult(null)
             }}
-/**
- * Fetches all campsites from the database
- */
-fun getAllCampsites(
-    onResult: (List<Campsite>) -> Unit
-) {
-    campsitesCollection.get()
-        .addOnSuccessListener { snapshot ->
+    /**
+     * Fetches all campsites from the database
+     */
+    fun getAllCampsites(
+        onResult: (List<Campsite>) -> Unit
+    ) {
+        campsitesCollection.get()
+            .addOnSuccessListener { snapshot ->
 
-            val campsites = snapshot.documents.mapNotNull { document ->
-                document.toObject(Campsite::class.java)
+                val campsites = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Campsite::class.java)
+                }
+
+                onResult(campsites)
             }
+    }
 
-            onResult(campsites)
-        }
+    /**
+     * Fetches campsites by a specified [ownerId] from the database
+     */
+    fun getCampsitesByOwner(
+        ownerId: String,
+        onResult: (List<Campsite>) -> Unit
+    ) {
+        campsitesCollection
+            .whereEqualTo("ownerId", ownerId)
+            .get()
+            .addOnSuccessListener { snapshot ->
 
+                val campsites = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Campsite::class.java)
+                }
 
-}}
+                onResult(campsites)
+            }
+    }
+}
 
