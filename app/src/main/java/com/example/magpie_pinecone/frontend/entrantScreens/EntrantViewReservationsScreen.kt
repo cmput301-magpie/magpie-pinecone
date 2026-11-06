@@ -12,6 +12,7 @@ import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,6 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import android.provider.Settings
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -43,7 +47,10 @@ import java.util.Locale
  */
 
 @Composable
-fun EntrantViewReservationsScreen(onCancelled: () -> Unit = {}) {
+fun EntrantViewReservationsScreen(
+    activeReservations: List<Reservation>,
+    campsiteDB: CampsiteDB,
+    onCancelled: () -> Unit = {}) {
     // Tab Navigation
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("Active", "Past")
@@ -82,7 +89,7 @@ fun EntrantViewReservationsScreen(onCancelled: () -> Unit = {}) {
 
         // Body, depending on the tab
         when (selectedTabIndex) {
-            0 -> ActiveEntrantReservations(onCancelled)
+            0 -> ActiveEntrantReservations(activeReservations, campsiteDB, onCancelled)
             1 -> PastEntrantReservations()
         }
 
@@ -90,7 +97,10 @@ fun EntrantViewReservationsScreen(onCancelled: () -> Unit = {}) {
 }
 
 @Composable
-fun ActiveEntrantReservations(onCancelled: () -> Unit) {
+fun ActiveEntrantReservations(
+    activeReservations: List<Reservation>,
+    campsiteDB: CampsiteDB,
+    onCancelled: () -> Unit) {
     val reservationDB = remember { ReservationDB() }
     // Android ID is the user's ID (same as ProfileScreen)
     val context = LocalContext.current
@@ -131,7 +141,20 @@ fun ActiveEntrantReservations(onCancelled: () -> Unit) {
                 Button(
                     onClick = { selectedReservation = reservation }
                 ) {
-                    Text("Cancel")
+                    var campsite: Campsite? = Campsite(name = "Test")
+                    campsiteDB.readCampsite(reservation.campsiteID) { campsite = it }
+
+                    Text(
+                        text = campsite?.name ?: "Campsite",
+                        fontSize = 30.sp
+                    )
+
+                    Button(
+                        onClick = {
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             }
         }
@@ -188,5 +211,5 @@ fun PastEntrantReservations() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowEntrantViewReservationsScreenPreview() {
-    EntrantViewReservationsScreen()
+    EntrantViewReservationsScreen(listOf(), CampsiteDB())
 }

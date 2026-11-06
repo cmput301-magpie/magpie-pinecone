@@ -30,6 +30,8 @@ import androidx.compose.runtime.setValue
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 import com.example.magpie_pinecone.backend.entrantClasses.EntrantHandler
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
@@ -78,6 +80,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val userDB = remember { UserDB() }
     val campsiteDB = remember { CampsiteDB() }
     val lotteryDB = remember { LotteryDB() }
+    val reservationDB = remember { ReservationDB() }
     val entrantHandler = remember { EntrantHandler() }
 
     var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
@@ -85,6 +88,9 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+
+    // Reservation Variables
+    var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
 
     // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
     // Screen is vertical (i.e. phone screen) -> bottom navbar
@@ -208,7 +214,15 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 CampsiteResultScreen({ navController.popBackStack() }, title = resultTitle, message = resultMessage)
             }
             composable<EntrantViewReservations> {
+              // Grab active reservations everytime view reservations is loaded
+                LaunchedEffect(Unit) {
+                    reservationDB.getActiveReservationsByEntrant(entrantID = androidId) {
+                        activeReservations = it
+                    }
+                }
                 EntrantViewReservationsScreen(
+                    activeReservations = activeReservations,
+                    campsiteDB = campsiteDB,
                     onCancelled = {
                         resultTitle = "Campsite Cancelled"
                         resultMessage = "Your reservation was cancelled."
