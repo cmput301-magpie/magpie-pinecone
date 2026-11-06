@@ -36,7 +36,8 @@ fun CampsiteDetailsScreen(
     campsite: Campsite,
     onBack: () -> Unit,
     isWinner: Boolean = false,
-    onReserve: () -> Unit = {}
+    onReserve: () -> Unit = {},
+    onSubmit: () -> Unit
 ) {
     Column(
         modifier = Modifier
