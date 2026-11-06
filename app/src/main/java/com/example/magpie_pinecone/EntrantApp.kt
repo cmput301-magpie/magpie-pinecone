@@ -35,8 +35,6 @@ import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 import com.example.magpie_pinecone.backend.entrantClasses.EntrantHandler
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
-import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
-import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 
 
 /**
@@ -75,6 +73,9 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
     }
+    // What the result screen should say (reserved or cancelled)
+    var resultTitle by remember { mutableStateOf("Campsite Reserved") }
+    var resultMessage by remember { mutableStateOf("") }
 
     val userDB = remember { UserDB() }
     val campsiteDB = remember { CampsiteDB() }
@@ -194,12 +195,26 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             }
                         }
                     )
+
+
                 }
             }
-            composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }, campsiteId = selectedCampsite?.ID ?: "") }
-            composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
+            composable<CampsiteReserve> {
+                CampsiteReserveScreen(
+                    onBack = { navController.popBackStack() },
+                    campsiteId = selectedCampsite?.ID ?: "",
+                    onReserved = {
+                        resultTitle = "Campsite Reserved"
+                        resultMessage = "Your reservation was placed successfully!"
+                        navController.navigate(CampsiteResult)
+                    }
+                )
+            }
+            composable<CampsiteResult> {
+                CampsiteResultScreen({ navController.popBackStack() }, title = resultTitle, message = resultMessage)
+            }
             composable<EntrantViewReservations> {
-                // Grab active reservations everytime view reservations is loaded
+              // Grab active reservations everytime view reservations is loaded
                 LaunchedEffect(Unit) {
                     reservationDB.getActiveReservationsByEntrant(entrantID = androidId) {
                         activeReservations = it
@@ -207,10 +222,15 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 }
                 EntrantViewReservationsScreen(
                     activeReservations = activeReservations,
-                    campsiteDB = campsiteDB
+                    campsiteDB = campsiteDB,
+                    onCancelled = {
+                        resultTitle = "Campsite Cancelled"
+                        resultMessage = "Your reservation was cancelled."
+                        navController.navigate(CampsiteResult)
+                    }
                 )
             }
-            composable<Profile> { ProfileScreen(navController, onProfileDeleted) }
+            composable(EntrantDestination.PROFILE.route) { ProfileScreen(navController, onProfileDeleted) }
             composable<EditProfile> { EditProfileScreen(navController) }
         }
     }

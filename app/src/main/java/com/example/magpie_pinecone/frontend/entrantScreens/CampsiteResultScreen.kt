@@ -30,7 +30,9 @@ import com.example.magpie_pinecone.R
 
 @Composable
 fun CampsiteResultScreen(
-    onBack: () -> Boolean
+    onBack: () -> Boolean,
+    title: String = "Campsite Reserved/Cancelled",
+    message: String = ""
 ) {
     Column(
         modifier = Modifier
@@ -57,9 +59,17 @@ fun CampsiteResultScreen(
                 // Title
                 Text(
                     modifier = Modifier.padding(20.dp),
-                    text = "Campsite Reserved/Cancelled",
+                    text = title,
                     fontSize = 36.sp
                 )
+                // Message telling the entrant what happened
+                if (message.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                        text = message,
+                        fontSize = 20.sp
+                    )
+                }
 
                 // Campsite Details
                 Column(

@@ -43,7 +43,8 @@ import java.util.Locale
 @Composable
 fun CampsiteReserveScreen(
     onBack: () -> Boolean,
-    campsiteId: String = ""
+    campsiteId: String = "",
+    onReserved: () -> Unit = {}
 ) {
     var checked by remember { mutableStateOf(false) }
     val userDB = remember { UserDB() }
@@ -133,6 +134,7 @@ fun CampsiteReserveScreen(
                         onClick = {
                             // Record that this user confirmed the rules
                             userDB.setRulesAccepted(androidId, true)
+                            onReserved()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Green
