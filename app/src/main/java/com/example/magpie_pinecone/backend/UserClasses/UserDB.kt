@@ -32,6 +32,25 @@ class UserDB {
                 Log.e("UserDB", "Failed to add user", exception)
             }
     }
+    /**
+     * Deletes a [user] from the database.
+     */
+    fun deleteUser(user: User) {
+
+        if (user.id.isEmpty()) {
+            Log.e("UserDB", "Cannot delete user with empty ID")
+            return
+        }
+
+        usersCollection.document(user.id)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("UserDB", "User deleted: ${user.id}")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to delete user", exception)
+            }
+    }
 
     /**
      * Updates a [user] in the database with the details in the given [User]

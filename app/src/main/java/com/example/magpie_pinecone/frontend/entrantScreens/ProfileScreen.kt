@@ -23,16 +23,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.graphics.Color
+import com.example.magpie_pinecone.EditProfile
 
 /**
  * Displays the entrant's name, email and phone number.
  * Entrants can open the edit profile screen from here.
  *
  * @param navController Controls navigation between entrant screens.
+ * @param onProfileDeleted Called after the entrant's profile has been deleted.
  */
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {}) {
 
     val userDB = remember { UserDB() }
 
@@ -41,6 +47,8 @@ fun ProfileScreen(navController: NavController) {
     val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
     var user by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
+    var showFirstAlert by remember { mutableStateOf(false) }   // Whether the first "delete?" alert is showing
+    var showSecondAlert by remember { mutableStateOf(false) }  // Whether the final "cannot be undone" alert is showing
 
 
     LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
@@ -95,11 +103,73 @@ fun ProfileScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    navController.navigate("editProfile")
+                    navController.navigate(EditProfile)
                 },
                 modifier = Modifier.testTag("editProfileButton") // for testing
             ) {
                 Text("Edit Profile")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Red delete link (US 01.08.01)
+            TextButton(
+                onClick = { showFirstAlert = true },
+                colors = ButtonDefaults.textButtonColors(contentColor = Color.Red),
+                modifier = Modifier.testTag("deleteProfileButton") // for testing
+            ) {
+                Text("Delete Profile")
+            }
+
+            // First alert: ask if they really want to delete
+            if (showFirstAlert) {
+                AlertDialog(
+                    onDismissRequest = { showFirstAlert = false },
+                    title = { Text("Delete profile?") },
+                    text = { Text("Are you sure you want to delete your profile?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showFirstAlert = false
+                                showSecondAlert = true
+                            },
+                            modifier = Modifier.testTag("firstDeleteConfirmButton") // for testing
+                        ) {
+                            Text("Yes, delete")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showFirstAlert = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
+            // Second alert: warn that deleting can not be undone
+            if (showSecondAlert) {
+                AlertDialog(
+                    onDismissRequest = { showSecondAlert = false },
+                    title = { Text("This cannot be undone") },
+                    text = { Text("Deleting your profile is permanent. All of your profile information will be lost.") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showSecondAlert = false
+                                userDB.deleteUser(currentUser)
+                                onProfileDeleted()
+                            },
+                            modifier = Modifier.testTag("secondDeleteConfirmButton") // for testing
+                        ) {
+                            Text("Delete forever")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showSecondAlert = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }

@@ -50,8 +50,11 @@ object Profile
 @Serializable
 object EntrantViewReservations
 
+@Serializable
+object EditProfile
+
 @Composable
-fun EntrantApp() {
+fun EntrantApp(onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
@@ -104,8 +107,8 @@ fun EntrantApp() {
             composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
             composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
-            composable("profile") { ProfileScreen(navController) }
-            composable("editProfile") { EditProfileScreen(navController) }
+            composable<Profile> { ProfileScreen(navController, onProfileDeleted) }
+            composable<EditProfile> { EditProfileScreen(navController) }
         }
     }
 }
