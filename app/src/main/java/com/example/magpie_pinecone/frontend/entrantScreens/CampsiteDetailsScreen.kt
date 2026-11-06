@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -22,16 +23,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.R
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 
 /**
- * Display's Campsite Details
- * TO-DO
- * Link to actual campsite data
+ * Displays campsite details.
+ *
+ * @param campsite The campsite whose information is being displayed.
+ * @param onBack Returns to the previous screen.
  */
-
 @Composable
 fun CampsiteDetailsScreen(
-    onBack: () -> Boolean
+    campsite: Campsite,
+    onBack: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -45,7 +48,7 @@ fun CampsiteDetailsScreen(
         ) {
             Button(
                 modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack() }
+                onClick = onBack
             ) {
                 Text("<--")
             }
@@ -55,56 +58,64 @@ fun CampsiteDetailsScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
+                // Campsite name
                 Text(
                     modifier = Modifier.padding(20.dp),
-                    text = "Campsite",
+                    text = campsite.name,
                     fontSize = 36.sp,
                     textAlign = TextAlign.Center
                 )
 
-                // Campsite Details
+                // Campsite details
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(vertical = 10.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    // Max Cap.
-                    Row() {
+                    // Maximum occupancy
+                    Row {
                         Text(
-                            text = "Max Capacity: 5",
+                            text = "Max Capacity: ${campsite.maxOccupancy}",
                             fontSize = 16.sp
                         )
                     }
 
-                    // Price and Rating
+                    // Price and rating
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "$38",
+                            text = "\$${campsite.price}",
                             fontSize = 16.sp
                         )
 
                         Text(
-                            text = "Rating: 5.0",
+                            text = "Rating: ${campsite.rating}",
                             fontSize = 16.sp
                         )
                     }
 
-                    // Images
+                    // Campsite image placeholder
                     LazyRow(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp)
                     ) {
                         item {
                             Image(
-                                painter = painterResource(R.drawable.placeholdercampsiteimage),
+                                painter = painterResource(
+                                    R.drawable.placeholdercampsiteimage
+                                ),
                                 contentDescription = "Campsite Image"
                             )
                         }
                     }
 
-                    // Details.
+                    // Description
                     Column(
                         modifier = Modifier.padding(vertical = 10.dp)
                     ) {
@@ -117,13 +128,13 @@ fun CampsiteDetailsScreen(
 
                         Text(
                             modifier = Modifier.padding(vertical = 10.dp),
-                            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet tellus bibendum, tristique orci sit amet, ornare neque. Cras mauris nisi, maximus id arcu in, dapibus rutrum urna. Nulla eget felis vel odio semper dapibus non vitae urna. Mauris quis commodo tellus. Ut quis est vulputate massa efficitur laoreet. Quisque ac maximus neque, quis consequat sapien. In non sagittis odio, sit amet ullamcorper dolor.",
+                            text = campsite.description,
                             fontSize = 16.sp
                         )
                     }
 
                     // Tags
-                    Column() {
+                    Column {
                         Text(
                             text = "Tags",
                             fontSize = 16.sp
@@ -134,22 +145,10 @@ fun CampsiteDetailsScreen(
                         LazyRow(
                             modifier = Modifier.padding(vertical = 10.dp)
                         ) {
-                            item {
+                            items(campsite.tags) { tag ->
                                 Text(
                                     modifier = Modifier.padding(horizontal = 10.dp),
-                                    text = "Tag1",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    modifier = Modifier.padding(horizontal = 10.dp),
-                                    text = "Tag2",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    modifier = Modifier.padding(horizontal = 10.dp),
-                                    text = "Tag3",
+                                    text = tag,
                                     fontSize = 16.sp
                                 )
                             }
@@ -157,17 +156,27 @@ fun CampsiteDetailsScreen(
                     }
 
                     // Location
-                    Column(modifier = Modifier.padding(vertical = 10.dp)) {
+                    Column(
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    ) {
                         Text(
                             text = "Location",
                             fontSize = 16.sp
                         )
 
                         HorizontalDivider()
+
+                        Text(
+                            modifier = Modifier.padding(vertical = 10.dp),
+                            text = campsite.location,
+                            fontSize = 16.sp
+                        )
                     }
 
-                    // Rate Campsite.
-                    Row(modifier = Modifier.padding(vertical = 10.dp)) {
+                    // Rating functionality will be implemented separately
+                    Row(
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    ) {
                         Text(
                             text = "Rate this campsite: {rating stuff here}",
                             fontSize = 16.sp
@@ -176,9 +185,12 @@ fun CampsiteDetailsScreen(
                 }
             }
 
+            // Lottery functionality will be connected later
             ExtendedFloatingActionButton(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 70.dp),
-                onClick = {  }
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 70.dp),
+                onClick = { }
             ) {
                 Text("Enter Lottery")
             }
@@ -189,5 +201,16 @@ fun CampsiteDetailsScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowCampsiteDetailsScreenPreview() {
-    CampsiteDetailsScreen({false})
+    CampsiteDetailsScreen(
+        campsite = Campsite(
+            name = "Sample Campsite",
+            location = "Edmonton",
+            maxOccupancy = 5,
+            price = 38.0,
+            rating = 4.5,
+            description = "A sample campsite used for previewing the details screen.",
+            tags = listOf("Forest", "Camping", "Family")
+        ),
+        onBack = { }
+    )
 }

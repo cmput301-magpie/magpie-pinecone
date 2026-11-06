@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -23,6 +24,10 @@ import com.example.magpie_pinecone.frontend.entrantScreens.ProfileScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
 import kotlinx.serialization.Serializable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -56,6 +61,9 @@ object EditProfile
 @Composable
 fun EntrantApp(onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
+    var selectedCampsite by remember {
+        mutableStateOf<Campsite?>(null)
+    }
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -101,9 +109,30 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
             startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
         ) {
             composable(EntrantDestination.HOME.route) { EntrantHomeScreen({ navController.navigate(route = EntrantViewReservations) }) }
-            composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }
             composable<AppPolicyGuidelines> { AppPolicyGuidelinesScreen({ navController.popBackStack() }) }
-            composable<CampsiteDetails> { CampsiteDetailsScreen({ navController.popBackStack() }) }
+            composable(EntrantDestination.SEARCH.route) {
+                SearchCampsiteScreen(
+                    navController = navController,
+                    onCampsiteClick = { campsite ->
+                        selectedCampsite = campsite
+                        navController.navigate(CampsiteDetails)
+                    }
+                )
+            }
+            composable<CampsiteDetails> {
+                val campsite = selectedCampsite
+
+                if (campsite != null) {
+                    CampsiteDetailsScreen(
+                        campsite = campsite,
+                        onBack = {
+                            if (!navController.popBackStack()) {
+                                navController.navigate(EntrantDestination.SEARCH.route)
+                            }
+                        }
+                    )
+                }
+            }
             composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
             composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
