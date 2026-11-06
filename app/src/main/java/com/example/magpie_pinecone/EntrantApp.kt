@@ -31,7 +31,7 @@ enum class EntrantDestination(
 }
 
 @Composable
-fun EntrantApp() {
+fun EntrantApp(onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
@@ -79,7 +79,7 @@ fun EntrantApp() {
         ) {
             composable(EntrantDestination.HOME.route) { EntrantHomeScreen(navController) }
             composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }
-            composable("profile") { ProfileScreen(navController) }
+            composable("profile") { ProfileScreen(navController, onProfileDeleted) }
             composable("editProfile") { EditProfileScreen(navController) }
         }
     }
