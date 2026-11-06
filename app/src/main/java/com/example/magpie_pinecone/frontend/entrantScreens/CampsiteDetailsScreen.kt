@@ -12,12 +12,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+/**
+ * Display's Campsite Details
+ * TO-DO
+ *
+ */
+
 @Composable
-fun ViewCampsiteScreen(navController: NavController) {
+fun CampsiteDetailsScreen(navController: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
@@ -41,4 +48,10 @@ fun ViewCampsiteScreen(navController: NavController) {
 
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ShowCampsiteDetailsScreenPreview() {
+    CampsiteDetailsScreen({})
 }
