@@ -5,6 +5,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,7 @@ fun OwnerApp() {
 
     // null = creating a new campsite, not null = editing existing campsite
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
+    var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -106,18 +108,21 @@ fun OwnerApp() {
             startDestination = OwnerDestination.HOME.route  // The first screen is set to HOME.
         ) {
             composable(OwnerDestination.HOME.route) {
+                // Runs every time the home screen is shown
+                LaunchedEffect(Unit) {
+                    campsiteDB.getAllCampsites { campsites = it }
+                }
+
                 OwnerHomeScreen(
+                    campsites = campsites,
                     onEditLottery = { navController.navigate(route = EditLottery) },
                     onViewWaitlist = { navController.navigate(route = WaitingList) },
                     onCreateCampsite = {
                         campsiteToEdit = null
                         navController.navigate(route = EditCampsite)
                     },
-                    onEditCampsite = {
-                        // Temporary until cards show real campsites. Later we need to change
-                        // onEditCampsite to (Campsite) -> Unit and set campsiteToEdit to the
-                        // corresponding campsite.
-                        campsiteToEdit = Campsite(ID = "some existing campsite doc id")
+                    onEditCampsite = { campsite ->
+                        campsiteToEdit = campsite
                         navController.navigate(route = EditCampsite)
                     },
                     onPreviewCampsite = { navController.navigate(route = ViewCampsite) },
