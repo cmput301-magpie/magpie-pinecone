@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -33,20 +34,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.R
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 
 /**
  * TO-DO
- * Link actual campsite data to loop over and display
  * Link actual lottery data to loop over and display
  */
 
 @Composable
 fun OwnerHomeScreen(
+    campsites: List<Campsite>,
     onEditLottery: () -> Unit,
     onViewWaitlist: () -> Unit,
     // onQRCode: () -> Unit, implement after halfway point
     // onNotifications: () -> Unit, implement after halfway point
-    onEditCampsite: () -> Unit,
+    onEditCampsite: (Campsite) -> Unit,
+    onCreateCampsite: () -> Unit,
     onPreviewCampsite: () -> Unit,
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
@@ -86,8 +89,18 @@ fun OwnerHomeScreen(
 
         // Body, depending on the tab
         when (selectedTabIndex) {
-            0 -> MyLotteries(onEditLottery, onViewWaitlist)
-            1 -> MyCampsites(onEditCampsite, onPreviewCampsite, onDatesBooked, onViewReservations)
+            0 -> MyLotteries(
+                onEditLottery,
+                onViewWaitlist
+            )
+            1 -> MyCampsites(
+                campsites,
+                onEditCampsite,
+                onCreateCampsite,
+                onPreviewCampsite,
+                onDatesBooked,
+                onViewReservations
+            )
         }
     }
 }
@@ -263,184 +276,38 @@ fun MyLotteries(
 // My Campsites Body
 @Composable
 fun MyCampsites(
-    onEditCampsite: () -> Unit,
+    campsites: List<Campsite>,
+    onEditCampsite: (Campsite) -> Unit,
+    onCreateCampsite: () -> Unit,
     onPreviewCampsite: () -> Unit,
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
 ) {
-    // Dropdown Menu Items
-    val menuItems = listOf("Edit", "Preview", "Dates Booked")
-    val menuFunctions = listOf(onEditCampsite, onPreviewCampsite, onDatesBooked)
-
     Box(modifier = Modifier.fillMaxHeight()) {
         LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
-            // For now, just a single card as placeholder, will need to change into loop over all campsites
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth().height(200.dp).padding(10.dp)
-                ) {
-                    Box() {
-                        // Dropdown Menu State
-                        var expanded by remember { mutableStateOf(true) }
-
-                        Row(
-                            modifier = Modifier.fillMaxSize().padding(20.dp),
-                            verticalAlignment = Alignment.Top,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Campsite Details
-                            Column() {
-                                Text(
-                                    text = "Campsite",
-                                    fontSize = 32.sp
-                                )
-
-                                Text(
-                                    text = "Rating: 5",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    text = "Max Capacity: 5",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    text = "$38",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    text = "1234 567 St",
-                                    fontSize = 16.sp
-                                )
-                            }
-
-                            // Placeholder Icon Image
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_favorite),
-                                contentDescription = "Campsite Image"
-                            )
-                        }
-
-                        // Dropdown Menu
-                        Column(modifier = Modifier.align(Alignment.TopEnd)) {
-                            SmallFloatingActionButton(
-                                onClick = {
-                                    expanded = !expanded
-                                }
-                            ) {
-                                Text("...")
-                            }
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                menuItems.zip(menuFunctions).forEach { (title, function) ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = title
-                                            )
-                                        },
-                                        onClick = { function() }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Card(
-                    modifier = Modifier.fillMaxWidth().height(200.dp).padding(10.dp)
-                ) {
-                    Box() {
-                        // Dropdown Menu State
-                        var expanded by remember { mutableStateOf(false) }
-
-                        Row(
-                            modifier = Modifier.fillMaxSize().padding(20.dp),
-                            verticalAlignment = Alignment.Top,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Campsite Details
-                            Column() {
-                                Text(
-                                    text = "Campsite",
-                                    fontSize = 32.sp
-                                )
-
-                                Text(
-                                    text = "Rating: 5",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    text = "Max Capacity: 5",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    text = "$38",
-                                    fontSize = 16.sp
-                                )
-
-                                Text(
-                                    text = "1234 567 St",
-                                    fontSize = 16.sp
-                                )
-                            }
-
-                            // Placeholder Icon Image
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_favorite),
-                                contentDescription = "Campsite Image"
-                            )
-                        }
-
-                        // Dropdown Menu
-                        Column(modifier = Modifier.align(Alignment.TopEnd)) {
-                            SmallFloatingActionButton(
-                                onClick = {
-                                    expanded = !expanded
-                                }
-                            ) {
-                                Text("...")
-                            }
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                menuItems.zip(menuFunctions).forEach { (title, function) ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = title
-                                            )
-                                        },
-                                        onClick = { function() }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+            // For each campsite, display a card with the details
+            items(campsites) { campsite ->
+                CampsiteCard(
+                    campsite = campsite,
+                    menuItems = listOf(
+                        "Edit" to { onEditCampsite(campsite) },
+                        "Preview" to onPreviewCampsite,
+                        "Dates Booked" to onDatesBooked
+                    )
+                )
             }
         }
 
-        // Create Campsite and View Reservations
+        // Floating buttons to add campsite and view campsite reservations
         Column(
             modifier = Modifier.align(Alignment.BottomEnd),
             horizontalAlignment = Alignment.End
-            ) {
+        ) {
             ExtendedFloatingActionButton(
-                onClick = { onEditCampsite() }
+                onClick = { onCreateCampsite() }
             ) {
                 Text("+ Campsite")
             }
-
             ExtendedFloatingActionButton(
                 modifier = Modifier.padding(top = 10.dp),
                 onClick = { onViewReservations() }
@@ -451,8 +318,76 @@ fun MyCampsites(
     }
 }
 
+@Composable
+fun CampsiteCard(
+    campsite: Campsite,
+    menuItems: List<Pair<String, () -> Unit>>
+) {
+    var expanded by remember { mutableStateOf(false) }  // Start dropdown menu collapsed
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(10.dp)
+    ) {
+        Box {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(text = campsite.name.ifBlank { "Unnamed campsite" }, fontSize = 32.sp)
+                    Text(text = "Rating: ${campsite.rating}", fontSize = 16.sp)
+                    Text(text = "Max Occupancy: ${campsite.maxOccupancy}", fontSize = 16.sp)
+                    Text(text = $$"$ $${campsite.price}", fontSize = 16.sp)
+                    Text(text = campsite.location, fontSize = 16.sp)
+                }
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_favorite),
+                    contentDescription = "Campsite Image"
+                )
+            }
+
+            Column(modifier = Modifier.align(Alignment.TopEnd)) {
+                SmallFloatingActionButton(onClick = { expanded = !expanded }) {
+                    Text("...")
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    menuItems.forEach { (title, action) ->
+                        DropdownMenuItem(
+                            text = { Text(title) },
+                            onClick = {
+                                expanded = false
+                                action()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowOwnerHomeScreenPreview() {
-    OwnerHomeScreen({}, {}, {}, {}, {}, {})
+    OwnerHomeScreen(
+        campsites = emptyList(),
+        onEditLottery = {},
+        onViewWaitlist = {},
+        onEditCampsite = {},
+        onCreateCampsite = {},
+        onPreviewCampsite = {},
+        onDatesBooked = {},
+        onViewReservations = {}
+    )
 }

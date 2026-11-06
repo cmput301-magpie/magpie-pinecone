@@ -13,28 +13,44 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
  */
 class OwnerHandler() {
     /**
-     * Creates a campsite with properties defined by the Owner.
+     * Adds a campsite with properties defined by the Owner into the provided campsite database.
      */
-    fun registerCampsite(campsites: CampsiteDB): Campsite {
-        return TODO("Provide the return value")
+    fun registerCampsite(
+        campsites: CampsiteDB,
+        campsite: Campsite
+    ) {
+        campsites.addCampsite(campsite)
     }
 
     /**
      * Updates the details of a Campsite registered by the Owner.
      */
-    fun updateCampsiteDetails(campsite: Campsite): Unit { TODO() }
+    fun updateCampsiteDetails(
+        campsites: CampsiteDB,
+        campsite: Campsite
+    ) {
+        campsites.updateCampsite(campsite)
+    }
 
     /**
      * Creates a lottery.
      */
-    fun createLottery(campsites: List<Campsite>,lotteries: LotteryDB): Lottery {
-        return TODO("Provide the return value")
+    fun createLottery(
+        lotteries: LotteryDB,
+        lottery: Lottery
+    ) {
+        lotteries.addLottery(lottery)
     }
 
     /**
      * Updates a lottery created by the Owner.
      */
-    fun updateLottery(lottery: Lottery): Unit { TODO() }
+    fun updateLottery(
+        lotteries: LotteryDB,
+        lottery: Lottery,
+    ) {
+        lotteries.updateLottery(lottery)
+    }
 
     /**
      * Rejects a Reservation made by an Entrant.
