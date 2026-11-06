@@ -47,6 +47,7 @@ fun OwnerHomeScreen(
     // onQRCode: () -> Unit, implement after halfway point
     // onNotifications: () -> Unit, implement after halfway point
     onEditCampsite: () -> Unit,
+    onCreateCampsite: () -> Unit,
     onPreviewCampsite: () -> Unit,
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
@@ -87,7 +88,7 @@ fun OwnerHomeScreen(
         // Body, depending on the tab
         when (selectedTabIndex) {
             0 -> MyLotteries(onEditLottery, onViewWaitlist)
-            1 -> MyCampsites(onEditCampsite, onPreviewCampsite, onDatesBooked, onViewReservations)
+            1 -> MyCampsites(onEditCampsite, onCreateCampsite, onPreviewCampsite, onDatesBooked, onViewReservations)
         }
     }
 }
@@ -264,6 +265,7 @@ fun MyLotteries(
 @Composable
 fun MyCampsites(
     onEditCampsite: () -> Unit,
+    onCreateCampsite: () -> Unit,
     onPreviewCampsite: () -> Unit,
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
@@ -436,7 +438,7 @@ fun MyCampsites(
             horizontalAlignment = Alignment.End
             ) {
             ExtendedFloatingActionButton(
-                onClick = { onEditCampsite() }
+                onClick = { onCreateCampsite() }
             ) {
                 Text("+ Campsite")
             }
@@ -454,5 +456,5 @@ fun MyCampsites(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowOwnerHomeScreenPreview() {
-    OwnerHomeScreen({}, {}, {}, {}, {}, {})
+    OwnerHomeScreen({}, {}, {}, {}, {}, {}, {})
 }

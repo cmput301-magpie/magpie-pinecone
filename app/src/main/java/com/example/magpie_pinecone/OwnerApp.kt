@@ -6,6 +6,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -13,6 +16,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
 import com.example.magpie_pinecone.frontend.ownerScreens.DatesBookedScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.EditCampsiteScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.EditLotteryScreen
@@ -50,6 +56,11 @@ object WaitingList
 @Composable
 fun OwnerApp() {
     val navController = rememberNavController()
+    val campsiteDB = remember { CampsiteDB() }
+    val ownerHandler = remember { OwnerHandler() }
+
+    // null = creating a new campsite, not null = editing existing campsite
+    var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -96,15 +107,48 @@ fun OwnerApp() {
         ) {
             composable(OwnerDestination.HOME.route) {
                 OwnerHomeScreen(
-                    { navController.navigate(route = EditLottery) },
-                    { navController.navigate(route = WaitingList) },
-                    { navController.navigate(route = EditCampsite) },
-                    { navController.navigate(route = ViewCampsite) },
-                    { navController.navigate(route = DatesBooked) },
-                    { navController.navigate(route = ViewReservations) })
+                    onEditLottery = { navController.navigate(route = EditLottery) },
+                    onViewWaitlist = { navController.navigate(route = WaitingList) },
+                    onCreateCampsite = {
+                        campsiteToEdit = null
+                        navController.navigate(route = EditCampsite)
+                    },
+                    onEditCampsite = {
+                        // Temporary until cards show real campsites. Later we need to change
+                        // onEditCampsite to (Campsite) -> Unit and set campsiteToEdit to the
+                        // corresponding campsite.
+                        campsiteToEdit = Campsite(ID = "some existing campsite doc id")
+                        navController.navigate(route = EditCampsite)
+                    },
+                    onPreviewCampsite = { navController.navigate(route = ViewCampsite) },
+                    onDatesBooked = { navController.navigate(route = DatesBooked) },
+                    onViewReservations = { navController.navigate(route = ViewReservations) }
+                )
             }
             composable<DatesBooked> { DatesBookedScreen({ navController.popBackStack() }) }
-            composable<EditCampsite> { EditCampsiteScreen({ navController.popBackStack() }) }
+            composable<EditCampsite> {
+                val existing = campsiteToEdit
+                val isEdit = existing != null
+
+                // remember so the same object is used across recompositions
+                val campsite = remember {
+                    existing ?: Campsite()
+                }
+
+                EditCampsiteScreen(
+                    isEdit = isEdit,
+                    campsite = campsite,
+                    onBack = { navController.popBackStack() },
+                    onSubmit = { submitted ->
+                        if (isEdit) {
+                            ownerHandler.updateCampsiteDetails(campsiteDB, submitted)
+                        } else {
+                            ownerHandler.registerCampsite(campsiteDB, submitted)
+                        }
+                        navController.popBackStack()
+                    }
+                )
+            }
             composable<EditLottery> { EditLotteryScreen({ navController.popBackStack() }) }
             composable<ViewCampsite> { ViewCampsiteScreen({ navController.popBackStack() }) }
             composable<ViewReservations> { ViewReservationsScreen() }
