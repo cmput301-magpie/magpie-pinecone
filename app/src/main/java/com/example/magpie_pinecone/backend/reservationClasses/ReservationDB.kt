@@ -32,10 +32,19 @@ class ReservationDB {
     }
 
     /**
-     * Deletes the specified [reservation] from this reservation database. Only attempts deletion if the specified reservation currently exists in the lottery database.
+     * Deletes the specified [reservation] from this reservation database. Only attempts deletion if the specified reservation currently exists in the reservation database.
      */
     fun deleteReservation(reservation: Reservation) {
+        if (reservation.ID.isEmpty()) {
+            Log.e("ReservationDB", "Cannot delete reservation with empty ID")
+            return
+        }
 
+        reservationCollection.document(reservation.ID)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("ReservationDB", "Reservation deleted: ${reservation.ID}")
+            }
     }
 
     /**
