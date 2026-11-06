@@ -1,6 +1,5 @@
 package com.example.magpie_pinecone
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.magpie_pinecone.frontend.NewUserApp
-import com.example.magpie_pinecone.frontend.WelcomeScreen
+import com.example.magpie_pinecone.frontend.userScreens.NewUserApp
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -53,7 +51,7 @@ fun PineconeApp(androidId: String) {
 
     when (state) {
         StartState.LOADING -> Box(Modifier.fillMaxSize())  // Empty screen while awaiting Firestore search
-        StartState.NONE -> NewUserApp(onUserSignedUp = { })
+        StartState.NONE -> NewUserApp(onUserSignedUp = { state = StartState.LOADING })
         StartState.ENTRANT -> EntrantApp()
         StartState.OWNER -> OwnerApp()
         StartState.ERROR -> Column(  // Display simple page notifying user of error, with a button to try searching again.
