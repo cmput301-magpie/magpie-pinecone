@@ -28,7 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import java.text.SimpleDateFormat
 import java.util.Locale
-
+import androidx.compose.foundation.clickable
 /**
  * Displays a list of campsites that entrants can search through.
  *
@@ -36,7 +36,10 @@ import java.util.Locale
  */
 
 @Composable
-fun SearchCampsiteScreen(navController: NavController) {
+fun SearchCampsiteScreen(
+    navController: NavController,
+    onCampsiteClick: (Campsite) -> Unit
+) {
 
     val campsiteDB = remember { CampsiteDB() } // Stores the campsites fetched from the campsite database
 
@@ -62,9 +65,8 @@ fun SearchCampsiteScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .statusBarsPadding()
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Text(
             text = "Search Campsites",
@@ -151,6 +153,9 @@ fun SearchCampsiteScreen(navController: NavController) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable {
+                            onCampsiteClick(campsite)
+                        }
                         .padding(vertical = 8.dp)
                 ) {
                     Text(
