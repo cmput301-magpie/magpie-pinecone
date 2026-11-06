@@ -50,7 +50,7 @@ fun OwnerHomeScreen(
     // onNotifications: () -> Unit, implement after halfway point
     onEditCampsite: (Campsite) -> Unit,
     onCreateCampsite: () -> Unit,
-    onPreviewCampsite: () -> Unit,
+    onPreviewCampsite: (Campsite) -> Unit,
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
 ) {
@@ -279,7 +279,7 @@ fun MyCampsites(
     campsites: List<Campsite>,
     onEditCampsite: (Campsite) -> Unit,
     onCreateCampsite: () -> Unit,
-    onPreviewCampsite: () -> Unit,
+    onPreviewCampsite: (Campsite) -> Unit,
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
 ) {
@@ -291,7 +291,7 @@ fun MyCampsites(
                     campsite = campsite,
                     menuItems = listOf(
                         "Edit" to { onEditCampsite(campsite) },
-                        "Preview" to onPreviewCampsite,
+                        "Preview" to { onPreviewCampsite(campsite) },
                         "Dates Booked" to onDatesBooked
                     )
                 )

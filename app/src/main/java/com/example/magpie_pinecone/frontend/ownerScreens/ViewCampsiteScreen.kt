@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 
 /**
  * TO-DO
@@ -24,15 +25,19 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ViewCampsiteScreen(
-    onBack: () -> Boolean
+    campsite: Campsite,
+    onBack: () -> Boolean,
+    onEdit: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             Button(
                 modifier = Modifier.align(Alignment.TopStart),
                 onClick = { onBack() }
@@ -60,27 +65,32 @@ fun ViewCampsiteScreen(
 
                 // Campsite Details
                 Text(
-                    text = "Name",
+                    text = campsite.name,
                     fontSize = 30.sp
                 )
 
                 Text(
-                    text = "Location",
+                    text = campsite.location,
                     fontSize = 30.sp
                 )
 
                 Text(
-                    text = "Description",
+                    text = $$"$ $${campsite.price}",
                     fontSize = 30.sp
                 )
 
                 Text(
-                    text = "Max Occupancy",
+                    text = campsite.description,
                     fontSize = 30.sp
                 )
 
                 Text(
-                    text = "Tags",
+                    text = "Max Occupancy: ${campsite.maxOccupancy}",
+                    fontSize = 30.sp
+                )
+
+                Text(
+                    text = "Tags: ${campsite.tags.joinToString(", ")}",  // subject to change
                     fontSize = 30.sp
                 )
 
@@ -93,7 +103,7 @@ fun ViewCampsiteScreen(
 
             ExtendedFloatingActionButton(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(100.dp),
-                onClick = { TODO("Edit Campsite") }
+                onClick = onEdit
             ) {
                 Text("Edit Campsite")
             }
@@ -104,5 +114,5 @@ fun ViewCampsiteScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowViewCampsiteScreenPreview() {
-    ViewCampsiteScreen({ false })
+    ViewCampsiteScreen(campsite = Campsite(name = "Test Site"), onBack = { false }, onEdit = {})
 }
