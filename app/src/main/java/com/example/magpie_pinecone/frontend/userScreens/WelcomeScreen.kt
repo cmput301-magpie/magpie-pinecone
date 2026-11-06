@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.frontend
+package com.example.magpie_pinecone.frontend.userScreens
 
 import androidx.compose.foundation.Image
 import com.example.magpie_pinecone.R

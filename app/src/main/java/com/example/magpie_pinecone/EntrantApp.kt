@@ -21,6 +21,7 @@ import com.example.magpie_pinecone.frontend.entrantScreens.EntrantHomeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EntrantViewReservationsScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.ProfileScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
 import kotlinx.serialization.Serializable
 
 /**
@@ -103,7 +104,8 @@ fun EntrantApp() {
             composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
             composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
-            composable<Profile> { ProfileScreen({ navController.popBackStack() }) }
+            composable("profile") { ProfileScreen(navController) }
+            composable("editProfile") { EditProfileScreen(navController) }
         }
     }
 }

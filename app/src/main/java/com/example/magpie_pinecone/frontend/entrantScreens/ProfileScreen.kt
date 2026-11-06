@@ -1,144 +1,106 @@
 package com.example.magpie_pinecone.frontend.entrantScreens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import android.provider.Settings
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.magpie_pinecone.R
+import androidx.navigation.NavController
+import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.backend.UserClasses.UserDB
 
 /**
- * Display's Entrant's Profile
- * TO-DO
- * Implement Delete Profile
- * Implement link to edit profile
- * Implement link to actual entrant data
+ * Displays the entrant's name, email and phone number.
+ * Entrants can open the edit profile screen from here.
+ *
+ * @param navController Controls navigation between entrant screens.
  */
 
 @Composable
-fun ProfileScreen(
-    onBack: () -> Boolean
-) {
+fun ProfileScreen(navController: NavController) {
+
+    val userDB = remember { UserDB() }
+
+    // The user's ID is the device ID, the same one PineconeApp uses
+    val context = LocalContext.current
+    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+
+    var user by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
+
+
+    LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
+    {
+        userDB.readUser(androidId) { fetchedUser ->
+            user = fetchedUser
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
+            .statusBarsPadding()
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Text(
+            text = "Profile",
+            fontSize = 24.sp
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Only show the details once the user has been fetched
+        val currentUser = user
+        if (currentUser == null) {
+            Text("Loading profile...")
+        } else {
+
+            Text(
+                text = "Name",
+                fontSize = 20.sp
+            )
+            Text(currentUser.name)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Email",
+                fontSize = 20.sp
+            )
+            Text(currentUser.email)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Phone",
+                fontSize = 20.sp
+            )
+            Text(currentUser.phoneNumber)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack() }
+                onClick = {
+                    navController.navigate("editProfile")
+                },
+                modifier = Modifier.testTag("editProfileButton") // for testing
             ) {
-                Text("<--")
-            }
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Title
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = "Profile",
-                    fontSize = 36.sp
-                )
-
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Profile Picture
-                    Image(
-                        modifier = Modifier.clip(CircleShape).border(2.dp, Color.Black)
-                            .size(150.dp),
-                        painter = painterResource(R.drawable.squareimageplaceholder),
-                        contentDescription = "Campsite Image"
-                    )
-
-                    // Entrant Details
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 20.dp)
-                    ) {
-                        Text(
-                            text = "Name",
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = "John Doe",
-                            fontSize = 20.sp
-                        )
-
-                        Text(
-                            modifier = Modifier.padding(top = 20.dp),
-                            text = "Email",
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            modifier = Modifier.padding(bottom = 20.dp),
-                            text = "johndoe@gmail.com",
-                            fontSize = 20.sp
-                        )
-
-                        Text(
-                            text = "Phone",
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = "123-456-7890",
-                            fontSize = 20.sp
-                        )
-                    }
-
-                    // Edit Profile Button
-                    Button(
-                        onClick = {}
-                    ) {
-                        Text("Edit Profile")
-                    }
-
-                    // Delete Profile Button
-                    Button(
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
-                        )
-                    ) {
-                        Text("Delete Profile")
-                    }
-
-                }
-
+                Text("Edit Profile")
             }
         }
-
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ShowProfileScreenPreview() {
-    ProfileScreen({ false })
 }

@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.frontend
+package com.example.magpie_pinecone.frontend.userScreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.provider.Settings
+import androidx.compose.ui.platform.LocalContext
+import com.example.magpie_pinecone.backend.UserClasses.AccountType
+import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.backend.UserClasses.UserDB
 
 @Composable
 fun SignupScreen(modifier: Modifier = Modifier, onClickSignUp: () -> Unit) {
@@ -35,6 +40,8 @@ fun SignupScreen(modifier: Modifier = Modifier, onClickSignUp: () -> Unit) {
     var email by remember {mutableStateOf("")}
     var phone by remember {mutableStateOf("")}
     var isOwner by remember {mutableStateOf(false)}
+    val context = LocalContext.current
+    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
     Column(modifier = Modifier.fillMaxSize().padding(30.dp),
         verticalArrangement = Arrangement.spacedBy(36.dp, Alignment.CenterVertically),
@@ -88,12 +95,15 @@ fun SignupScreen(modifier: Modifier = Modifier, onClickSignUp: () -> Unit) {
 
         //Spacer(modifier = Modifier.height(20.dp))
         Button(modifier = Modifier.size(width = 180.dp, height = 60.dp),
-            onClick = onClickSignUp,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF6155f5),
-                contentColor = Color.White
-            ), shape = RoundedCornerShape(8.dp)
-        ) {
+            onClick = {
+                // Entrant or Owner, depending on the switch
+                val accountType = if (isOwner) AccountType.Owner else AccountType.Entrant
+                // The profile screens use one name field, so join first and last name
+                val user = User(androidId, "$firstName $lastName", email, phone, accountType)
+                UserDB().addUser(user)
+                onClickSignUp()
+            },)
+        {
             Text("Sign up", fontSize = 20.sp)
         }
     }
