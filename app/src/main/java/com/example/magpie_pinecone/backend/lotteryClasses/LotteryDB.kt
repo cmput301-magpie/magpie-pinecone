@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.lotteryClasses
 
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.Firebase
@@ -73,43 +74,66 @@ class LotteryDB {
      * Adds a [lottery] to this lottery database.
      */
     fun addLottery(lottery: Lottery): Unit{
-        lotteriesRef.add(lottery)
+        val document = lotteriesRef.document()
+        lottery.id = document.id
+
+            document.set(lottery)
+            .addOnSuccessListener {
+                Log.d("LotteryDB", "Lottery added with ID: ${lottery.id}")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("LotteryDB", "Failed to add lottery", exception)
+            }
     }
 
     /**
      * Deletes the specified [lottery] based on Firestore id from this lottery database. Only attempts deletion if the specified lottery currently exists in this lottery database.
      */
     fun deleteLottery(lottery: Lottery): Unit{
+        if (lottery.id.isEmpty()) {
+            Log.e("LotteryDB", "Cannot delete lottery with empty ID")
+            return
+        }
+
         lotteriesRef.document(lottery.id).delete()
+            .addOnSuccessListener {
+                Log.d("LotteryDB", "Lottery deleted: ${lottery.id}")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("LotteryDB", "Failed to delete lottery", exception)
+            }
     }
 
     /**
-     * Replaces the specified [oldLottery]’s details with [updatedLottery] in this lottery database. Only attempts replacement if the specified lottery currently exists in this lottery database.
+     * Replaces the specified old details with [lottery] in this lottery database. Only attempts replacement if the specified lottery currently exists in this lottery database.
      */
-    fun updateLottery(oldLottery: Lottery, updatedLottery: Lottery): Unit{
-        lotteriesRef.document(oldLottery.id).set(updatedLottery)
+    fun updateLottery(lottery: Lottery): Unit{
+        if (lottery.id.isEmpty()) {
+            Log.e("LotteryDB", "Cannot update lottery with empty ID")
+            return
+        }
+
+        lotteriesRef.document(lottery.id)
+            .set(lottery)
+            .addOnSuccessListener {
+                Log.d("LotteryDB", "Lottery updated: ${lottery.id}")
+            }
     }
 
-    fun readLottery(lotteryId: String): Lottery {
-//        code from https://firebase.google.com/docs/firestore/query-data/get-data
+    fun readLottery(lotteryId: String, onResult: (Lottery?) -> Unit): Unit {
 
-        var lottery = Lottery()
-
-//        .get() doesn't directly give the object or the item, so kotlin has a .toObject to convert back for classes
         lotteriesRef.document(lotteryId).get()
-            .addOnSuccessListener { documentSnapshot ->
+            .addOnSuccessListener { snapshot ->
 
-//                This line turns it back into an actual object
-                val result = documentSnapshot.toObject<Lottery>()
+                // This line turns it back into an actual object
+                val lottery = snapshot.toObject<Lottery>()
+                lottery?.id = snapshot.id
+                onResult(lottery)
 
-//                Making sure return is not null
-                if (result != null){
-                    lottery = result
-                }
 
             }
 
-        return lottery
+            .addOnFailureListener { onResult(null) }
     }
 
     fun addEntrant(lottery: Lottery, entrant: Entrant){
@@ -121,10 +145,18 @@ class LotteryDB {
         lotteriesRef.document(lottery.id).collection("waitlistEntrants").document(entrant.id).delete()
     }
 
-    fun viewEntrants(lotteryId: String): List<Entrant>{
-        val lottery = readLottery(lotteryId)
+    fun viewEntrants(lotteryId: String, onResult: (List<Entrant>) -> Unit): Unit{
+        lotteriesRef.document(lotteryId).collection("waitlistEntrants").get()
 
-        return lottery.waitlist
+            .addOnSuccessListener {snapshot ->
+                val entrants = snapshot.documents.mapNotNull { document -> document.toObject(Entrant::class.java) }
+                onResult(entrants)
+            }
+
+            .addOnFailureListener {exception ->
+                Log.e("LotteryDB", "Failed to read entrants", exception)
+                onResult(emptyList())}
+
     }
 
     /**
