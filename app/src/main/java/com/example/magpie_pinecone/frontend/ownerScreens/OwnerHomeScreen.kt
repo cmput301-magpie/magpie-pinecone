@@ -47,7 +47,7 @@ fun OwnerHomeScreen(
     lotteries: List<Lottery>,
     onEditLottery: (Lottery) -> Unit,
     onCreateLottery: () -> Unit,
-    onViewWaitlist: () -> Unit,
+    onViewWaitlist: (Lottery) -> Unit,
     // onQRCode: () -> Unit, implement after halfway point
     // onNotifications: () -> Unit, implement after halfway point
     onEditCampsite: (Campsite) -> Unit,
@@ -61,7 +61,9 @@ fun OwnerHomeScreen(
     val tabs = listOf("My Lotteries", "My Campsites")
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -115,7 +117,7 @@ fun MyLotteries(
     lotteries: List<Lottery>,
     onEditLottery: (Lottery) -> Unit,
     onCreateLottery: () -> Unit,
-    onViewWaitlist: () -> Unit,
+    onViewWaitlist: (Lottery) -> Unit,
 ) {
     if (lotteries.isEmpty()) {
         Text(
@@ -133,7 +135,7 @@ fun MyLotteries(
                     lottery = lottery,
                     menuItems = listOf(
                         "Edit" to { onEditLottery(lottery) },
-                        "View waitlist" to onViewWaitlist
+                        "View waitlist" to { onViewWaitlist(lottery) }
                     )
                 )
             }
@@ -166,7 +168,9 @@ fun LotteryCard(
     ) {
         Box {
             Row(
-                modifier = Modifier.fillMaxSize().padding(20.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
