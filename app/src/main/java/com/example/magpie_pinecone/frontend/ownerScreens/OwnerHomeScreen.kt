@@ -45,7 +45,8 @@ import java.util.Locale
 fun OwnerHomeScreen(
     campsites: List<Campsite>,
     lotteries: List<Lottery>,
-    onEditLottery: () -> Unit,
+    onEditLottery: (Lottery) -> Unit,
+    onCreateLottery: () -> Unit,
     onViewWaitlist: () -> Unit,
     // onQRCode: () -> Unit, implement after halfway point
     // onNotifications: () -> Unit, implement after halfway point
@@ -93,6 +94,7 @@ fun OwnerHomeScreen(
             0 -> MyLotteries(
                 lotteries,
                 onEditLottery,
+                onCreateLottery,
                 onViewWaitlist
             )
             1 -> MyCampsites(
@@ -111,7 +113,8 @@ fun OwnerHomeScreen(
 @Composable
 fun MyLotteries(
     lotteries: List<Lottery>,
-    onEditLottery: () -> Unit,
+    onEditLottery: (Lottery) -> Unit,
+    onCreateLottery: () -> Unit,
     onViewWaitlist: () -> Unit,
 ) {
     if (lotteries.isEmpty()) {
@@ -129,12 +132,16 @@ fun MyLotteries(
                 LotteryCard(
                     lottery = lottery,
                     menuItems = listOf(
-                        "Edit" to onEditLottery,
+                        "Edit" to { onEditLottery(lottery) },
                         "View waitlist" to onViewWaitlist
                     )
                 )
             }
         }
+        ExtendedFloatingActionButton(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            onClick = { onCreateLottery() }
+        ) { Text("+ Lottery") }
     }
 }
 
@@ -337,6 +344,7 @@ fun ShowOwnerHomeScreenPreview() {
         lotteries = emptyList(),
         campsites = emptyList(),
         onEditLottery = {},
+        onCreateLottery = {},
         onViewWaitlist = {},
         onEditCampsite = {},
         onCreateCampsite = {},

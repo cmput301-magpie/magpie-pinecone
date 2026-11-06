@@ -67,6 +67,8 @@ fun OwnerApp(androidId: String) {
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
     var campsiteToView by remember { mutableStateOf<Campsite?>(null) }
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
+
+    var lotteryToEdit by remember { mutableStateOf<Lottery?>(null) }
     var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
@@ -122,7 +124,10 @@ fun OwnerApp(androidId: String) {
                 OwnerHomeScreen(
                     lotteries = lotteries,
                     campsites = campsites,
-                    onEditLottery = { navController.navigate(route = EditLottery) },
+                    onEditLottery = { lottery ->
+                        lotteryToEdit = lottery
+                        navController.navigate(route = EditLottery)
+                    },
                     onViewWaitlist = { navController.navigate(route = WaitingList) },
                     onCreateCampsite = {
                         campsiteToEdit = null
@@ -169,7 +174,25 @@ fun OwnerApp(androidId: String) {
                     }
                 )
             }
-            composable<EditLottery> { EditLotteryScreen({ navController.popBackStack() }) }
+            composable<EditLottery> {
+                val existing = lotteryToEdit
+                val lottery = remember { existing ?: Lottery() }
+
+                EditLotteryScreen(
+                    isEdit = existing != null,
+                    lottery = lottery,
+                    availableCampsites = campsites,
+                    onBack = { navController.popBackStack() },
+                    onSubmit = { submitted ->
+                        if (existing != null) {
+                            ownerHandler.updateLottery(lotteryDB, submitted)
+                        } else {
+                            ownerHandler.createLottery(lotteryDB, submitted)
+                        }
+                        navController.popBackStack(OwnerDestination.HOME.route, inclusive = false)
+                    }
+                )
+            }
             composable<ViewCampsite> {
                 val campsite = campsiteToView
                 if (campsite == null) {
