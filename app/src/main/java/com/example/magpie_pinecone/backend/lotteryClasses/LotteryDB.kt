@@ -77,7 +77,7 @@ class LotteryDB {
         val document = lotteriesRef.document()
         lottery.id = document.id
 
-            document.set(lottery)
+        document.set(lottery)
             .addOnSuccessListener {
                 Log.d("LotteryDB", "Lottery added with ID: ${lottery.id}")
             }
