@@ -16,6 +16,7 @@ import java.sql.Date
  * @property endDate The end date of this reservation.
  * @property numGuests The number of guests in this reservation.
  * @property termsAndConditions The terms and conditions of this reservation.
+ * @property isCancelled Whether the reservation was cancelled or not
  * @constructor Creates a Reservation.
  */
 class Reservation(
@@ -25,6 +26,7 @@ class Reservation(
     var campsiteID: String = "",
     var startDate: Date,
     var endDate: Date,
-    var numGuests: Int,
-    var termsAndConditions: Boolean
+    var numGuests: Int = 0,
+    var termsAndConditions: Boolean = false,
+    var isCancelled: Boolean = false
 )

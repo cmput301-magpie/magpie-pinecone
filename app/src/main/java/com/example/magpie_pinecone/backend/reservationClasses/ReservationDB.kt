@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.reservationClasses
 
 import android.util.Log
+import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -27,7 +28,7 @@ class ReservationDB {
                 Log.d("ReservationDB", "Successfully added reservation")
             }
             .addOnFailureListener { e ->
-                Log.e("ReservationDB", "Failed to add reservation")
+                Log.e("ReservationDB", "Failed to add reservation", e)
             }
     }
 
@@ -50,7 +51,9 @@ class ReservationDB {
     /**
      * Updates the specified [reservation]'s details in this reservation database. Only attempts replacement if the specified reservation currently exists in the reservation database
      */
-    fun updateReservation(reservation: Reservation) {
+    fun updateReservation(
+        reservation: Reservation
+    ) {
         if (reservation.ID.isEmpty()) {
             Log.e("ReservationDB", "Cannot delete reservation with empty ID")
             return
@@ -67,5 +70,23 @@ class ReservationDB {
      * Gets the reservation with the matching [reservationID] from the database.
      * @return The specified reservation instance.
      */
-    fun readReservation(reservationID: String): Reservation { TODO() }
+    fun readReservation(
+        reservationID: String,
+        onResult: (Reservation?) -> Unit
+    ) {
+        reservationCollection.document(reservationID).get()
+            .addOnSuccessListener { snapshot ->
+
+                if (snapshot.exists()) {
+                    val reservation = snapshot.toObject(Reservation::class.java)
+                    onResult(reservation)
+                } else {
+                    onResult(null)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read reservation", e)
+                onResult(null)
+            }
+    }
 }
