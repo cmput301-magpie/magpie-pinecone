@@ -15,6 +15,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.magpie_pinecone.frontend.entrantScreens.EntrantHomeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.ProfileScreen
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -77,6 +79,8 @@ fun EntrantApp() {
         ) {
             composable(EntrantDestination.HOME.route) { EntrantHomeScreen(navController) }
             composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }
+            composable("profile") { ProfileScreen(navController) }
+            composable("editProfile") { EditProfileScreen(navController) }
         }
     }
 }

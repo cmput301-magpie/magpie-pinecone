@@ -18,10 +18,10 @@ enum class AccountType {
  * @constructor Creates a user class.
  */
 class User(
-    var id: String = "",                                // CHANGE 1: String, not Int
-    var name: String = "",                              // CHANGE 2: every field has a default value
+    var id: String = "",
+    var name: String = "",
     var email: String = "",
     var phoneNumber: String = "",
     var accountType: AccountType = AccountType.Entrant,
-    var rulesAccepted: Boolean = false                  // CHANGE 3: new field for US 02.11.01
+    var rulesAccepted: Boolean = false
 )
