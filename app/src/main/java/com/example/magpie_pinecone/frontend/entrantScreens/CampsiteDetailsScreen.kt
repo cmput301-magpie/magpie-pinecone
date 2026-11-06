@@ -34,7 +34,8 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 @Composable
 fun CampsiteDetailsScreen(
     campsite: Campsite,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onSubmit: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -185,12 +186,12 @@ fun CampsiteDetailsScreen(
                 }
             }
 
-            // Lottery functionality will be connected later
             ExtendedFloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 70.dp),
-                onClick = { }
+                    onClick = onSubmit
+
             ) {
                 Text("Enter Lottery")
             }
@@ -211,6 +212,7 @@ fun ShowCampsiteDetailsScreenPreview() {
             description = "A sample campsite used for previewing the details screen.",
             tags = listOf("Forest", "Camping", "Family")
         ),
-        onBack = { }
+        onBack = { },
+        onSubmit = { }
     )
 }

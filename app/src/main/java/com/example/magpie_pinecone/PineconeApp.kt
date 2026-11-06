@@ -52,7 +52,7 @@ fun PineconeApp(androidId: String) {
     when (state) {
         StartState.LOADING -> Box(Modifier.fillMaxSize())  // Empty screen while awaiting Firestore search
         StartState.NONE -> NewUserApp(onUserSignedUp = { state = StartState.LOADING })
-        StartState.ENTRANT -> EntrantApp(onProfileDeleted = { state = StartState.LOADING })
+        StartState.ENTRANT -> EntrantApp(androidId, onProfileDeleted = { state = StartState.LOADING })
         StartState.OWNER -> OwnerApp(androidId)
         StartState.ERROR -> Column(  // Display simple page notifying user of error, with a button to try searching again.
             modifier = Modifier.fillMaxSize(),
