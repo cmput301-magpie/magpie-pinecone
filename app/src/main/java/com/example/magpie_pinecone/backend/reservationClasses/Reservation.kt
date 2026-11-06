@@ -20,7 +20,7 @@ import java.sql.Date
 class Reservation(
     var entrantID: String = "",
     var ownerID: String = "",
-    var campsiteID: Campsite,
+    var campsiteID: String = "",
     var startDate: Date,
     var endDate: Date,
     var numGuests: Int,
