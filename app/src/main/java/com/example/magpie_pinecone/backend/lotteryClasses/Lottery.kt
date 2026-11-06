@@ -2,7 +2,8 @@ package com.example.magpie_pinecone.backend.lotteryClasses
 
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import com.google.firebase.Timestamp
+
+import java.util.Date
 
 
 /**
@@ -25,20 +26,28 @@ import com.google.firebase.Timestamp
 
 data class Lottery (
     var id: String = "",
-    val campsites: List<Campsite>? = null,
-    val activeStartDate: Timestamp? = null,
-    val activeEndDate: Timestamp? = null,
-    val registrationStartDate: Timestamp? = null,
-    val registrationEndDate: Timestamp? = null,
-    val bookingStartDate: Timestamp? = null,
-    val bookingEndDate: Timestamp? = null,
-    val numberOfWinners: Int? = null,
-    val waitlistCapacity: Int? = null,
-    val waitlist: List<Entrant> = listOf<Entrant>(),
-    val winners: List<Entrant>? = null,
+    val campsites: MutableList<Campsite> = mutableListOf<Campsite>(),
+    val activeStartDate: Date? = null,
+    val activeEndDate: Date? = null,
+    val registrationStartDate: Date? = null,
+    val registrationEndDate: Date? = null,
+    val bookingStartDate: Date? = null,
+    val bookingEndDate: Date? = null,
+    val numberOfWinners: Int = 1,
+    val waitlistCapacity: Int = 100,
+    var waitlist: MutableList<Entrant> = mutableListOf<Entrant>(),
+    var winners: List<Entrant> = listOf<Entrant>(),
 ) {
 
+    /**
+     * Uses the waitlist attribute to generate the random order of winners, then select the first n (n is the number of winners)
+     * Updates the winners property to reflect the selection
+     */
     fun generateWinners(): List<Entrant>{
-        return TODO("Provide the return value")
+
+        val randomChoice = waitlist.shuffled().take(numberOfWinners)
+        winners = randomChoice
+        return randomChoice
+
     }
 }

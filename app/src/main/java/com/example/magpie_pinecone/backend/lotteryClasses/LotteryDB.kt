@@ -1,7 +1,6 @@
 package com.example.magpie_pinecone.backend.lotteryClasses
 
-import android.content.ContentValues.TAG
-import android.util.Log
+
 import androidx.compose.runtime.mutableStateListOf
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.Firebase
@@ -85,7 +84,7 @@ class LotteryDB {
     }
 
     /**
-     * Replaces the specified [lottery]’s details in this lottery database. Only attempts replacement if the specified lottery currently exists in this lottery database.
+     * Replaces the specified [oldLottery]’s details with [updatedLottery] in this lottery database. Only attempts replacement if the specified lottery currently exists in this lottery database.
      */
     fun updateLottery(oldLottery: Lottery, updatedLottery: Lottery): Unit{
         lotteriesRef.document(oldLottery.id).set(updatedLottery)
@@ -126,5 +125,19 @@ class LotteryDB {
         val lottery = readLottery(lotteryId)
 
         return lottery.waitlist
+    }
+
+    /**
+     * Adds a [lotteryWinner] to the lotteryWinners database.
+     */
+    fun addLotteryWinner(lotteryWinner: LotteryWinner): Unit{
+        lotteryWinnersRef.add(lotteryWinner)
+    }
+
+    /**
+     * Deletes the specified [lotteryWinner] based on Firestore id from this lottery database. Only attempts deletion if the specified lottery currently exists in this lottery database.
+     */
+    fun deleteLotteryWinner(lotteryWinner: LotteryWinner): Unit{
+        lotteryWinnersRef.document(lotteryWinner.id).delete()
     }
 }

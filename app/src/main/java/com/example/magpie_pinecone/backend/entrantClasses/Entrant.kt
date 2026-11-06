@@ -1,7 +1,7 @@
 package com.example.magpie_pinecone.backend.entrantClasses
 
-import com.example.magpie_pinecone.backend.AccountType
-import com.example.magpie_pinecone.backend.User
+import com.example.magpie_pinecone.backend.UserClasses.AccountType
+import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 
 /**
@@ -17,8 +17,8 @@ class Entrant (
     name: String = "",
     email: String = "",
     phoneNumber: String = "",
-    var activeReservations: List<Reservation>,
-    var pastReservations: List<Reservation>,
+    var activeReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
+    var pastReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
     var notifOptOut: Boolean,
 ): User(id, name, email, phoneNumber, accountType = AccountType.Entrant) {
 }
