@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun WelcomeScreen(modifier: Modifier = Modifier, onClickGetStarted: () -> Unit = {}) {
+fun WelcomeScreen(modifier: Modifier = Modifier, onClickGetStarted: () -> Unit) {
 
     // Background image is from unsplash: https://unsplash.com/photos/looking-up-through-dense-green-trees-to-a-cloudy-sky-y2pCSM6OnT4
     Box(modifier = Modifier.fillMaxSize()) {
@@ -50,7 +50,8 @@ fun WelcomeScreen(modifier: Modifier = Modifier, onClickGetStarted: () -> Unit =
             Spacer(modifier = Modifier.height(320.dp))
 
             Button(modifier = Modifier.size(width = 180.dp, height = 60.dp),
-                onClick = {onClickGetStarted()}, colors = ButtonDefaults.buttonColors(
+                onClick = onClickGetStarted,
+                colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF6155f5),
                 contentColor = Color.White
             ), shape = RoundedCornerShape(8.dp)
@@ -67,5 +68,5 @@ fun WelcomeScreen(modifier: Modifier = Modifier, onClickGetStarted: () -> Unit =
 )
 @Composable
 fun WelcomeScreenPreview() {
-    WelcomeScreen()
+    WelcomeScreen(onClickGetStarted = {})
 }
