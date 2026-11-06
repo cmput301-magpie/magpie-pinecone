@@ -8,7 +8,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
-
+import java.util.Date
 
 /**
  * Provides actions for interfacing with the lottery database and the lottery winners.
@@ -103,6 +103,53 @@ class LotteryDB {
             .addOnFailureListener { exception ->
                 Log.e("LotteryDB", "Failed to delete lottery", exception)
             }
+    }
+
+    /**
+     * Draws the winners of a [lottery] once its registration period has ended.
+     * Winners are picked only from the waitlist, and never more than numberOfWinners.
+     */
+    fun drawWinnersIfReady(lottery: Lottery) {
+
+        // A lottery needs a saved ID and a registration end date to be drawn
+        val registrationEnd = lottery.registrationEndDate
+        if (lottery.id.isEmpty() || registrationEnd == null) {
+            return
+        }
+
+        // Do not draw before the registration period has ended
+        if (Date().before(registrationEnd)) {
+            return
+        }
+
+        // Do not draw a second time
+        if (lottery.winners.isNotEmpty()) {
+            return
+        }
+
+        // Load the entrants who joined the waitlist, then pick winners from them
+        viewEntrants(lottery.id) { entrants ->
+            if (entrants.isEmpty()) {
+                return@viewEntrants
+            }
+
+            lottery.waitlist = entrants.toMutableList()
+            val winners = lottery.generateWinners()  // takes at most numberOfWinners entrants
+
+            // Record each winner for this lottery
+            for (winner in winners) {
+                addLotteryWinner(
+                    LotteryWinner(
+                        entrant = winner,
+                        lottery = lottery,
+                        campsites = lottery.campsites
+                    )
+                )
+            }
+
+            // Save the winners on the lottery itself
+            updateLottery(lottery)
+        }
     }
 
     /**

@@ -119,7 +119,11 @@ fun OwnerApp(androidId: String) {
             composable(OwnerDestination.HOME.route) {
                 // Runs every time the home screen is shown
                 LaunchedEffect(Unit) {
-                    lotteryDB.getLotteriesByOwner(ownerId = androidId) { lotteries = it }
+                    lotteryDB.getLotteriesByOwner(ownerId = androidId) { ownerLotteries ->
+                        lotteries = ownerLotteries
+                        // Draw winners for any lottery whose registration period has ended
+                        ownerLotteries.forEach { lotteryDB.drawWinnersIfReady(it) }
+                    }
                     campsiteDB.getCampsitesByOwner(ownerId = androidId) { campsites = it }
                 }
 
