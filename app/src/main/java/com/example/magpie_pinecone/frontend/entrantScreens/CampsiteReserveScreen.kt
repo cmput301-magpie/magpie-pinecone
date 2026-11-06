@@ -22,6 +22,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.provider.Settings
+import androidx.compose.ui.platform.LocalContext
+import com.example.magpie_pinecone.backend.UserClasses.UserDB
+import androidx.compose.runtime.LaunchedEffect
+import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 
 /**
  * Display's Campsite for Entrant to Reserve
@@ -32,9 +37,23 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CampsiteReserveScreen(
-    onBack: () -> Boolean
+    onBack: () -> Boolean,
+    campsiteId: String = ""
 ) {
     var checked by remember { mutableStateOf(false) }
+    val userDB = remember { UserDB() }
+    // Android ID is the user's ID in Firestore (same as ProfileScreen)
+    val context = LocalContext.current
+    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+    val campsiteDB = remember { CampsiteDB() }
+    var rules by remember { mutableStateOf("Loading rules...") }
+
+    // Load the campsite's rules and policy text
+    LaunchedEffect(campsiteId) {
+        campsiteDB.readCampsite(campsiteId) { campsite ->
+            rules = campsite?.rulesAndPolicy ?: "No rules provided for this campsite."
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -67,6 +86,12 @@ fun CampsiteReserveScreen(
 
                 // Date picker placeholder
                 Text("Date picker")
+                // Campsite rules and policies shown before confirming
+                Text(
+                    text = rules,
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 16.sp
+                )
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -82,7 +107,11 @@ fun CampsiteReserveScreen(
 
                     // Reserve and Decline Buttons
                     Button(
-                        onClick = {},
+                        enabled = checked,  // Cannot reserve until the rules are confirmed
+                        onClick = {
+                            // Record that this user confirmed the rules
+                            userDB.setRulesAccepted(androidId, true)
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Green
                         ),
