@@ -1,6 +1,8 @@
-package com.example.magpie_pinecone.backend
-import com.google.firebase.firestore.FirebaseFirestore
+package com.example.magpie_pinecone.backend.UserClasses
+
 import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
+
 /**
  * Provides actions for interfacing with the user database
  *

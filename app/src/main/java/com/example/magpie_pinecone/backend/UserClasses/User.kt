@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.backend
+package com.example.magpie_pinecone.backend.UserClasses
 
 enum class AccountType {
     Entrant,
