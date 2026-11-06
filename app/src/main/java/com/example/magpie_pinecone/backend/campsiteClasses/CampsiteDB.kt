@@ -1,6 +1,8 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
 import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
+import java.util.Calendar
+import java.util.Date
 /**
  * Provides actions for interfacing with the campsite database
  *
@@ -121,6 +123,63 @@ class CampsiteDB {
 
                 onResult(campsites)
             }
+    }
+    /**
+     * Fetches campsites that match the given search filters.
+     * Blank or null filters are ignored.
+     */
+    fun searchCampsites(
+        name: String,
+        location: String,
+        date: Date?,
+        guests: Int?,
+        onResult: (List<Campsite>) -> Unit
+    ) {
+        getAllCampsites { campsites ->
+
+            val filteredCampsites = campsites.filter { campsite ->
+
+                val matchesName =
+                    name.isBlank() ||
+                            campsite.name.contains(name, ignoreCase = true)
+
+                val matchesLocation =
+                    location.isBlank() ||
+                            campsite.location.contains(location, ignoreCase = true)
+
+                val matchesGuests =
+                    guests == null ||
+                            guests <= campsite.maxOccupancy
+
+                val matchesDate =
+                    date == null ||
+                            campsite.availableDates.any { availableDate ->
+                                isSameDay(availableDate, date)
+                            }
+
+                matchesName &&
+                        matchesLocation &&
+                        matchesGuests &&
+                        matchesDate
+            }
+
+            onResult(filteredCampsites)
+        }
+    }
+    /**
+     * Checks whether two dates represent the same calendar day.
+     */
+    private fun isSameDay(date1: Date, date2: Date): Boolean {
+        val calendar1 = Calendar.getInstance().apply {
+            time = date1
+        }
+
+        val calendar2 = Calendar.getInstance().apply {
+            time = date2
+        }
+
+        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
+                calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR)
     }
 }
 
