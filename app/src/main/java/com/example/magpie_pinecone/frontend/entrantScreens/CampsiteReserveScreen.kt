@@ -27,6 +27,11 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import androidx.compose.runtime.LaunchedEffect
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Display's Campsite for Entrant to Reserve
@@ -47,11 +52,14 @@ fun CampsiteReserveScreen(
     val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
     val campsiteDB = remember { CampsiteDB() }
     var rules by remember { mutableStateOf("Loading rules...") }
+    var availableDates by remember { mutableStateOf<List<Date>>(emptyList()) }
+    val dateFormat = remember { SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault()) }
 
     // Load the campsite's rules and policy text
     LaunchedEffect(campsiteId) {
         campsiteDB.readCampsite(campsiteId) { campsite ->
             rules = campsite?.rulesAndPolicy ?: "No rules provided for this campsite."
+            availableDates = campsite?.availableDates ?: emptyList()
         }
     }
 
@@ -77,6 +85,7 @@ fun CampsiteReserveScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 // Title
                 Text(
                     modifier = Modifier.padding(20.dp),
@@ -85,7 +94,20 @@ fun CampsiteReserveScreen(
                 )
 
                 // Date picker placeholder
-                Text("Date picker")
+                // Dates the winner can reserve
+                Text("Available dates", fontSize = 20.sp)
+                if (availableDates.isEmpty()) {
+                    Text("No available dates")
+                }
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(availableDates) { date ->
+                        Text(
+                            text = dateFormat.format(date),
+                            modifier = Modifier.padding(8.dp),
+                            fontSize = 18.sp
+                        )
+                    }
+                }
                 // Campsite rules and policies shown before confirming
                 Text(
                     text = rules,

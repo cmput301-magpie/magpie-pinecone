@@ -125,6 +125,8 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
                 if (campsite != null) {
                     CampsiteDetailsScreen(
                         campsite = campsite,
+                        isWinner = false,  // TODO: check the lotteryWinners collection for this entrant
+                        onReserve = { navController.navigate(CampsiteReserve) },
                         onBack = {
                             if (!navController.popBackStack()) {
                                 navController.navigate(EntrantDestination.SEARCH.route)
@@ -133,7 +135,7 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
                     )
                 }
             }
-            composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
+            composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }, campsiteId = selectedCampsite?.ID ?: "") }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
             composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
             composable<Profile> { ProfileScreen(navController, onProfileDeleted) }
