@@ -50,7 +50,18 @@ class ReservationDB {
     /**
      * Updates the specified [reservation]'s details in this reservation database. Only attempts replacement if the specified reservation currently exists in the reservation database
      */
-    fun updateReservation(reservation: Reservation) { TODO() }
+    fun updateReservation(reservation: Reservation) {
+        if (reservation.ID.isEmpty()) {
+            Log.e("ReservationDB", "Cannot delete reservation with empty ID")
+            return
+        }
+
+        reservationCollection.document(reservation.ID)
+            .set(reservation)
+            .addOnSuccessListener {
+                Log.d("ReservationDB", "Reservation updated: ${reservation.ID}")
+            }
+    }
 
     /**
      * Gets the reservation with the matching [reservationID] from the database.
