@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.frontend.entrantScreens
+ package com.example.magpie_pinecone.frontend.entrantScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +23,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.magpie_pinecone.EditLottery
 import com.example.magpie_pinecone.R
+import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 
-/**
+ /**
  * Display's Entrant's Home Screen
  * TO-DO
  * Link to entrant's actual lotteries to loop over
@@ -35,7 +37,8 @@ import com.example.magpie_pinecone.R
 
 @Composable
 fun EntrantHomeScreen(
-    onMyReservations: () -> Unit
+     lotteries: List<Lottery>,
+     onMyReservations: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -299,5 +302,5 @@ fun EntrantHomeScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowEntrantHomeScreenPreview() {
-    EntrantHomeScreen({})
+    EntrantHomeScreen(emptyList(), { } )
 }
