@@ -8,6 +8,7 @@ import java.sql.Date
 /**
  * Stores the data associated with a reservation.
  *
+ * @property ID The id of the reservation
  * @property entrantID The id of the entrant who booked this reservation.
  * @property ownerID The id of the owner of the campsite of this reservation.
  * @property campsiteID The id of the campsite of this reservation.
@@ -18,6 +19,7 @@ import java.sql.Date
  * @constructor Creates a Reservation.
  */
 class Reservation(
+    var ID: String = "",
     var entrantID: String = "",
     var ownerID: String = "",
     var campsiteID: String = "",

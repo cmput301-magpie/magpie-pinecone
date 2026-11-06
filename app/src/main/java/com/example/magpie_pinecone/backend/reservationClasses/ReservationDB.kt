@@ -1,5 +1,6 @@
 package com.example.magpie_pinecone.backend.reservationClasses
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -17,13 +18,25 @@ class ReservationDB {
      * Adds a [reservation] to the reservation database.
      */
     fun addReservation(reservation: Reservation) {
-        val
+        val document = reservationCollection.document()
+
+        reservation.ID = document.id
+
+        document.set(reservation)
+            .addOnSuccessListener {
+                Log.d("ReservationDB", "Successfully added reservation")
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to add reservation")
+            }
     }
 
     /**
      * Deletes the specified [reservation] from this reservation database. Only attempts deletion if the specified reservation currently exists in the lottery database.
      */
-    fun deleteReservation(reservation: Reservation) { TODO() }
+    fun deleteReservation(reservation: Reservation) {
+
+    }
 
     /**
      * Updates the specified [reservation]'s details in this reservation database. Only attempts replacement if the specified reservation currently exists in the reservation database
