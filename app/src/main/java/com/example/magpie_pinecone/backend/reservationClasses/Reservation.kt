@@ -3,7 +3,7 @@ package com.example.magpie_pinecone.backend.reservationClasses
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.example.magpie_pinecone.backend.ownerClasses.Owner
-import java.sql.Date
+import java.util.Date
 
 /**
  * Stores the data associated with a reservation.
@@ -24,8 +24,8 @@ class Reservation(
     var entrantID: String = "",
     var ownerID: String = "",
     var campsiteID: String = "",
-    var startDate: Date,
-    var endDate: Date,
+    var startDate: Date = Date(),
+    var endDate: Date = Date(),
     var numGuests: Int = 0,
     var termsAndConditions: Boolean = false,
     var isCancelled: Boolean = false
