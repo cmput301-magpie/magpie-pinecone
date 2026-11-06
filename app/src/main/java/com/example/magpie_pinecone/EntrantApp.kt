@@ -39,6 +39,7 @@ enum class EntrantDestination(
 ) {
     HOME("entrantHome", "Home", R.drawable.ic_home),  // icons are temporary -Albert
     SEARCH("searchCampsite", "Search", R.drawable.ic_home),
+    PROFILE("viewProfile", "Profile", R.drawable.ic_favorite)
 }
 
 // Objects to represent routes
@@ -136,7 +137,7 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
             composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
             composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
-            composable<Profile> { ProfileScreen(navController, onProfileDeleted) }
+            composable(EntrantDestination.PROFILE.route) { ProfileScreen(navController, onProfileDeleted) }
             composable<EditProfile> { EditProfileScreen(navController) }
         }
     }
