@@ -37,6 +37,11 @@ import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 
+/**
+ * EntrantApp.kt controls the data flow between backend classes like DBs and Handlers and entrant
+ * frontend screens. It also maps out the navigation routes between screens, and defines button
+ * functionality.
+ */
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.

@@ -7,8 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 
-
-
+/**
+ * Starts the application, gets the [androidId] of the device to assist with detecting app start state.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

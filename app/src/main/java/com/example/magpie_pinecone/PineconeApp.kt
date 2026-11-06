@@ -20,6 +20,16 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
 /**
+ * PineconeApp.kt determines the type of user and what screens they should see.
+ *
+ * - While waiting for Firestore to respond, the screen remains blank
+ * - Entrants are redirected to EntrantApp.kt. androidId is passed through to EntrantApp.kt
+ * - Owners are redirected to OwnerApp.kt. androidId is passed through to EntrantApp.kt
+ * - First time users are redirected to NewUserApp.kt
+ * - Any interrupting errors redirect users to a basic error page and a button to try again
+ */
+
+/**
  * Indicates the state of the app at startup.
  */
 enum class StartState {

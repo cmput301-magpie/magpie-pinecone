@@ -33,6 +33,12 @@ import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
 import kotlinx.serialization.Serializable
 
 /**
+ * OwnerApp.kt controls the data flow between backend classes like DBs and Handlers and owner
+ * frontend screens. It also maps out the navigation routes between screens, and defines button
+ * functionality.
+ */
+
+/**
  * Provide destinations for the navigation bar at the bottom of the app.
  */
 enum class OwnerDestination(
