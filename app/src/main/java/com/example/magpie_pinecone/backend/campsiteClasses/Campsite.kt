@@ -33,14 +33,13 @@ class Campsite(
     var price: Double = 0.0,
     var rating: Double = 0.0,
     var imageUrl: String? = null,
-    var rulesAndPolicy: String  = "",
+    var rulesAndPolicy: String = "",
     var availableDates: List<Date> = emptyList(),
     var bookedDates: List<Date> = emptyList(),
     var ownerId: String = "",
-    //    var QRCode: QRCode,
-    var description: String  = "",
-    var amenities: String  = "",
+//    var QRCode: QRCode,
+    var description: String = "",
+//    var amenities: String = "",
     var mapLocation: GeoPoint? = null,
     var tags: List<String> = emptyList()
-
-    )
+)
