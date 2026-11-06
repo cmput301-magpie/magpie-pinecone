@@ -36,17 +36,21 @@ class OwnerHandler() {
      * Creates a lottery.
      */
     fun createLottery(
-        campsites: List<Campsite>,
         lotteries: LotteryDB,
         lottery: Lottery
-    ): Lottery {
-        TODO("Provide the return value")
+    ) {
+        lotteries.addLottery(lottery)
     }
 
     /**
      * Updates a lottery created by the Owner.
      */
-    fun updateLottery(lottery: Lottery): Unit { TODO() }
+    fun updateLottery(
+        lotteries: LotteryDB,
+        lottery: Lottery,
+    ) {
+        lotteries.updateLottery(lottery)
+    }
 
     /**
      * Rejects a Reservation made by an Entrant.
