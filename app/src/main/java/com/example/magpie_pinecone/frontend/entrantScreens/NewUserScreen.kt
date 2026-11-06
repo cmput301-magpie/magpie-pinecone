@@ -16,6 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+/**
+ * Display's Screen for New Users
+ * TO-DO
+ *
+ */
+
 @Composable
 fun NewUserScreen(navController: NavController) {
     Column(
