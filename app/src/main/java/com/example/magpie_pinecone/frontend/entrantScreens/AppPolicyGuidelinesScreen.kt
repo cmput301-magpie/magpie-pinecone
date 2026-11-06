@@ -25,7 +25,7 @@ import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
 /**
  * Display's App Policy and Guidelines
  * TO-DO
- *
+ * Add an actual policy and guideline
  */
 
 @Composable
