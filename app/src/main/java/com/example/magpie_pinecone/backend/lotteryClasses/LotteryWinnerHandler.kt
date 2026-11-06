@@ -12,17 +12,17 @@ class LotteryWinnerHandler {
      * Gives the option for LotteryWinner to reserve or to decline the [lottery].
      * @return The boolean value of reserve or decline
      */
-    fun lotteryDecision(lottery: Lottery, ): Boolean{
+    fun lotteryDecision(lottery: Lottery, decision: Boolean): Unit{
         return TODO("Provide the return value")
     }
 
 
     /**
-     * Allows LotteryWinner to select one of the campsites in the [lottery] to reserve.
+     * Allows LotteryWinner to select one of the [campsites] in the [lottery] to create a reserveration.
      * @return The selected campsite.
      */
-    fun selectCampsite(lottery: Lottery): Campsite{
-        return TODO("Provide the return value")
+    fun selectCampsite(lottery: Lottery, campsite: Campsite){
+
     }
 
 

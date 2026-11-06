@@ -13,6 +13,7 @@ import com.example.magpie_pinecone.backend.entrantClasses.Entrant
  */
 
 class LotteryWinner (
+    var id: String = "",
     val entrant: Entrant,
     val lottery: Lottery,
     val campsites: List<Campsite>

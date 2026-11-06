@@ -10,7 +10,7 @@ import com.google.firebase.firestore.toObject
 
 
 /**
- * Provides actions for interfacing with the lottery database.
+ * Provides actions for interfacing with the lottery database and the lottery winners.
  * @property lotteries The list of lotteries
  */
 class LotteryDB {
@@ -20,6 +20,10 @@ class LotteryDB {
     private val lotteriesRef = db.collection("lotteries")       // lotteriesRef is the collection of lotteries
 
     private val lotteries = mutableStateListOf<Lottery>()       // lotteries is the local list of lotteries
+
+    private val lotteryWinnersRef = db.collection("lotteryWinners")
+    private val lotteryWinners = mutableStateListOf<LotteryWinner>()
+
     /**
      * init block creates a listener to watch the collection, and update the local list of lotteries
      */
@@ -40,6 +44,26 @@ class LotteryDB {
                 if (lottery != null){
                     lottery.id = document.id
                     lotteries.add(lottery)
+                }
+            }
+        }
+
+        lotteryWinnersRef.addSnapshotListener { snapshot, error ->
+            if (error != null){
+                return@addSnapshotListener
+            }
+
+            // empty local list of lottery winners
+            lotteryWinners.clear()
+
+            snapshot?.documents?.forEach { document ->
+                // get the lottery class
+                val lotteryWinner = document.toObject(LotteryWinner::class.java)
+
+                // assign the fire store id to the lottery and add it to the local list
+                if (lotteryWinner != null){
+                    lotteryWinner.id = document.id
+                    lotteryWinners.add(lotteryWinner)
                 }
             }
         }
