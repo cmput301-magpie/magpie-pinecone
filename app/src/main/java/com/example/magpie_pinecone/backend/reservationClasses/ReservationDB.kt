@@ -3,6 +3,7 @@ package com.example.magpie_pinecone.backend.reservationClasses
 import android.util.Log
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Date
 
 
 /**
@@ -68,7 +69,6 @@ class ReservationDB {
 
     /**
      * Gets the reservation with the matching [reservationID] from the database.
-     * @return The specified reservation instance.
      */
     fun readReservation(
         reservationID: String,
@@ -87,6 +87,119 @@ class ReservationDB {
             .addOnFailureListener { e ->
                 Log.e("ReservationDB", "Failed to read reservation", e)
                 onResult(null)
+            }
+    }
+
+    /**
+     * Fetches past reservations by a specified [ownerID] from the database
+     */
+    fun getPastReservationsByOwner(
+        ownerID: String,
+        onResult: (List<Reservation>) -> Unit
+    ) {
+        val currentDate = Date()
+
+        reservationCollection
+            .whereEqualTo("ownerID", ownerID)
+            .whereLessThan("endDate", currentDate)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val reservations = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Reservation::class.java)
+                }
+
+                onResult(reservations)
+            }
+    }
+
+    /**
+     * Fetches active reservations by a specified [ownerID] from the database
+     */
+    fun getActiveReservationsByOwner(
+        ownerID: String,
+        onResult: (List<Reservation>) -> Unit
+    ) {
+        val currentDate = Date()
+
+        reservationCollection
+            .whereEqualTo("ownerID", ownerID)
+            .whereGreaterThanOrEqualTo("endDate", currentDate)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val reservations = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Reservation::class.java)
+                }
+
+                onResult(reservations)
+            }
+    }
+
+    /**
+     * Fetches cancelled reservations by a specified [ownerID] from the database
+     */
+    fun getCancelledReservationsByOwner(
+        ownerID: String,
+        onResult: (List<Reservation>) -> Unit
+    ) {
+        reservationCollection
+            .whereEqualTo("ownerID", ownerID)
+            .whereEqualTo("isCancelled", true)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val reservations = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Reservation::class.java)
+                }
+
+                onResult(reservations)
+            }
+    }
+
+    /**
+     * Fetches reservations by a specified [entrantID] from the database
+     */
+    fun getPastReservationsByEntrant(
+        entrantID: String,
+        onResult: (List<Reservation>) -> Unit
+    ) {
+        val currentDate = Date()
+
+        reservationCollection
+            .whereEqualTo("ownerID", entrantID)
+            .whereLessThan("endDate", currentDate)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val reservations = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Reservation::class.java)
+                }
+
+                onResult(reservations)
+            }
+    }
+
+    /**
+     * Fetches active reservations by a specified [entrantID] from the database
+     */
+    fun getActiveReservationsByEntrant(
+        entrantID: String,
+        onResult: (List<Reservation>) -> Unit
+    ) {
+        val currentDate = Date()
+
+        reservationCollection
+            .whereEqualTo("ownerID", entrantID)
+            .whereGreaterThanOrEqualTo("endDate", currentDate)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val reservations = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Reservation::class.java)
+                }
+
+                onResult(reservations)
             }
     }
 }
