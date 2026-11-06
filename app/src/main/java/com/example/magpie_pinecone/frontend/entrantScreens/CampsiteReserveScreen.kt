@@ -38,13 +38,11 @@ import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 @Composable
 fun CampsiteReserveScreen(
     onBack: () -> Boolean,
-    campsiteId: String = ""
+    onUserAcceptedRules: () -> Unit,
+    campsiteId: String = "",
 ) {
     var checked by remember { mutableStateOf(false) }
-    val userDB = remember { UserDB() }
     // Android ID is the user's ID in Firestore (same as ProfileScreen)
-    val context = LocalContext.current
-    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
     val campsiteDB = remember { CampsiteDB() }
     var rules by remember { mutableStateOf("Loading rules...") }
 
@@ -110,7 +108,7 @@ fun CampsiteReserveScreen(
                         enabled = checked,  // Cannot reserve until the rules are confirmed
                         onClick = {
                             // Record that this user confirmed the rules
-                            userDB.setRulesAccepted(androidId, true)
+                            onUserAcceptedRules()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Green
@@ -139,5 +137,5 @@ fun CampsiteReserveScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowCampsiteReserveScreenPreview() {
-    CampsiteReserveScreen({ false })
+    CampsiteReserveScreen({ false }, onUserAcceptedRules = {})
 }

@@ -34,29 +34,18 @@ import com.example.magpie_pinecone.EditProfile
  * Entrants can open the edit profile screen from here.
  *
  * @param navController Controls navigation between entrant screens.
+ * @param curUser The current user. Use its details to populate the fields.
  * @param onProfileDeleted Called after the entrant's profile has been deleted.
  */
 
 @Composable
-fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {}) {
-
-    val userDB = remember { UserDB() }
+fun ProfileScreen(navController: NavController, curUser: User?, onProfileDeleted: () -> Unit = {}) {
 
     // The user's ID is the device ID, the same one PineconeApp uses
     val context = LocalContext.current
-    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
-    var user by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
     var showFirstAlert by remember { mutableStateOf(false) }   // Whether the first "delete?" alert is showing
     var showSecondAlert by remember { mutableStateOf(false) }  // Whether the final "cannot be undone" alert is showing
-
-
-    LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
-    {
-        userDB.readUser(androidId) { fetchedUser ->
-            user = fetchedUser
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -72,8 +61,7 @@ fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Only show the details once the user has been fetched
-        val currentUser = user
-        if (currentUser == null) {
+        if (curUser == null) {
             Text("Loading profile...")
         } else {
 
@@ -81,7 +69,7 @@ fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {
                 text = "Name",
                 fontSize = 20.sp
             )
-            Text(currentUser.name)
+            Text(curUser.name)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -89,7 +77,7 @@ fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {
                 text = "Email",
                 fontSize = 20.sp
             )
-            Text(currentUser.email)
+            Text(curUser.email)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -97,7 +85,7 @@ fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {
                 text = "Phone",
                 fontSize = 20.sp
             )
-            Text(currentUser.phoneNumber)
+            Text(curUser.phoneNumber)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -156,7 +144,6 @@ fun ProfileScreen(navController: NavController, onProfileDeleted: () -> Unit = {
                         TextButton(
                             onClick = {
                                 showSecondAlert = false
-                                userDB.deleteUser(currentUser)
                                 onProfileDeleted()
                             },
                             modifier = Modifier.testTag("secondDeleteConfirmButton") // for testing

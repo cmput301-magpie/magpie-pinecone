@@ -1,10 +1,12 @@
 package com.example.magpie_pinecone
 
+import android.provider.Settings
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
@@ -27,6 +29,9 @@ import kotlinx.serialization.Serializable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 
 /**
@@ -60,6 +65,25 @@ object EditProfile
 
 @Composable
 fun EntrantApp(onProfileDeleted: () -> Unit) {
+
+    // Handle creation of UserDB and fetch the current user
+    val userDB = remember { UserDB() }
+
+    // The user's ID is the device ID, the same one PineconeApp uses
+    val context = LocalContext.current
+    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+
+    var curUser by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
+
+    LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
+    {
+        userDB.readUser(androidId) { fetchedUser ->
+            curUser = fetchedUser
+        }
+    }
+
+    // End of UserDB handling
+
     val navController = rememberNavController()
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
@@ -133,11 +157,31 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
                     )
                 }
             }
-            composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
+            composable<CampsiteReserve> {
+                CampsiteReserveScreen(
+                    onBack = { navController.popBackStack() },
+                    onUserAcceptedRules = { userDB.setRulesAccepted(androidId, true) }
+                )
+            }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
             composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
-            composable<Profile> { ProfileScreen(navController, onProfileDeleted) }
-            composable<EditProfile> { EditProfileScreen(navController) }
-        }
+            composable<Profile> {
+                ProfileScreen(navController,
+                    curUser = curUser,
+                    onProfileDeleted = {
+                        curUser?.let { userDB.deleteUser(it) }
+                    }
+                )
+            }
+            composable<EditProfile> {
+                EditProfileScreen(navController,
+                    curUser,
+                    onUpdateProfile = {
+                        userDB.updateUser(it)
+                        // curUser = it  // Not needed because curUser is modified inside EditProfileScreen
+                    }
+                )
+            }
+        }  // NavHost
     }
 }

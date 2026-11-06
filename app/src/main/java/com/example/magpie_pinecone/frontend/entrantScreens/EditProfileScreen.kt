@@ -30,36 +30,17 @@ import com.example.magpie_pinecone.backend.UserClasses.UserDB
  * Lets entrants edit their name, email and phone number.
  *
  * @param navController Controls navigation between entrant screens.
+ * @param curUser The current user. Use its details to populate the fields. Modified in the function.
+ * @param onUpdateProfile Called after the user's profile has been updated.
  */
 
 @Composable
-fun EditProfileScreen(navController: NavController) {
-
-    val userDB = remember { UserDB() }
-
-    // The user's ID is the device ID, the same one PineconeApp uses
-    val context = LocalContext.current
-    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-
-    var user by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
+fun EditProfileScreen(navController: NavController, curUser: User?, onUpdateProfile: (user: User) -> Unit) {
 
     var name by remember { mutableStateOf("") }     // Stores the text entered into the name box
     var email by remember { mutableStateOf("") }    // Stores the text entered into the email box
     var phone by remember { mutableStateOf("") }    // Stores the text entered into the phone box
 
-
-    LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
-    {
-        userDB.readUser(androidId) { fetchedUser ->
-            user = fetchedUser
-            if (fetchedUser != null) {
-                // Fill the text boxes with the user's current details
-                name = fetchedUser.name
-                email = fetchedUser.email
-                phone = fetchedUser.phoneNumber
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -75,8 +56,7 @@ fun EditProfileScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Only show the boxes once the user has been fetched
-        val currentUser = user
-        if (currentUser == null) {
+        if (curUser == null) {
             Text("Loading profile...")
         } else {
 
@@ -116,10 +96,10 @@ fun EditProfileScreen(navController: NavController) {
             Button(
                 onClick = {
                     // Put the entered text into the user, save it, then go back
-                    currentUser.name = name
-                    currentUser.email = email
-                    currentUser.phoneNumber = phone
-                    userDB.updateUser(currentUser)
+                    curUser.name = name
+                    curUser.email = email
+                    curUser.phoneNumber = phone
+                    onUpdateProfile(curUser)
                     navController.popBackStack()
                 },
                 modifier = Modifier.testTag("saveProfileButton") // for testing
