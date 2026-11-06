@@ -1,6 +1,8 @@
 package com.example.magpie_pinecone.backend.ownerClasses
 
 import android.app.Notification
+import com.example.magpie_pinecone.backend.UserClasses.AccountType
+import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
@@ -17,10 +19,14 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
  * @constructor Creates an Owner class
  */
 class Owner(
+    id: String = "",
+    name: String = "",
+    email: String = "",
+    phoneNumber: String = "",
     var campsites: List<Campsite>,
     var lotteries: List<Lottery>,
     var activeReservations: List<Reservation>,
     var cancelledReservations: List<Reservation>,
     var pastReservations: List<Reservation>,
     var sentNotifications: List<Notification>
-)
+): User(id, name, email, phoneNumber, accountType = AccountType.Owner)
