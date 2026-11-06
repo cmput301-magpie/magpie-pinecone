@@ -48,11 +48,13 @@ import com.example.magpie_pinecone.frontend.ownerScreens.MyLotteries
  * TO-DO
  * Link to entrant's actual lotteries to loop over
  * Implement check for if in lottery or not to switch between buttons
- * Implement links to Notifs, Details, Leave, Reserve, My Reservations buttons
+ * Implement links to Notifs (after halfway point), Details, Leave, Reserve, My Reservations buttons
  */
 
 @Composable
-fun EntrantHomeScreen(navController: () -> Unit) {
+fun EntrantHomeScreen(
+    onMyReservations: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Top,
@@ -303,7 +305,7 @@ fun EntrantHomeScreen(navController: () -> Unit) {
             // My Reservations
             ExtendedFloatingActionButton(
                 modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 30.dp),
-                onClick = {  }
+                onClick = { onMyReservations() }
             ) {
                 Text("My Reservations")
             }
