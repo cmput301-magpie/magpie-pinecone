@@ -28,6 +28,8 @@ import com.example.magpie_pinecone.frontend.ownerScreens.ViewCampsiteScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.ViewReservationsScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
 import kotlinx.serialization.Serializable
+import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.backend.UserClasses.UserDB
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -64,6 +66,10 @@ fun OwnerApp(androidId: String) {
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
     var campsiteToView by remember { mutableStateOf<Campsite?>(null) }
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
+    val userDB = remember { UserDB() }
+    // IDs of the entrants on the waitlist being viewed, and the users loaded from them
+    var waitlistIds by remember { mutableStateOf<List<String>>(emptyList()) }
+    var waitlistEntrants by remember { mutableStateOf<List<User>>(emptyList()) }
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -117,9 +123,12 @@ fun OwnerApp(androidId: String) {
                 OwnerHomeScreen(
                     campsites = campsites,
                     onEditLottery = { navController.navigate(route = EditLottery) },
-                    onViewWaitlist = { navController.navigate(route = WaitingList) },
-                    onCreateCampsite = {
-                        campsiteToEdit = null
+                    onViewWaitlist = {
+                        // TODO: set to the selected lottery's waitlist IDs once lotteries are saved
+                        waitlistIds = emptyList()
+                        navController.navigate(route = WaitingList)
+                    },
+                    onCreateCampsite = {campsiteToEdit = null
                         navController.navigate(route = EditCampsite)
                     },
                     onEditCampsite = { campsite ->
@@ -181,7 +190,11 @@ fun OwnerApp(androidId: String) {
             }
             composable<ViewReservations> { ViewReservationsScreen() }
             composable<WaitingList> {
-                WaitingListScreen({ navController.popBackStack() })
+                // Load the users on the waitlist each time this screen is shown
+                LaunchedEffect(Unit) {
+                    userDB.readUsers(waitlistIds) { waitlistEntrants = it }
+                }
+                WaitingListScreen(waitlistEntrants, { navController.popBackStack() })
             }
         }
     }
