@@ -13,10 +13,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.magpie_pinecone.frontend.entrantScreens.AppPolicyGuidelinesScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.CampsiteDetailsScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.CampsiteReserveScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.CampsiteResultScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EntrantHomeScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.EntrantViewReservationsScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.ProfileScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
-import com.example.magpie_pinecone.frontend.entrantScreens.ProfileScreen
+import kotlinx.serialization.Serializable
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -29,6 +35,20 @@ enum class EntrantDestination(
     HOME("entrantHome", "Home", R.drawable.ic_home),  // icons are temporary -Albert
     SEARCH("searchCampsite", "Search", R.drawable.ic_home),
 }
+
+// Objects to represent routes
+@Serializable
+object AppPolicyGuidelines
+@Serializable
+object CampsiteDetails
+@Serializable
+object CampsiteReserve
+@Serializable
+object CampsiteResult
+@Serializable
+object Profile
+@Serializable
+object EntrantViewReservations
 
 @Composable
 fun EntrantApp(onProfileDeleted: () -> Unit) {
@@ -77,9 +97,15 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
             navController = navController,
             startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(EntrantDestination.HOME.route) { EntrantHomeScreen(navController) }
+            composable(EntrantDestination.HOME.route) { EntrantHomeScreen({ navController.navigate(route = EntrantViewReservations) }) }
             composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }
             composable("profile") { ProfileScreen(navController, onProfileDeleted) }
+            composable<AppPolicyGuidelines> { AppPolicyGuidelinesScreen({ navController.popBackStack() }) }
+            composable<CampsiteDetails> { CampsiteDetailsScreen({ navController.popBackStack() }) }
+            composable<CampsiteReserve> { CampsiteReserveScreen({ navController.popBackStack() }) }
+            composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
+            composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
+            composable("profile") { ProfileScreen(navController) }
             composable("editProfile") { EditProfileScreen(navController) }
         }
     }
