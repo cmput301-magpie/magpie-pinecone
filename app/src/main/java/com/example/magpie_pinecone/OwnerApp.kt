@@ -145,6 +145,7 @@ fun OwnerApp(androidId: String) {
                 }
 
                 EditCampsiteScreen(
+                    ownerId = androidId,
                     isEdit = isEdit,
                     campsite = campsite,
                     onBack = { navController.popBackStack() },
