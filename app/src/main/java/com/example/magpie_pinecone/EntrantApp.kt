@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -84,6 +85,8 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
 
     // End of UserDB handling
 
+    val lotteryDB = remember { LotteryDB() }
+
     val navController = rememberNavController()
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
@@ -132,7 +135,12 @@ fun EntrantApp(onProfileDeleted: () -> Unit) {
             navController = navController,
             startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(EntrantDestination.HOME.route) { EntrantHomeScreen({ navController.navigate(route = EntrantViewReservations) }) }
+            composable(EntrantDestination.HOME.route) {
+                EntrantHomeScreen(
+                    onMyReservations = { navController.navigate(route = EntrantViewReservations) },
+                    lotteries = lotteryDB.
+                )
+            }
             composable<AppPolicyGuidelines> { AppPolicyGuidelinesScreen({ navController.popBackStack() }) }
             composable(EntrantDestination.SEARCH.route) {
                 SearchCampsiteScreen(

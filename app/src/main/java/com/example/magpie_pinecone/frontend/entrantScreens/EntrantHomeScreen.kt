@@ -49,7 +49,7 @@ private fun parseDate(dateStr: String) = SimpleDateFormat("yyyy-MM-dd", Locale.U
 @Composable
 fun EntrantHomeScreen(
     onMyReservations: () -> Unit,
-    lotteries: List<Lottery> = emptyList()
+    lotteries: List<Lottery>,
 ) {
 
     // TODO: THIS IS TEMPORARY!!! USED FOR TESTING
