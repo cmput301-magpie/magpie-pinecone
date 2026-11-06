@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
@@ -69,6 +70,7 @@ fun OwnerApp(androidId: String) {
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
 
     var lotteryToEdit by remember { mutableStateOf<Lottery?>(null) }
+    var lotteryToView by remember { mutableStateOf<Lottery?>(null)}
     var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
@@ -132,7 +134,10 @@ fun OwnerApp(androidId: String) {
                         lotteryToEdit = null
                         navController.navigate(route = EditLottery)
                     },
-                    onViewWaitlist = { navController.navigate(route = WaitingList) },
+                    onViewWaitlist = { lottery ->
+                        lotteryToView = lottery
+                        navController.navigate(route = WaitingList)
+                    },
                     onCreateCampsite = {
                         campsiteToEdit = null
                         navController.navigate(route = EditCampsite)
@@ -215,7 +220,19 @@ fun OwnerApp(androidId: String) {
             }
             composable<ViewReservations> { ViewReservationsScreen() }
             composable<WaitingList> {
-                WaitingListScreen({ navController.popBackStack() })
+                val lottery = lotteryToView
+                if (lottery == null) {
+                    LaunchedEffect(Unit) { navController.popBackStack() }
+                } else {
+                    var entrants by remember { mutableStateOf<List<User>>(emptyList()) }
+                    LaunchedEffect(lottery.id) {
+                        lotteryDB.viewEntrants(lottery.id) { entrants = it }
+                    }
+                    WaitingListScreen(
+                        entrants = entrants,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }
