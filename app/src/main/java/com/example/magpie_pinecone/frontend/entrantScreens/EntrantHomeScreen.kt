@@ -60,5 +60,15 @@ fun EntrantHomeScreen(navController: NavController) {
             Text("Search Campsites")
 
         }
+
+        // Temporary: until the Settings screen links to Profile
+        Button(
+            onClick = {
+                navController.navigate("profile")
+            },
+            modifier = Modifier.testTag("profileButton") // for testing
+        ) {
+            Text("Profile")
+        }
     }
 }
