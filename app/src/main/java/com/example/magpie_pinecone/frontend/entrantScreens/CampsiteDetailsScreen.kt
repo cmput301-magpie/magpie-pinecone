@@ -40,7 +40,7 @@ fun CampsiteDetailsScreen(navController: () -> Unit) {
 
         Button(
             onClick = {
-                navController.navigate("home")
+                // navController.navigate("home")
             },
             modifier = Modifier.testTag("homeButton") // for testing
         ) {

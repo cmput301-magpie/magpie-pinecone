@@ -75,7 +75,7 @@ fun EntrantApp() {
             navController = navController,
             startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
         ) {
-            composable(EntrantDestination.HOME.route) { EntrantHomeScreen(navController) }
+            composable(EntrantDestination.HOME.route) { EntrantHomeScreen({  }) }
             composable(EntrantDestination.SEARCH.route) { SearchCampsiteScreen(navController) }
         }
     }

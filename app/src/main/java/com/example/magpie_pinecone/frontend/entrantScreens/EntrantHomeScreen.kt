@@ -39,7 +39,7 @@ fun EntrantHomeScreen(navController: () -> Unit) {
 
         Button(
             onClick = {
-                navController.navigate("newUser")
+                // navController.navigate("newUser")
             },
             modifier = Modifier.testTag("newUserButton") // for testing
         ) {
@@ -50,7 +50,7 @@ fun EntrantHomeScreen(navController: () -> Unit) {
 
         Button(
             onClick = {
-                navController.navigate("viewCampsite")
+                // navController.navigate("viewCampsite")
             },
             modifier = Modifier.testTag("viewCampsiteButton") // for testing
         ) {
@@ -60,7 +60,7 @@ fun EntrantHomeScreen(navController: () -> Unit) {
 
         Button(
             onClick = {
-                navController.navigate("searchCampsite")
+                // navController.navigate("searchCampsite")
             },
             modifier = Modifier.testTag("searchCampsiteButton") // for testing
         ) {
