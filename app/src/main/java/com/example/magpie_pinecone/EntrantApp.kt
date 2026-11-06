@@ -32,15 +32,12 @@ import androidx.compose.runtime.setValue
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import androidx.compose.ui.platform.LocalContext
 import com.example.magpie_pinecone.backend.UserClasses.User
-import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.entrantClasses.EntrantHandler
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
-import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-
 import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 
 /**
@@ -79,14 +76,19 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
     }
+    var campsiteToReserve by remember { mutableStateOf<Campsite?>(null) }
 
     val userDB = remember { UserDB() }
     var curUser by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
+    var curEntrant by remember { mutableStateOf<Entrant?>(null) }
 
     LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
     {
         userDB.readUser(androidId) { fetchedUser ->
             curUser = fetchedUser
+        }
+        userDB.readEntrant(androidId) { fetchedEntrant ->
+            curEntrant = fetchedEntrant
         }
     }
 
@@ -147,7 +149,21 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
 
                 EntrantHomeScreen(
                     lotteries = lotteries,
-                    onMyReservations = { navController.navigate(route = EntrantViewReservations) } ,
+                    onMyReservations = { navController.navigate(route = EntrantViewReservations) },
+                    curEntrant = curEntrant,
+                    onLotteryDetails = { lottery ->
+                        selectedCampsite = lottery.campsites[0]  // TODO: IMPLEMENT FUNCTIONALITY FOR MULTIPLE CAMPSITES
+                        navController.navigate(CampsiteDetails)
+                    },
+                    onReserveLottery = { lottery ->
+                        campsiteToReserve = lottery.campsites[0]  // TODO: IMPLEMENT FUNCTIONALITY FOR MULTIPLE CAMPSITES
+                        navController.navigate(CampsiteReserve)
+                    },
+                    onLeaveLottery = {lottery ->
+                        if (curEntrant != null) {
+                            lotteryDB.removeEntrant(lottery, curEntrant!!)
+                        }
+                    }
                 )
             }
 
@@ -206,7 +222,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
             composable<CampsiteReserve> {
                 CampsiteReserveScreen(
                     onBack = { navController.popBackStack() },
-                    onUserAcceptedRules = { userDB.setRulesAccepted(androidId, true) }
+                    onUserAcceptedRules = { userDB.setRulesAccepted(androidId, true) },
+                    campsiteId = campsiteToReserve?.ID ?: "",
                 )
             }
             composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }

@@ -28,12 +28,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.magpie_pinecone.EditLottery
 import com.example.magpie_pinecone.R
+import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -45,79 +44,16 @@ import java.util.Locale
  * Implement links to Notifs (after halfway point), Details, Leave, Reserve, My Reservations buttons
  */
 
-// TODO: ALSO TEMPORARY
-private fun parseDate(dateStr: String) = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(dateStr)
-
 @Composable
 fun EntrantHomeScreen(
-    onMyReservations: () -> Unit,
-    lotteries: List<Lottery>,
+     onMyReservations: () -> Unit,
+     lotteries: List<Lottery>,
+     curEntrant: Entrant?,
+     onReserveLottery: (lottery: Lottery) -> Unit,
+     onLotteryDetails: (lottery: Lottery) -> Unit,
+     onLeaveLottery: (lottery: Lottery) -> Unit
 ) {
-
-    // TODO: THIS IS TEMPORARY!!! USED FOR TESTING
-    val sampleLotteries = listOf(
-        // 1. High-demand backcountry peak summer lottery
-        Lottery(
-            id = "lottery_lake_ohara_summer",
-            campsites = mutableListOf(
-                Campsite(ID = "site_ohara_01", name = "Lake O'Hara Backcountry A", price=123.0, location="hello ave"),
-                Campsite(ID = "site_ohara_02", name = "Lake O'Hara Backcountry B")
-            ),
-            registrationStartDate = parseDate("2026-02-01"),
-            registrationEndDate = parseDate("2026-02-28"),
-            bookingStartDate = parseDate("2026-03-05"),
-            bookingEndDate = parseDate("2026-03-12"),
-            activeStartDate = parseDate("2026-07-01"),
-            activeEndDate = parseDate("2026-08-31"),
-            numberOfWinners = 15,
-            waitlistCapacity = 250,
-            waitlist = mutableListOf(
-                Entrant(id = "entrant_101", name = "Alex Chen", email = "alex.chen@example.com", notifOptOut = false),
-                Entrant(id = "entrant_102", name = "Maya Patel", email = "maya.patel@example.com", notifOptOut = false),
-                Entrant(id = "entrant_103", name = "Liam Vance", email = "liam.v@example.com", notifOptOut = false)
-            )
-        ),
-
-        // 2. Popular riverside drive-in campground lottery
-        Lottery(
-            id = "lottery_two_jack_main",
-            campsites = mutableListOf(
-                Campsite(ID = "site_tj_12", name = "Two Jack Lakeside - Site 12", price = 102.0, location = "1234 St"),
-            ),
-            registrationStartDate = parseDate("2026-03-15"),
-            registrationEndDate = parseDate("2026-04-15"),
-            bookingStartDate = parseDate("2026-04-20"),
-            bookingEndDate = parseDate("2026-04-27"),
-            activeStartDate = parseDate("2026-06-15"),
-            activeEndDate = parseDate("2026-09-15"),
-            numberOfWinners = 25,
-            waitlistCapacity = 500,
-            waitlist = mutableListOf(
-                Entrant(id = "entrant_201", name = "Sarah Jenkins", email = "sjenkins@example.com", notifOptOut = false),
-                Entrant(id = "entrant_202", name = "Tariq Morales", email = "tmorales@example.com", notifOptOut = false)
-            )
-        ),
-
-        // 3. Fall shoulder season group site lottery
-        Lottery(
-            id = "lottery_point_wolf_fall",
-            campsites = mutableListOf(
-                Campsite(ID = "site_pw_grp1", name = "Point Wolfe Group Site Alpha", location="Point Wolfe, OH")
-            ),
-            registrationStartDate = parseDate("2026-05-01"),
-            registrationEndDate = parseDate("2026-05-31"),
-            bookingStartDate = parseDate("2026-06-05"),
-            bookingEndDate = parseDate("2026-06-12"),
-            activeStartDate = parseDate("2026-09-18"),
-            activeEndDate = parseDate("2026-10-15"),
-            numberOfWinners = 5,
-            waitlistCapacity = 75,
-            waitlist = mutableListOf(
-                Entrant(id = "entrant_301", name = "Chloe Dubois", email = "chloe.d@example.com", notifOptOut = false)
-            )
-        )
-    )
-    // END OF TEMPORARY DATA
+    if (curEntrant == null) return
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -135,7 +71,7 @@ fun EntrantHomeScreen(
                 // Title, may switch entrant out with user's actual name
                 Text(
                     modifier = Modifier.padding(20.dp),
-                    text = "Welcome Back, Entrant!",
+                    text = "Welcome Back, ${curEntrant.name}!",
                     fontSize = 36.sp
                 )
 
@@ -158,11 +94,16 @@ fun EntrantHomeScreen(
 
                 LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
                     // For now, just a single card as placeholder, will need to change into loop over all campsites
-                    items(sampleLotteries) { lottery ->
-                        EntrantHomeScreenLotteryCard(wonLottery = true, lottery = lottery)
+                    items(lotteries) { lottery ->
+                        EntrantHomeScreenLotteryCard(
+                            wonLottery = lottery.winners.any { it.id == curEntrant.id },
+                            lottery = lottery,
+                            onReserveLottery = { onReserveLottery(lottery) },
+                            onLotteryDetails = { onLotteryDetails(lottery) },
+                            onLeaveLottery = { onLeaveLottery(lottery) }
+                        )
                     }
                 }
-
             }
 
             // My Reservations
@@ -178,8 +119,11 @@ fun EntrantHomeScreen(
 }
 
 @Composable
-fun EntrantHomeScreenLotteryCard(wonLottery: Boolean, lottery: Lottery, modifier: Modifier = Modifier) {
-  // TODO: SUPPORT MULTIPLE CAMPSITES PER LOTTERY
+fun EntrantHomeScreenLotteryCard(wonLottery: Boolean, lottery: Lottery,
+                                 onReserveLottery: () -> Unit,
+                                 onLotteryDetails: () -> Unit,
+                                 onLeaveLottery: () -> Unit,
+                                 modifier: Modifier = Modifier) {
     Card(
         modifier = Modifier.fillMaxWidth().height(240.dp).padding(5.dp)
     ) {
@@ -284,22 +228,85 @@ fun EntrantHomeScreenLotteryCard(wonLottery: Boolean, lottery: Lottery, modifier
                     }
                 }
             }
-
-
-            // My Reservations
-            ExtendedFloatingActionButton(
-                modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 30.dp),
-                onClick = { onMyReservations() }
-            ) {
-                Text("My Reservations")
-            }
         }
-
     }
 }
 
+// For preview
+ private fun parseDate(dateStr: String) = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(dateStr)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowEntrantHomeScreenPreview() {
-    EntrantHomeScreen({})
+    val sampleLotteries = listOf(
+        // 1. High-demand backcountry peak summer lottery
+        Lottery(
+            id = "lottery_lake_ohara_summer",
+            campsites = mutableListOf(
+                Campsite(ID = "site_ohara_01", name = "Lake O'Hara Backcountry A", price=123.0, location="hello ave"),
+                Campsite(ID = "site_ohara_02", name = "Lake O'Hara Backcountry B")
+            ),
+            registrationStartDate = parseDate("2026-02-01"),
+            registrationEndDate = parseDate("2026-02-28"),
+            bookingStartDate = parseDate("2026-03-05"),
+            bookingEndDate = parseDate("2026-03-12"),
+            activeStartDate = parseDate("2026-07-01"),
+            activeEndDate = parseDate("2026-08-31"),
+            numberOfWinners = 15,
+            waitlistCapacity = 250,
+            waitlist = mutableListOf(
+                Entrant(id = "entrant_101", name = "Jeffrey Chen", email = "jeffrey.chen@example.com", notifOptOut = false),
+                Entrant(id = "entrant_102", name = "Maya Patel", email = "maya.patel@example.com", notifOptOut = false),
+                Entrant(id = "entrant_103", name = "Liam Vance", email = "liam.v@example.com", notifOptOut = false)
+            ),
+            winners = mutableListOf(
+                Entrant(id = "entrant_101", name = "Jeffrey Chen", email = "jeffrey.chen@example.com", notifOptOut = false)
+            ),
+        ),
+
+        // 2. Popular riverside drive-in campground lottery
+        Lottery(
+            id = "lottery_two_jack_main",
+            campsites = mutableListOf(
+                Campsite(ID = "site_tj_12", name = "Two Jack Lakeside - Site 12", price = 102.0, location = "1234 St"),
+            ),
+            registrationStartDate = parseDate("2026-03-15"),
+            registrationEndDate = parseDate("2026-04-15"),
+            bookingStartDate = parseDate("2026-04-20"),
+            bookingEndDate = parseDate("2026-04-27"),
+            activeStartDate = parseDate("2026-06-15"),
+            activeEndDate = parseDate("2026-09-15"),
+            numberOfWinners = 25,
+            waitlistCapacity = 500,
+            waitlist = mutableListOf(
+                Entrant(id = "entrant_201", name = "Sarah Jenkins", email = "sjenkins@example.com", notifOptOut = false),
+                Entrant(id = "entrant_202", name = "Tariq Morales", email = "tmorales@example.com", notifOptOut = false)
+            ),
+            winners = mutableListOf(
+                Entrant(id = "entrant_201", name = "Sarah Jenkins", email = "sjenkins@example.com", notifOptOut = false)
+            )
+        ),
+
+        // 3. Fall shoulder season group site lottery
+        Lottery(
+            id = "lottery_point_wolf_fall",
+            campsites = mutableListOf(
+                Campsite(ID = "site_pw_grp1", name = "Point Wolfe Group Site Alpha", location="Point Wolfe, OH")
+            ),
+            registrationStartDate = parseDate("2026-05-01"),
+            registrationEndDate = parseDate("2026-05-31"),
+            bookingStartDate = parseDate("2026-06-05"),
+            bookingEndDate = parseDate("2026-06-12"),
+            activeStartDate = parseDate("2026-09-18"),
+            activeEndDate = parseDate("2026-10-15"),
+            numberOfWinners = 5,
+            waitlistCapacity = 75,
+            waitlist = mutableListOf(
+                Entrant(id = "entrant_301", name = "Chloe Dubois", email = "chloe.d@example.com", notifOptOut = false)
+            ),
+            winners = mutableListOf(
+                Entrant(id = "entrant_301", name = "Chloe Dubois", email = "chloe.d@example.com", notifOptOut = false)
+            )
+        )
+    )
+    EntrantHomeScreen({}, lotteries = sampleLotteries, curEntrant = Entrant(id = "entrant_101", name = "Jeffrey Chen", email = "jeffrey.chen@example.com", notifOptOut = false), onReserveLottery = {}, onLotteryDetails = {}, onLeaveLottery = {})
 }

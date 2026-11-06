@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
@@ -215,7 +216,7 @@ fun OwnerApp(androidId: String) {
             }
             composable<ViewReservations> { ViewReservationsScreen() }
             composable<WaitingList> {
-                WaitingListScreen({ navController.popBackStack() })
+                WaitingListScreen(List<User>(0, { User() }), { navController.popBackStack() })
             }
         }
     }
