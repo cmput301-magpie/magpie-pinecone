@@ -57,4 +57,57 @@ class EntrantTests {
         assertTrue(b.activeReservations.isEmpty())
         assertTrue(b.pastReservations.isEmpty())
     }
+
+    @Test
+    fun entrant_inheritsUserDefaults() {
+        val entrant = Entrant()
+
+        // These fields come from the User class
+        assertEquals("", entrant.name)
+        assertEquals("", entrant.email)
+        assertEquals("", entrant.phoneNumber)
+        assertEquals(AccountType.Entrant, entrant.accountType)
+        assertFalse(entrant.rulesAccepted)   // rules not accepted yet
+    }
+
+    @Test
+    fun entrant_fieldsCanBeUpdated() {
+        val entrant = Entrant()
+
+        // Fields are "var", so the entrant can update their profile later
+        entrant.id = "xyz789"
+        entrant.name = "Livvy Dunne"
+        entrant.email = "livvy@gmail.com"
+        entrant.phoneNumber = "587-987-6543"
+
+        assertEquals("xyz789", entrant.id)
+        assertEquals("Livvy Dunne", entrant.name)
+        assertEquals("livvy@gmail.com", entrant.email)
+        assertEquals("587-987-6543", entrant.phoneNumber)
+    }
+
+    @Test
+    @Suppress("KotlinConstantConditions")
+    fun notifOptOut_canBeToggled() {
+        val entrant = Entrant()
+
+        // Starts as opted in (false)
+        assertFalse(entrant.notifOptOut)
+
+        // Entrant opts out of notifications
+        entrant.notifOptOut = true
+        assertTrue(entrant.notifOptOut)
+
+        // Entrant opts back in
+        entrant.notifOptOut = false
+        assertFalse(entrant.notifOptOut)
+    }
+
+    @Test
+    fun entrant_canAddReservation() {
+        val entrant = Entrant(id = "abc123")
+        val reservation = Reservation(ID = "reservation123", entrantID = "abc123")
+
+        entrant.activeReservations.add(reservation)
+    }
 }
