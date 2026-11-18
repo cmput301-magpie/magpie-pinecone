@@ -1,54 +1,55 @@
 package com.example.magpie_pinecone.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
+// Light mode: the Figma colors
+private val PineconeLightColorScheme = lightColorScheme(
+    primary = PineconePurple,            // default Button color
+    onPrimary = Color.White,             // text/icons on top of primary
+    secondary = PillPurple,              // pill buttons (Edit Profile, Download CSV)
     onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    error = DeclineRed,
+    onError = Color.White,
+    background = Color.White,            // screen background
+    surface = Color.White,
+    surfaceContainer = LavenderSurface,  // bottom nav bar color
+    outlineVariant = OutlineLavender     // card outlines and dividers
 )
 
+// Dark mode: used when the phone is set to dark theme
+private val PineconeDarkColorScheme = darkColorScheme(
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    error = DarkError,
+    onError = DarkOnError,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkBackground,
+    onSurface = DarkOnBackground,
+    surfaceContainer = DarkSurfaceContainer,  // bottom nav bar color in dark mode
+    outlineVariant = DarkOutline
+)
+
+/**
+ * The app's theme. Wrap every screen in this (MainActivity already does).
+ *
+ * darkTheme follows the phone's setting by default.
+ * Dynamic (wallpaper) colors are turned off, so the app always uses the colors above.
+ */
 @Composable
 fun MagpiepineconeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    // Pick the dark or light colors depending on the phone's setting
+    val colorScheme = if (darkTheme) PineconeDarkColorScheme else PineconeLightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
