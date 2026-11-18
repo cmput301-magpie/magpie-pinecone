@@ -101,8 +101,7 @@ class UserTests {
 
     @Test
     fun accountType_hasThreeTypes() {
-        val types = AccountType.entries
-        // There should be exactly Entrant, Owner and Admin, in that order
+        val types = AccountType.entries        // There should be exactly Entrant, Owner and Admin, in that order
         assertEquals(3, types.size)
         assertEquals(AccountType.Entrant, types[0])
         assertEquals(AccountType.Owner, types[1])
