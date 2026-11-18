@@ -30,11 +30,9 @@ import android.provider.Settings
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 import java.text.SimpleDateFormat
 import java.util.Locale

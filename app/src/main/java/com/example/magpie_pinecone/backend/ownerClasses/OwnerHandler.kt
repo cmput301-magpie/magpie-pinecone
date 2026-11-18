@@ -1,6 +1,5 @@
 package com.example.magpie_pinecone.backend.ownerClasses
 
-import android.app.Notification
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery

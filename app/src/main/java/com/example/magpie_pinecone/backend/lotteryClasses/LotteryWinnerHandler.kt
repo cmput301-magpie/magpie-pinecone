@@ -1,7 +1,6 @@
 package com.example.magpie_pinecone.backend.lotteryClasses
 
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
-import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import java.util.Date
 
 
