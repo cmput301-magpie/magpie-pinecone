@@ -49,12 +49,7 @@ fun CampsiteDetailsScreen(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = onBack
-            ) {
-                Text("<--")
-            }
+
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -187,6 +182,12 @@ fun CampsiteDetailsScreen(
                     }
                 }
             }
+            Button(
+                modifier = Modifier.align(Alignment.TopStart),
+                onClick = onBack
+            ) {
+                Text("<--")
+            }
 
             ExtendedFloatingActionButton(
                 modifier = Modifier
@@ -197,24 +198,7 @@ fun CampsiteDetailsScreen(
             ) {
                 Text("Enter Lottery")
             }
-            // Lottery functionality will be connected later
-            ExtendedFloatingActionButton(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 70.dp),
-                onClick = { }
-            ) {
-                Text("Enter Lottery")
-            }
-            // Lottery functionality will be connected later
-                ExtendedFloatingActionButton(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 70.dp),
-                    onClick = { }
-                ) {
-                    Text("Enter Lottery")
-            }
+
 
             // Only lottery winners can go on to reserve dates
             if (isWinner) {
