@@ -81,6 +81,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     var resultTitle by remember { mutableStateOf("Campsite Reserved") }
     var resultMessage by remember { mutableStateOf("") }
 
+    var campsiteToReserve by remember { mutableStateOf<Campsite?>(null) }
+
     val userDB = remember { UserDB() }
     var curUser by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
     var curEntrant by remember { mutableStateOf<Entrant?>(null) }
@@ -233,7 +235,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
             composable<CampsiteReserve> {
                 CampsiteReserveScreen(
                     onBack = { navController.popBackStack() },
-                    campsiteId = selectedCampsite?.ID ?: "",
+                    onUserAcceptedRules = { userDB.setRulesAccepted(androidId, true) },
+                    campsiteId = campsiteToReserve?.ID ?: "",
                     onReserved = {
                         resultTitle = "Campsite Reserved"
                         resultMessage = "Your reservation was placed successfully!"
@@ -261,8 +264,23 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     }
                 )
             }
-            composable(EntrantDestination.PROFILE.route) { ProfileScreen(navController, onProfileDeleted) }
-            composable<EditProfile> { EditProfileScreen(navController) }
+            composable<Profile> {
+                ProfileScreen(navController,
+                    curUser = curUser,
+                    onProfileDeleted = {
+                        curUser?.let { userDB.deleteUser(it) }
+                    }
+                )
+            }
+            composable<EditProfile> {
+                EditProfileScreen(navController,
+                    curUser,
+                    onUpdateProfile = {
+                        userDB.updateUser(it)
+                        // curUser = it  // Not needed because curUser is modified inside EditProfileScreen
+                    }
+                )
+            }
         }
     }
 }
