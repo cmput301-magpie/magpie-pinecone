@@ -6,6 +6,7 @@ import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import kotlin.collections.listOf
 
 /**
  * Stores the data associated with an owner user of the application.
@@ -23,10 +24,10 @@ class Owner(
     name: String = "",
     email: String = "",
     phoneNumber: String = "",
-    var campsites: List<Campsite>,
-    var lotteries: List<Lottery>,
-    var activeReservations: List<Reservation>,
-    var cancelledReservations: List<Reservation>,
-    var pastReservations: List<Reservation>,
-    var sentNotifications: List<Notification>
+    var campsites: MutableList<Campsite> = mutableListOf<Campsite>(),
+    var lotteries: MutableList<Lottery> = mutableListOf<Lottery>(),
+    var activeReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
+    var cancelledReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
+    var pastReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
+    var sentNotifications: MutableList<Notification> = mutableListOf<Notification>()
 ): User(id, name, email, phoneNumber, accountType = AccountType.Owner)
