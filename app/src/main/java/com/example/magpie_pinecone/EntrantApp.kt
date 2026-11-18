@@ -27,13 +27,14 @@ import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
 import kotlinx.serialization.Serializable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import androidx.compose.ui.platform.LocalContext
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 import com.example.magpie_pinecone.backend.entrantClasses.EntrantHandler
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
@@ -76,7 +77,9 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
     }
-    var campsiteToReserve by remember { mutableStateOf<Campsite?>(null) }
+    // What the result screen should say (reserved or cancelled)
+    var resultTitle by remember { mutableStateOf("Campsite Reserved") }
+    var resultMessage by remember { mutableStateOf("") }
 
     val userDB = remember { UserDB() }
     var curUser by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
@@ -94,6 +97,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
 
     val campsiteDB = remember { CampsiteDB() }
     val lotteryDB = remember { LotteryDB() }
+    val reservationDB = remember { ReservationDB() }
     val entrantHandler = remember { EntrantHandler() }
 
     var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
@@ -101,6 +105,9 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+
+    // Reservation Variables
+    var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
 
     // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
     // Screen is vertical (i.e. phone screen) -> bottom navbar
@@ -193,6 +200,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
 
                     CampsiteDetailsScreen(
                         campsite = campsite,
+                        isWinner = false,  // TODO: check the lotteryWinners collection for this entrant
+                        onReserve = { navController.navigate(CampsiteReserve) },
                         onBack = {
                             if (!navController.popBackStack()) {
                                 navController.navigate(EntrantDestination.SEARCH.route)
@@ -217,34 +226,43 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             }
                         }
                     )
+
+
                 }
             }
             composable<CampsiteReserve> {
                 CampsiteReserveScreen(
                     onBack = { navController.popBackStack() },
-                    onUserAcceptedRules = { userDB.setRulesAccepted(androidId, true) },
-                    campsiteId = campsiteToReserve?.ID ?: "",
-                )
-            }
-            composable<CampsiteResult> { CampsiteResultScreen({ navController.popBackStack() }) }
-            composable<EntrantViewReservations> { EntrantViewReservationsScreen() }
-            composable<Profile> {
-                ProfileScreen(navController,
-                    curUser = curUser,
-                    onProfileDeleted = {
-                        curUser?.let { userDB.deleteUser(it) }
+                    campsiteId = selectedCampsite?.ID ?: "",
+                    onReserved = {
+                        resultTitle = "Campsite Reserved"
+                        resultMessage = "Your reservation was placed successfully!"
+                        navController.navigate(CampsiteResult)
                     }
                 )
             }
-            composable<EditProfile> {
-                EditProfileScreen(navController,
-                    curUser,
-                    onUpdateProfile = {
-                        userDB.updateUser(it)
-                        // curUser = it  // Not needed because curUser is modified inside EditProfileScreen
+            composable<CampsiteResult> {
+                CampsiteResultScreen({ navController.popBackStack() }, title = resultTitle, message = resultMessage)
+            }
+            composable<EntrantViewReservations> {
+              // Grab active reservations everytime view reservations is loaded
+                LaunchedEffect(Unit) {
+                    reservationDB.getActiveReservationsByEntrant(entrantID = androidId) {
+                        activeReservations = it
+                    }
+                }
+                EntrantViewReservationsScreen(
+                    activeReservations = activeReservations,
+                    campsiteDB = campsiteDB,
+                    onCancelled = {
+                        resultTitle = "Campsite Cancelled"
+                        resultMessage = "Your reservation was cancelled."
+                        navController.navigate(CampsiteResult)
                     }
                 )
             }
-        }  // NavHost
+            composable(EntrantDestination.PROFILE.route) { ProfileScreen(navController, onProfileDeleted) }
+            composable<EditProfile> { EditProfileScreen(navController) }
+        }
     }
 }

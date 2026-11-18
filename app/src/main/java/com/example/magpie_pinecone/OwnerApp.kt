@@ -31,6 +31,10 @@ import com.example.magpie_pinecone.frontend.ownerScreens.ViewCampsiteScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.ViewReservationsScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
 import kotlinx.serialization.Serializable
+import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.backend.UserClasses.UserDB
+import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 
 /**
  * Provide destinations for the navigation bar at the bottom of the app.
@@ -63,13 +67,22 @@ fun OwnerApp(androidId: String) {
     val campsiteDB = remember { CampsiteDB() }
     val lotteryDB = remember { LotteryDB() }
     val ownerHandler = remember { OwnerHandler() }
+    val reservationDB = remember { ReservationDB() }
 
     // null = creating a new campsite, not null = editing existing campsite
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
     var campsiteToView by remember { mutableStateOf<Campsite?>(null) }
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
 
+    // Reservation Variables
+    var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+
+    val userDB = remember { UserDB() }
+    // IDs of the entrants on the waitlist being viewed, and the users loaded from them
+    var waitlistIds by remember { mutableStateOf<List<String>>(emptyList()) }
+    var waitlistEntrants by remember { mutableStateOf<List<User>>(emptyList()) }
     var lotteryToEdit by remember { mutableStateOf<Lottery?>(null) }
+    var lotteryToView by remember { mutableStateOf<Lottery?>(null)}
     var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
 
     // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
@@ -118,7 +131,11 @@ fun OwnerApp(androidId: String) {
             composable(OwnerDestination.HOME.route) {
                 // Runs every time the home screen is shown
                 LaunchedEffect(Unit) {
-                    lotteryDB.getLotteriesByOwner(ownerId = androidId) { lotteries = it }
+                    lotteryDB.getLotteriesByOwner(ownerId = androidId) { ownerLotteries ->
+                        lotteries = ownerLotteries
+                        // Draw winners for any lottery whose registration period has ended
+                        ownerLotteries.forEach { lotteryDB.drawWinnersIfReady(it) }
+                    }
                     campsiteDB.getCampsitesByOwner(ownerId = androidId) { campsites = it }
                 }
 
@@ -133,7 +150,10 @@ fun OwnerApp(androidId: String) {
                         lotteryToEdit = null
                         navController.navigate(route = EditLottery)
                     },
-                    onViewWaitlist = { navController.navigate(route = WaitingList) },
+                    onViewWaitlist = { lottery ->
+                        lotteryToView = lottery
+                        navController.navigate(route = WaitingList)
+                    },
                     onCreateCampsite = {
                         campsiteToEdit = null
                         navController.navigate(route = EditCampsite)
@@ -214,9 +234,33 @@ fun OwnerApp(androidId: String) {
                     )
                 }
             }
-            composable<ViewReservations> { ViewReservationsScreen() }
+            composable<ViewReservations> {
+                // Grab active reservations everytime view reservations is loaded
+                LaunchedEffect(Unit) {
+                    reservationDB.getActiveReservationsByOwner(ownerID = androidId) {
+                        activeReservations = it
+                    }
+                }
+
+                ViewReservationsScreen(
+                    activeReservations = activeReservations,
+                    campsiteDB = campsiteDB
+                )
+            }
             composable<WaitingList> {
-                WaitingListScreen(List<User>(0, { User() }), { navController.popBackStack() })
+                val lottery = lotteryToView
+                if (lottery == null) {
+                    LaunchedEffect(Unit) { navController.popBackStack() }
+                } else {
+                    var entrants by remember { mutableStateOf<List<User>>(emptyList()) }
+                    LaunchedEffect(lottery.id) {
+                        lotteryDB.viewEntrants(lottery.id) { entrants = it }
+                    }
+                    WaitingListScreen(
+                        entrants = entrants,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }
