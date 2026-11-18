@@ -89,4 +89,96 @@ class LotteryTests {
         assertTrue(b.campsites.isEmpty())
         assertTrue(b.waitlist.isEmpty())
     }
+
+    @Test
+    fun generateWinners_picksCorrectNumber() {
+        val lottery = Lottery(
+            numberOfWinners = 2,
+            waitlist = mutableListOf(Entrant(id = "E1"), Entrant(id = "E2"), Entrant(id = "E3"))
+        )
+
+        val winners = lottery.generateWinners()
+
+        // Only 2 winners should be picked out of 3 entrants
+        assertEquals(2, winners.size)
+    }
+
+    @Test
+    fun generateWinners_waitlistSmallerThanWinners() {
+        val lottery = Lottery(
+            numberOfWinners = 5,
+            waitlist = mutableListOf(Entrant(id = "E1"), Entrant(id = "E2"))
+        )
+
+        val winners = lottery.generateWinners()
+
+        // Only 2 people joined, so everyone wins (no crash, no extra winners)
+        assertEquals(2, winners.size)
+    }
+
+    @Test
+    fun generateWinners_emptyWaitlist() {
+        val lottery = Lottery(numberOfWinners = 3)
+
+        val winners = lottery.generateWinners()
+
+        // Nobody joined, so there are no winners
+        assertTrue(winners.isEmpty())
+        assertTrue(lottery.winners.isEmpty())
+    }
+
+    @Test
+    fun generateWinners_winnersComeFromWaitlist() {
+        val e1 = Entrant(id = "E1")
+        val e2 = Entrant(id = "E2")
+        val e3 = Entrant(id = "E3")
+        val lottery = Lottery(numberOfWinners = 2, waitlist = mutableListOf(e1, e2, e3))
+
+        val winners = lottery.generateWinners()
+
+        // Every winner must be someone who was on the waitlist
+        for (winner in winners) {
+            assertTrue(lottery.waitlist.contains(winner))
+        }
+    }
+
+    @Test
+    fun generateWinners_noDuplicateWinners() {
+        val lottery = Lottery(
+            numberOfWinners = 3,
+            waitlist = mutableListOf(Entrant(id = "E1"), Entrant(id = "E2"), Entrant(id = "E3"))
+        )
+
+        val winners = lottery.generateWinners()
+
+        // A set removes duplicates, so the sizes match only if nobody won twice
+        assertEquals(winners.size, winners.toSet().size)
+    }
+
+    @Test
+    fun generateWinners_updatesWinnersProperty() {
+        val lottery = Lottery(
+            numberOfWinners = 1,
+            waitlist = mutableListOf(Entrant(id = "E1"), Entrant(id = "E2"))
+        )
+
+        val returned = lottery.generateWinners()
+
+        // The returned list should also be saved on the lottery
+        assertEquals(returned, lottery.winners)
+    }
+
+    @Test
+    fun generateWinners_doesNotChangeWaitlist() {
+        val e1 = Entrant(id = "E1")
+        val e2 = Entrant(id = "E2")
+        val e3 = Entrant(id = "E3")
+        val lottery = Lottery(numberOfWinners = 2, waitlist = mutableListOf(e1, e2, e3))
+
+        lottery.generateWinners()
+
+        // The waitlist should stay the same (same people, same order)
+        assertEquals(mutableListOf(e1, e2, e3), lottery.waitlist)
+    }
+
 }
