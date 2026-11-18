@@ -45,7 +45,6 @@ fun CampsiteReserveScreen(
     onBack: () -> Boolean,
     onUserAcceptedRules: () -> Unit,
     campsiteId: String = "",
-    campsiteId: String = "",
     onReserved: () -> Unit = {}
 ) {
     var checked by remember { mutableStateOf(false) }
@@ -133,7 +132,6 @@ fun CampsiteReserveScreen(
                         onClick = {
                             // Record that this user confirmed the rules
                             onUserAcceptedRules()
-                            userDB.setRulesAccepted(androidId, true)
                             onReserved()
                         },
                         colors = ButtonDefaults.buttonColors(
