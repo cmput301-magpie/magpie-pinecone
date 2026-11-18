@@ -40,6 +40,7 @@ import java.util.Locale
 
 @Composable
 fun EditLotteryScreen(
+    ownerId: String,
     isEdit: Boolean,
     lottery: Lottery,
     availableCampsites: List<Campsite>,  // the campsites the owner can add to the lottery
@@ -194,19 +195,24 @@ fun EditLotteryScreen(
                     onClick = {
                         // Lottery is immutable apart from its id, so submit an updated copy.
                         // copy() keeps the id and waitlist/winners of the original.
-                        onSubmit(
-                            lottery.copy(
-                                campsites = selectedCampsites.toMutableList(),
-                                numberOfWinners = winners ?: 1,
-                                waitlistCapacity = capacity ?: 100,
-                                registrationStartDate = textToDate(registrationStart),
-                                registrationEndDate = textToDate(registrationEnd),
-                                bookingStartDate = textToDate(bookingStart),
-                                bookingEndDate = textToDate(bookingEnd),
-                                activeStartDate = textToDate(activeStart),
-                                activeEndDate = textToDate(activeEnd)
-                            )
-                        )
+                        lottery.ownerId = ownerId
+                        lottery.numberOfWinners = winners ?: 0
+                        lottery.waitlistCapacity = capacity ?: 0
+                        lottery.registrationStartDate = textToDate(registrationStart)
+                        lottery.registrationEndDate = textToDate(registrationEnd)
+                        lottery.bookingStartDate = textToDate(bookingStart)
+                        lottery.bookingEndDate = textToDate(bookingEnd)
+                        lottery.activeStartDate = textToDate(activeStart)
+                        lottery.activeEndDate = textToDate(activeEnd)
+                        lottery.campsites = selectedCampsites.toMutableList()
+
+
+                        // The lottery can only be submitted once everything is filled in correctly
+
+                        onSubmit(lottery)
+
+
+
                     }
                 ) {
                     Text(if (isEdit) "Update Lottery" else "Start Lottery")
@@ -296,6 +302,7 @@ fun ShowEditLotteryScreenPreview() {
         lottery = Lottery(),
         availableCampsites = emptyList(),
         onBack = { false },
-        onSubmit = {}
+        onSubmit = {},
+        ownerId = ""
     )
 }

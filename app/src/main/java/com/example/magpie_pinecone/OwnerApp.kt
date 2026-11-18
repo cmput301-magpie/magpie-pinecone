@@ -214,7 +214,8 @@ fun OwnerApp(androidId: String) {
                             ownerHandler.createLottery(lotteryDB, submitted)
                         }
                         navController.popBackStack(OwnerDestination.HOME.route, inclusive = false)
-                    }
+                    },
+                    ownerId = androidId,
                 )
             }
             composable<ViewCampsite> {
