@@ -78,4 +78,72 @@ class OwnerTests {
         assertTrue(b.campsites.isEmpty())
         assertTrue(b.activeReservations.isEmpty())
     }
+
+    @Test
+    fun owner_inheritsUserDefaults() {
+        val owner = Owner()
+
+        // These fields come from the User class
+        assertEquals("", owner.name)
+        assertEquals("", owner.email)
+        assertEquals("", owner.phoneNumber)
+        assertEquals(AccountType.Owner, owner.accountType)   // always Owner, not the User default
+        assertTrue(!owner.rulesAccepted)                     // rules not accepted yet
+    }
+
+    @Test
+    fun owner_canAddAndRemoveCampsites() {
+        val owner = Owner(id = "abc123")
+        val campsite1 = Campsite(name = "Lakeview")
+        val campsite2 = Campsite(name = "Hilltop")
+
+        // Owner registers two campsites
+        owner.campsites.add(campsite1)
+        owner.campsites.add(campsite2)
+        assertEquals(2, owner.campsites.size)
+
+        // Owner removes one campsite
+        owner.campsites.remove(campsite1)
+        assertEquals(1, owner.campsites.size)
+        assertEquals(campsite2, owner.campsites[0])
+    }
+
+    @Test
+    fun owner_canAddLottery() {
+        val owner = Owner(id = "abc123")
+        val lottery = Lottery(id = "lottery123", ownerId = "abc123")
+
+        owner.lotteries.add(lottery)
+
+        assertEquals(1, owner.lotteries.size)
+        assertEquals("abc123", owner.lotteries[0].ownerId)   // lottery belongs to this owner
+    }
+
+    @Test
+    fun owner_reservationCanMoveToCancelled() {
+        val reservation = Reservation(ID = "reservation123")
+        val owner = Owner(activeReservations = mutableListOf(reservation))
+
+        // Move the reservation from active to cancelled
+        owner.activeReservations.remove(reservation)
+        owner.cancelledReservations.add(reservation)
+
+        assertTrue(owner.activeReservations.isEmpty())
+        assertEquals(mutableListOf(reservation), owner.cancelledReservations)
+    }
+
+    @Test
+    fun twoOwners_doNotShareOtherLists() {
+        val a = Owner()
+        val b = Owner()
+
+        // The first test checked campsites and activeReservations, so this checks the rest
+        a.lotteries.add(Lottery())
+        a.cancelledReservations.add(Reservation())
+        a.pastReservations.add(Reservation())
+
+        assertTrue(b.lotteries.isEmpty())
+        assertTrue(b.cancelledReservations.isEmpty())
+        assertTrue(b.pastReservations.isEmpty())
+    }
 }
