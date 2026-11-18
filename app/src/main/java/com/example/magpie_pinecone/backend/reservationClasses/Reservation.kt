@@ -1,8 +1,5 @@
 package com.example.magpie_pinecone.backend.reservationClasses
 
-import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
-import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import com.example.magpie_pinecone.backend.ownerClasses.Owner
 import java.util.Date
 
 /**

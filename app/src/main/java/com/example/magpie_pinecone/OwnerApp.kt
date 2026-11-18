@@ -31,7 +31,6 @@ import com.example.magpie_pinecone.frontend.ownerScreens.ViewCampsiteScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.ViewReservationsScreen
 import com.example.magpie_pinecone.frontend.ownerScreens.WaitingListScreen
 import kotlinx.serialization.Serializable
-import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB

@@ -23,7 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.magpie_pinecone.EditLottery
 import com.example.magpie_pinecone.R
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 
