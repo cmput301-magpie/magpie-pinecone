@@ -1,0 +1,4 @@
+package UserClassesTests
+
+class UserTests {
+}
