@@ -20,5 +20,5 @@ class Entrant (
     var activeReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
     var pastReservations: MutableList<Reservation> = mutableListOf<Reservation>(),
     var notifOptOut: Boolean = false,
-    ): User(id, name, email, phoneNumber, accountType = AccountType.Entrant) {
+): User(id, name, email, phoneNumber, accountType = AccountType.Entrant) {
 }

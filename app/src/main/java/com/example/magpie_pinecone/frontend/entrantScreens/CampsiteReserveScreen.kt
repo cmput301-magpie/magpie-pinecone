@@ -43,14 +43,13 @@ import java.util.Locale
 @Composable
 fun CampsiteReserveScreen(
     onBack: () -> Boolean,
+    onUserAcceptedRules: () -> Unit,
+    campsiteId: String = "",
     campsiteId: String = "",
     onReserved: () -> Unit = {}
 ) {
     var checked by remember { mutableStateOf(false) }
-    val userDB = remember { UserDB() }
     // Android ID is the user's ID in Firestore (same as ProfileScreen)
-    val context = LocalContext.current
-    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
     val campsiteDB = remember { CampsiteDB() }
     var rules by remember { mutableStateOf("Loading rules...") }
     var availableDates by remember { mutableStateOf<List<Date>>(emptyList()) }
@@ -133,6 +132,7 @@ fun CampsiteReserveScreen(
                         enabled = checked,  // Cannot reserve until the rules are confirmed
                         onClick = {
                             // Record that this user confirmed the rules
+                            onUserAcceptedRules()
                             userDB.setRulesAccepted(androidId, true)
                             onReserved()
                         },
@@ -163,5 +163,5 @@ fun CampsiteReserveScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowCampsiteReserveScreenPreview() {
-    CampsiteReserveScreen({ false })
+    CampsiteReserveScreen({ false }, onUserAcceptedRules = {})
 }

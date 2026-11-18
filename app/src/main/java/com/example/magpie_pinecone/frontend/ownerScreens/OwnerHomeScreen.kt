@@ -119,14 +119,6 @@ fun MyLotteries(
     onCreateLottery: () -> Unit,
     onViewWaitlist: (Lottery) -> Unit,
 ) {
-    if (lotteries.isEmpty()) {
-        Text(
-            modifier = Modifier.padding(20.dp),
-            text = "You have no lotteries yet.",
-            fontSize = 16.sp
-        )
-        return
-    }
 
     Box(modifier = Modifier.fillMaxHeight()) {
         LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
@@ -144,6 +136,15 @@ fun MyLotteries(
             modifier = Modifier.align(Alignment.BottomEnd),
             onClick = { onCreateLottery() }
         ) { Text("+ Lottery") }
+    }
+
+    if (lotteries.isEmpty()) {
+        Text(
+            modifier = Modifier.padding(20.dp),
+            text = "You have no lotteries yet.",
+            fontSize = 16.sp
+        )
+        return
     }
 }
 
@@ -238,16 +239,9 @@ fun MyCampsites(
     onDatesBooked: () -> Unit,
     onViewReservations: () -> Unit
 ) {
-    if (campsites.isEmpty()) {
-        Text(
-            modifier = Modifier.padding(20.dp),
-            text = "You have no campsites yet.",
-            fontSize = 16.sp
-        )
-        return
-    }
 
-    Box(modifier = Modifier.fillMaxHeight()) {
+
+    Box(modifier = Modifier.fillMaxSize().padding(5.dp)) {
         LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
             // For each campsite, display a card with the details
             items(campsites) { campsite ->
@@ -279,6 +273,15 @@ fun MyCampsites(
                 Text("Campsite Resv.")
             }
         }
+    }
+
+    if (campsites.isEmpty()) {
+        Text(
+            modifier = Modifier.padding(20.dp),
+            text = "You have no campsites yet.",
+            fontSize = 16.sp
+        )
+        return
     }
 }
 
