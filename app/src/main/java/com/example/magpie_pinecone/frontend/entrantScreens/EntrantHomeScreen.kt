@@ -1,312 +1,531 @@
- package com.example.magpie_pinecone.frontend.entrantScreens
+package com.example.magpie_pinecone.frontend.entrantScreens
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.magpie_pinecone.R
-import com.example.magpie_pinecone.backend.UserClasses.User
-import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
+import com.example.magpie_pinecone.frontend.sharedComposables.NotifsInbox
+import com.example.magpie_pinecone.ui.components.CampsiteImage
+import com.example.magpie_pinecone.ui.components.PillButton
+import com.example.magpie_pinecone.ui.components.StarRating
+import com.example.magpie_pinecone.ui.theme.LavenderSurface
+import com.example.magpie_pinecone.ui.theme.LeaveRed
+import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
+import com.example.magpie_pinecone.ui.theme.OutlineLavender
+import com.example.magpie_pinecone.ui.theme.PineconePurple
+import com.example.magpie_pinecone.ui.theme.ReserveGreen
 
- /**
- * Display's Entrant's Home Screen
- * TO-DO
- * Link to entrant's actual lotteries to loop over
- * Implement check for if in lottery or not to switch between buttons
- * Implement links to Notifs (after halfway point), Details, Leave, Reserve, My Reservations buttons
+/**
+ * Displays the entrant landing page.
+ *
+ * The home screen shows the entrant's active lottery entries and whether
+ * they have won each lottery. Entrants can view campsite details, leave
+ * lotteries, reserve a campsite after winning, or open their reservations.
+ *
+ * @param onMyReservations Opens the entrant's reservations.
+ * @param onNotifications Opens the entrant notifications screen.
+ * @param lotteries Lotteries that the entrant has joined.
+ * @param curEntrant The entrant currently using the app.
+ * @param onReserveLottery Called when a lottery winner chooses to reserve.
+ * @param onLotteryDetails Opens the details for a lottery's campsite.
+ * @param onLeaveLottery Removes the entrant from the selected lottery.
  */
-
 @Composable
 fun EntrantHomeScreen(
-     onMyReservations: () -> Unit,
-     lotteries: List<Lottery>,
-     curEntrant: Entrant?,
-     onReserveLottery: (lottery: Lottery) -> Unit,
-     onLotteryDetails: (lottery: Lottery) -> Unit,
-     onLeaveLottery: (lottery: Lottery) -> Unit
+    onMyReservations: () -> Unit,
+    onNotifications: () -> Unit,
+    lotteries: List<Lottery>,
+    curEntrant: Entrant?,
+    onReserveLottery: (lottery: Lottery) -> Unit,
+    onLotteryDetails: (lottery: Lottery) -> Unit,
+    onLeaveLottery: (lottery: Lottery) -> Unit
 ) {
-    if (curEntrant == null) return
+    if (curEntrant == null) {
+        return
+    }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Box(
+        Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            HomeWelcomeBanner(
+                entrantName = curEntrant.name
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 20.dp,
+                        end = 12.dp,
+                        top = 16.dp,
+                        bottom = 8.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Title, may switch entrant out with user's actual name
                 Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = "Welcome Back, ${curEntrant.name}!",
-                    fontSize = 36.sp
+                    text = "Your Lottery Entries",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                /*
+                 * Notification functionality is implemented separately.
+                 * Reuse the shared inbox component here rather than
+                 * duplicating notification behaviour in the home screen.
+                 */
+                NotifsInbox(
+                    onInboxClicked = onNotifications
+                )
+            }
+
+            if (lotteries.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Your Lottery Entries",
-                        fontSize = 20.sp
+                        text = "You have no lottery entries yet.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
-                    Button(
-                        onClick = {}
-                    ) {
-                        Text("Notifs (0)")
-                    }
                 }
-
-                LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
-                    // For now, just a single card as placeholder, will need to change into loop over all campsites
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 4.dp,
+                        bottom = 96.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     items(lotteries) { lottery ->
-                        EntrantHomeScreenLotteryCard(
-                            wonLottery = lottery.winners.any { it.id == curEntrant.id },
-                            lottery = lottery,
-                            onReserveLottery = { onReserveLottery(lottery) },
-                            onLotteryDetails = { onLotteryDetails(lottery) },
-                            onLeaveLottery = { onLeaveLottery(lottery) }
-                        )
+                        val campsite = lottery.campsites.firstOrNull()
+
+                        /*
+                         * A lottery should normally contain a campsite.
+                         * Avoid indexing campsites[0] so malformed data
+                         * cannot crash the entire home screen.
+                         */
+                        if (campsite != null) {
+                            EntrantHomeScreenLotteryCard(
+                                wonLottery = lottery.winners.any {
+                                    it.id == curEntrant.id
+                                },
+                                lottery = lottery,
+                                campsite = campsite,
+                                onReserveLottery = {
+                                    onReserveLottery(lottery)
+                                },
+                                onLotteryDetails = {
+                                    onLotteryDetails(lottery)
+                                },
+                                onLeaveLottery = {
+                                    onLeaveLottery(lottery)
+                                }
+                            )
+                        }
                     }
                 }
-            }
-
-            // My Reservations
-            ExtendedFloatingActionButton(
-                modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 30.dp),
-                onClick = { onMyReservations() }
-            ) {
-                Text("My Reservations")
             }
         }
 
+        ExtendedFloatingActionButton(
+            onClick = onMyReservations,
+            containerColor = PineconePurple,
+            contentColor = Color.White,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = 20.dp,
+                    bottom = 18.dp
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
+            Text(
+                text = "My reservations",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 
+/**
+ * Purple welcome banner displayed at the top of the entrant home screen.
+ *
+ * @param entrantName Name of the currently signed-in entrant.
+ */
 @Composable
-fun EntrantHomeScreenLotteryCard(wonLottery: Boolean, lottery: Lottery,
-                                 onReserveLottery: () -> Unit,
-                                 onLotteryDetails: () -> Unit,
-                                 onLeaveLottery: () -> Unit,
-                                 modifier: Modifier = Modifier) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(240.dp).padding(5.dp)
+private fun HomeWelcomeBanner(
+    entrantName: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PineconePurple)
+            .padding(
+                horizontal = 28.dp,
+                vertical = 26.dp
+            )
     ) {
-        Box() {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+        Text(
+            text = "Welcome back,\n${entrantName.ifBlank { "User" }}!",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = Color.White
+        )
+    }
+}
+
+/**
+ * Displays one lottery entry on the entrant home screen.
+ *
+ * Winners see a reservation action. Entrants who have not won can view
+ * the campsite details or leave the lottery.
+ *
+ * @param wonLottery Whether the current entrant won this lottery.
+ * @param lottery Lottery represented by the card.
+ * @param campsite Campsite displayed by this lottery entry.
+ * @param onReserveLottery Called when the winner selects Reserve.
+ * @param onLotteryDetails Called when Details is selected.
+ * @param onLeaveLottery Called when Leave is selected.
+ */
+@Composable
+fun EntrantHomeScreenLotteryCard(
+    wonLottery: Boolean,
+    lottery: Lottery,
+    campsite: Campsite,
+    onReserveLottery: () -> Unit,
+    onLotteryDetails: () -> Unit,
+    onLeaveLottery: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = OutlineLavender
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = LavenderSurface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 16.dp,
+                        end = 12.dp,
+                        top = 12.dp,
+                        bottom = 10.dp
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().weight(2f),
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(116.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Campsite Details
-                    Column(modifier = Modifier.weight(1.5f)) {
-                        // This basic text component will resize to fit the campsite's name, and adds ellipsis if it doesn't fit
-                        BasicText(
-                            text = lottery.campsites[0].name,
-                            maxLines = 1, // Forces the text to stay on a single line
-                            overflow = TextOverflow.Ellipsis, // Backup handling if it doesn't fit the min bounds
-                            //style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
-                            autoSize = TextAutoSize.StepBased(
-                                minFontSize = 24.sp,  // The absolute smallest the text can shrink to
-                                maxFontSize = 32.sp,  // The starting target font size
-                                stepSize = 1.sp       // The increments it drops by when calculating fit
-                            )
-                        )
-
-                        Text(
-                            text = "Rating: " + lottery.campsites[0].rating.toString(),
-                            fontSize = 16.sp
-                        )
-
-                        Text(
-                            text = "Max Capacity: " + lottery.campsites[0].maxOccupancy,
-                            fontSize = 16.sp
-                        )
-
-                        Text(
-                            text = "\$${lottery.campsites[0].price} / night",
-                            fontSize = 16.sp
-                        )
-
-                        Text(
-                            text = lottery.campsites[0].location,
-                            fontSize = 16.sp
-                        )
-                    }
-
-                    // TODO: ADD IMAGE FROM CAMPSITE CLASS
-                    // Placeholder Icon Image
-                    Image(
-                        modifier = Modifier.weight(1f),
-                        painter = painterResource(id = R.drawable.placeholdercampsiteimage),
-                        contentDescription = "Campsite Image",
-                        contentScale = ContentScale.Crop
+                    Text(
+                        text = campsite.name.ifBlank {
+                            "Unnamed campsite"
+                        },
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                }
 
-                if (wonLottery) {
-                    // Not In Lottery Buttons
+                    StarRating(
+                        rating = campsite.rating
+                    )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "You won the lottery!"
+                        Icon(
+                            imageVector = Icons.Filled.People,
+                            contentDescription = "Maximum occupancy",
+                            modifier = Modifier.size(20.dp)
                         )
 
-                        Button(
-                            onClick = {},
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Green
-                            )
-                        ) {
-                            Text("Reserve")
-                        }
-                    }
-                } else {
-                    // In Lottery Buttons
+                        Spacer(
+                            modifier = Modifier.width(6.dp)
+                        )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Button(
-                            onClick = {}
-                        ) {
-                            Text("Details")
-                        }
+                        Text(
+                            text = campsite.maxOccupancy.toString(),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
 
-                        Button(
-                            onClick = {},
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red
-                            )
-                        ) {
-                            Text("Leave")
-                        }
+                        Spacer(
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text(
+                            text = "$${formatPrice(campsite.price)}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
+
+                    Text(
+                        text = campsite.location,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
+
+                CampsiteImage(
+                    modifier = Modifier
+                        .width(148.dp)
+                        .height(116.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            }
+
+            if (wonLottery) {
+                WinnerActions(
+                    onReserveLottery = onReserveLottery
+                )
+            } else {
+                LotteryEntryActions(
+                    onLotteryDetails = onLotteryDetails,
+                    onLeaveLottery = onLeaveLottery
+                )
             }
         }
     }
 }
 
-// For preview
- private fun parseDate(dateStr: String) = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(dateStr)
-@Preview(showBackground = true, showSystemUi = true)
+/**
+ * Bottom section displayed when the entrant has won a lottery.
+ */
 @Composable
-fun ShowEntrantHomeScreenPreview() {
-    val sampleLotteries = listOf(
-        // 1. High-demand backcountry peak summer lottery
-        Lottery(
-            id = "lottery_lake_ohara_summer",
-            campsites = mutableListOf(
-                Campsite(ID = "site_ohara_01", name = "Lake O'Hara Backcountry A", price=123.0, location="hello ave"),
-                Campsite(ID = "site_ohara_02", name = "Lake O'Hara Backcountry B")
+private fun WinnerActions(
+    onReserveLottery: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = 18.dp,
+                end = 12.dp,
+                bottom = 12.dp
             ),
-            registrationStartDate = parseDate("2026-02-01"),
-            registrationEndDate = parseDate("2026-02-28"),
-            bookingStartDate = parseDate("2026-03-05"),
-            bookingEndDate = parseDate("2026-03-12"),
-            activeStartDate = parseDate("2026-07-01"),
-            activeEndDate = parseDate("2026-08-31"),
-            numberOfWinners = 15,
-            waitlistCapacity = 250,
-            waitlist = mutableListOf(
-                Entrant(id = "entrant_101", name = "Jeffrey Chen", email = "jeffrey.chen@example.com", notifOptOut = false),
-                Entrant(id = "entrant_102", name = "Maya Patel", email = "maya.patel@example.com", notifOptOut = false),
-                Entrant(id = "entrant_103", name = "Liam Vance", email = "liam.v@example.com", notifOptOut = false)
-            ),
-            winners = mutableListOf(
-                Entrant(id = "entrant_101", name = "Jeffrey Chen", email = "jeffrey.chen@example.com", notifOptOut = false)
-            ),
-        ),
-
-        // 2. Popular riverside drive-in campground lottery
-        Lottery(
-            id = "lottery_two_jack_main",
-            campsites = mutableListOf(
-                Campsite(ID = "site_tj_12", name = "Two Jack Lakeside - Site 12", price = 102.0, location = "1234 St"),
-            ),
-            registrationStartDate = parseDate("2026-03-15"),
-            registrationEndDate = parseDate("2026-04-15"),
-            bookingStartDate = parseDate("2026-04-20"),
-            bookingEndDate = parseDate("2026-04-27"),
-            activeStartDate = parseDate("2026-06-15"),
-            activeEndDate = parseDate("2026-09-15"),
-            numberOfWinners = 25,
-            waitlistCapacity = 500,
-            waitlist = mutableListOf(
-                Entrant(id = "entrant_201", name = "Sarah Jenkins", email = "sjenkins@example.com", notifOptOut = false),
-                Entrant(id = "entrant_202", name = "Tariq Morales", email = "tmorales@example.com", notifOptOut = false)
-            ),
-            winners = mutableListOf(
-                Entrant(id = "entrant_201", name = "Sarah Jenkins", email = "sjenkins@example.com", notifOptOut = false)
-            )
-        ),
-
-        // 3. Fall shoulder season group site lottery
-        Lottery(
-            id = "lottery_point_wolf_fall",
-            campsites = mutableListOf(
-                Campsite(ID = "site_pw_grp1", name = "Point Wolfe Group Site Alpha", location="Point Wolfe, OH")
-            ),
-            registrationStartDate = parseDate("2026-05-01"),
-            registrationEndDate = parseDate("2026-05-31"),
-            bookingStartDate = parseDate("2026-06-05"),
-            bookingEndDate = parseDate("2026-06-12"),
-            activeStartDate = parseDate("2026-09-18"),
-            activeEndDate = parseDate("2026-10-15"),
-            numberOfWinners = 5,
-            waitlistCapacity = 75,
-            waitlist = mutableListOf(
-                Entrant(id = "entrant_301", name = "Chloe Dubois", email = "chloe.d@example.com", notifOptOut = false)
-            ),
-            winners = mutableListOf(
-                Entrant(id = "entrant_301", name = "Chloe Dubois", email = "chloe.d@example.com", notifOptOut = false)
-            )
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "You won the lottery!",
+            style = MaterialTheme.typography.bodyMedium,
+            color = ReserveGreen,
+            modifier = Modifier.weight(1f)
         )
+
+        PillButton(
+            text = "Reserve",
+            onClick = onReserveLottery,
+            containerColor = ReserveGreen
+        )
+    }
+}
+
+/**
+ * Joined Details and Leave controls shown for an active lottery entry.
+ */
+@Composable
+private fun LotteryEntryActions(
+    onLotteryDetails: () -> Unit,
+    onLeaveLottery: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = 12.dp,
+                end = 12.dp,
+                bottom = 12.dp
+            )
+    ) {
+        Button(
+            onClick = onLotteryDetails,
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            shape = RoundedCornerShape(
+                topStart = 24.dp,
+                bottomStart = 24.dp,
+                topEnd = 0.dp,
+                bottomEnd = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = OutlineLavender
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 0.dp
+            )
+        ) {
+            Text(
+                text = "Details",
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Button(
+            onClick = onLeaveLottery,
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            shape = RoundedCornerShape(
+                topStart = 0.dp,
+                bottomStart = 0.dp,
+                topEnd = 24.dp,
+                bottomEnd = 24.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = LeaveRed,
+                contentColor = Color.White
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 0.dp
+            )
+        ) {
+            Text(
+                text = "Leave",
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+/**
+ * Formats prices without unnecessary decimal places.
+ */
+private fun formatPrice(
+    price: Double
+): String {
+    return if (price % 1.0 == 0.0) {
+        price.toInt().toString()
+    } else {
+        "%.2f".format(price)
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+private fun EntrantHomeScreenPreview() {
+    val entrant = Entrant(
+        id = "entrant_101",
+        name = "User",
+        email = "user@example.com",
+        notifOptOut = false
     )
-    EntrantHomeScreen({}, lotteries = sampleLotteries, curEntrant = Entrant(id = "entrant_101", name = "Jeffrey Chen", email = "jeffrey.chen@example.com", notifOptOut = false), onReserveLottery = {}, onLotteryDetails = {}, onLeaveLottery = {})
+
+    val campsite = Campsite(
+        ID = "campsite_1",
+        name = "Campsite",
+        location = "1234 567 St",
+        maxOccupancy = 5,
+        price = 38.0,
+        rating = 5.0
+    )
+
+    val activeLottery = Lottery(
+        id = "lottery_1",
+        campsites = mutableListOf(campsite),
+        waitlist = mutableListOf(entrant)
+    )
+
+    val wonLottery = Lottery(
+        id = "lottery_2",
+        campsites = mutableListOf(campsite),
+        waitlist = mutableListOf(entrant),
+        winners = listOf(entrant)
+    )
+
+    MagpiepineconeTheme {
+        EntrantHomeScreen(
+            onMyReservations = {},
+            onNotifications = {},
+            lotteries = listOf(
+                activeLottery,
+                wonLottery,
+                activeLottery
+            ),
+            curEntrant = entrant,
+            onReserveLottery = {},
+            onLotteryDetails = {},
+            onLeaveLottery = {}
+        )
+    }
 }
