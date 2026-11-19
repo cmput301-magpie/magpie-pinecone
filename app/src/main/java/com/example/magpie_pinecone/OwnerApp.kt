@@ -34,16 +34,28 @@ import kotlinx.serialization.Serializable
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.magpie_pinecone.ui.components.ComingSoonScreen
 
 /**
- * Provide destinations for the navigation bar at the bottom of the app.
+ * The 4 tabs of the bottom navigation bar, matching Figma: Home, Search, Settings, Scan QR.
+ * Only Home is built for owners so far; the others show a "Coming soon" screen.
  */
 enum class OwnerDestination(
     val route: String,
     val label: String,
-    @DrawableRes val icon: Int,
+    val icon: ImageVector,
 ) {
-    HOME("ownerHome", "Home", R.drawable.ic_home),  // icons are temporary -Albert
+    HOME("ownerHome", "Home", Icons.Filled.Menu),
+    SEARCH("ownerSearch", "Search", Icons.Filled.Search),
+    SETTINGS("ownerSettings", "Settings", Icons.Filled.Settings),
+    SCAN_QR("ownerScanQr", "Scan QR", Icons.Filled.QrCodeScanner)
 }
 
 // Objects to represent routes
@@ -92,12 +104,14 @@ fun OwnerApp(androidId: String) {
     // Screen is vertical (i.e. phone screen) -> bottom navbar
     // Screen is horizontal (i.e. tablet screen) -> sidebar
     NavigationSuiteScaffold(
+        // Always show the normal bottom bar, like Figma
+        layoutType = NavigationSuiteType.NavigationBar,
         navigationSuiteItems = {
             OwnerDestination.entries.forEach { destination ->
                 item(
                     icon = {
                         Icon(
-                            painter = painterResource(destination.icon),
+                            imageVector = destination.icon,
                             contentDescription = null  // Label describes it already
                         )
                     },
@@ -262,6 +276,10 @@ fun OwnerApp(androidId: String) {
                     )
                 }
             }
+            // Tabs that are not built for owners yet
+            composable(OwnerDestination.SEARCH.route) { ComingSoonScreen(title = "Search") }
+            composable(OwnerDestination.SETTINGS.route) { ComingSoonScreen(title = "Settings") }
+            composable(OwnerDestination.SCAN_QR.route) { ComingSoonScreen(title = "Scan QR") }
         }
     }
 }
