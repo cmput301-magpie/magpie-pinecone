@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
+import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import com.example.magpie_pinecone.ui.theme.StarGold
 
@@ -57,12 +58,7 @@ fun PineconeTopBar(
         contentAlignment = Alignment.Center
     ) {
         if (onBack != null) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
+            BackButton(onBack = onBack, modifier = Modifier.align(Alignment.CenterStart))
         }
         Text(text = title, style = MaterialTheme.typography.headlineMedium)
     }

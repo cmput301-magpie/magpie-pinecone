@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
@@ -62,7 +63,7 @@ private fun bookedDays(reservations: List<Reservation>): Set<LocalDate> =
 fun DatesBookedScreen(
     campsite: Campsite,
     reservations: List<Reservation>,
-    onBack: () -> Boolean
+    onBack: () -> Unit
 ) {
     val booked = remember(reservations) { bookedDays(reservations) }
     var month by remember { mutableStateOf(YearMonth.now()) }
@@ -70,11 +71,7 @@ fun DatesBookedScreen(
     Column(Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Button(onClick = { onBack }) { Text("<--") }
-            Spacer(Modifier.width(16.dp))
-            Text("Dates Booked", fontSize = 28.sp)
-        }
+        PineconeTopBar("Dates Booked", onBack = { onBack() })
         Text(
             text = campsite.name.ifBlank { "Unnamed campsite" },
             fontSize = 18.sp,

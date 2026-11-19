@@ -350,7 +350,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             "Your reservation was cancelled."
 
                         navController.navigate(CampsiteResult)
-                    }
+                    },
+                    onBack = {navController.popBackStack()}
                 )
             }
 

@@ -1,0 +1,42 @@
+package com.example.magpie_pinecone.frontend.sharedComposables
+
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.magpie_pinecone.ui.theme.PineconePurple
+
+@Composable
+fun BackButton(modifier: Modifier = Modifier, onBack: () -> Unit) {
+    IconButton(
+        modifier = modifier.size(50.dp),
+        onClick = { onBack() },
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = PineconePurple,
+            contentColor = Color.White
+        )
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Back Button",
+            tint = Color.White
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewBackButton() {
+    BackButton(modifier = Modifier.width(50.dp).height(50.dp), { true })
+}

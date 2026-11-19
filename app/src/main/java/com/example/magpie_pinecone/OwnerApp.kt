@@ -280,7 +280,8 @@ fun OwnerApp(androidId: String) {
 
                 ViewReservationsScreen(
                     activeReservations = activeReservations,
-                    campsiteDB = campsiteDB
+                    campsiteDB = campsiteDB,
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable<WaitingList> {
