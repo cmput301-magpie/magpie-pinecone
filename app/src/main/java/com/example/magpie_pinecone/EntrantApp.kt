@@ -64,17 +64,23 @@ enum class EntrantDestination(
     SETTINGS("entrantSettings", "Settings", Icons.Filled.Settings),
     SCAN_QR("entrantScanQr", "Scan QR", Icons.Filled.QrCodeScanner)
 }
+
 // Objects to represent routes
 @Serializable
 object AppPolicyGuidelines
+
 @Serializable
 object CampsiteDetails
+
 @Serializable
 object CampsiteReserve
+
 @Serializable
 object CampsiteResult
+
 @Serializable
 object Profile
+
 @Serializable
 object EntrantViewReservations
 
@@ -83,27 +89,37 @@ object EditProfile
 
 @Serializable
 object ComingSoon
+
 @Composable
 fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
+
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
     }
+
     // What the result screen should say (reserved or cancelled)
     var resultTitle by remember { mutableStateOf("Campsite Reserved") }
     var resultMessage by remember { mutableStateOf("") }
 
-    var campsiteToReserve by remember { mutableStateOf<Campsite?>(null) }
+    var campsiteToReserve by remember {
+        mutableStateOf<Campsite?>(null)
+    }
 
     val userDB = remember { UserDB() }
-    var curUser by remember { mutableStateOf<User?>(null) }  // Stores the user fetched from the user database
-    var curEntrant by remember { mutableStateOf<Entrant?>(null) }
+    var curUser by remember {
+        mutableStateOf<User?>(null)
+    }
 
-    LaunchedEffect(Unit) // Fetch the user when the screen is first displayed
-    {
+    var curEntrant by remember {
+        mutableStateOf<Entrant?>(null)
+    }
+
+    LaunchedEffect(Unit) {
         userDB.readUser(androidId) { fetchedUser ->
             curUser = fetchedUser
         }
+
         userDB.readEntrant(androidId) { fetchedEntrant ->
             curEntrant = fetchedEntrant
         }
@@ -114,48 +130,56 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val reservationDB = remember { ReservationDB() }
     val entrantHandler = remember { EntrantHandler() }
 
-    var lotteries by remember { mutableStateOf<List<Lottery>>(emptyList())}
+    var lotteries by remember {
+        mutableStateOf<List<Lottery>>(emptyList())
+    }
 
-    // Tracking the current screen on top of the back stack, if the user navigates Compose redraws and updates the screen.
+    // Tracking the current screen on top of the back stack.
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
     // Reservation Variables
-    var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    var activeReservations by remember {
+        mutableStateOf<List<Reservation>>(emptyList())
+    }
 
     // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
     // Screen is vertical (i.e. phone screen) -> bottom navbar
     // Screen is horizontal (i.e. tablet screen) -> sidebar
-    // Figma shows no nav bar on the Campsite Details and Reserve screens, so hide it there
-    val hideNavBar = currentDestination?.hasRoute(CampsiteDetails::class) == true ||
-            currentDestination?.hasRoute(CampsiteReserve::class) == true
+    // Figma shows no nav bar on the Campsite Details and Reserve screens.
+    val hideNavBar =
+        currentDestination?.hasRoute(CampsiteDetails::class) == true ||
+                currentDestination?.hasRoute(CampsiteReserve::class) == true
 
     NavigationSuiteScaffold(
-        // None = no bar, NavigationBar = the normal bottom bar
-        layoutType = if (hideNavBar) NavigationSuiteType.None else NavigationSuiteType.NavigationBar,
+        layoutType = if (hideNavBar) {
+            NavigationSuiteType.None
+        } else {
+            NavigationSuiteType.NavigationBar
+        },
         navigationSuiteItems = {
             EntrantDestination.entries.forEach { destination ->
                 item(
                     icon = {
                         Icon(
                             imageVector = destination.icon,
-                            contentDescription = null // label already describes it
+                            contentDescription = null
                         )
                     },
-                    label = { Text(destination.label) },
-                    // Highlight the tab if the current screen belongs to it
+                    label = {
+                        Text(destination.label)
+                    },
                     selected = currentDestination?.hierarchy
                         ?.any { it.route == destination.route } == true,
                     onClick = {
-                        // Navigate to the correct screen
                         navController.navigate(destination.route) {
-                            // Removes screens above Home from the back stack to prevent long back stack
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true  // Saves state of the tab while leaving it.
+                            popUpTo(
+                                navController.graph.findStartDestination().id
+                            ) {
+                                saveState = true
                             }
-                            // Prevents duplicates of the same tab in the backstack when already on it.
+
                             launchSingleTop = true
-                            // Restore the state of the tab (i.e. scroll position)
                             restoreState = true
                         }
                     }
@@ -163,38 +187,56 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
             }
         }
     ) {
-        // Area where the screen of the current route is displayed.
         NavHost(
             navController = navController,
-            startDestination = EntrantDestination.HOME.route  // The first screen is set to HOME.
+            startDestination = EntrantDestination.HOME.route
         ) {
             composable(EntrantDestination.HOME.route) {
                 // Runs every time the home screen is shown
                 LaunchedEffect(Unit) {
-                    lotteryDB.getLotteriesByEntrant(entrantId = androidId) { lotteries = it }
+                    lotteryDB.getLotteriesByEntrant(
+                        entrantId = androidId
+                    ) {
+                        lotteries = it
+                    }
                 }
 
                 EntrantHomeScreen(
                     lotteries = lotteries,
-                    onMyReservations = { navController.navigate(route = EntrantViewReservations) },
+                    onMyReservations = {
+                        navController.navigate(
+                            route = EntrantViewReservations
+                        )
+                    },
+                    onNotifications = {
+                        navController.navigate(ComingSoon)
+                    },
                     curEntrant = curEntrant,
                     onLotteryDetails = { lottery ->
-                        selectedCampsite = lottery.campsites[0]  // TODO: IMPLEMENT FUNCTIONALITY FOR MULTIPLE CAMPSITES
+                        selectedCampsite = lottery.campsites[0]
                         navController.navigate(CampsiteDetails)
                     },
                     onReserveLottery = { lottery ->
-                        campsiteToReserve = lottery.campsites[0]  // TODO: IMPLEMENT FUNCTIONALITY FOR MULTIPLE CAMPSITES
+                        campsiteToReserve = lottery.campsites[0]
                         navController.navigate(CampsiteReserve)
                     },
-                    onLeaveLottery = {lottery ->
+                    onLeaveLottery = { lottery ->
                         if (curEntrant != null) {
-                            lotteryDB.removeEntrant(lottery, curEntrant!!)
+                            lotteryDB.removeEntrant(
+                                lottery,
+                                curEntrant!!
+                            )
                         }
                     }
                 )
             }
 
-            composable<AppPolicyGuidelines> { AppPolicyGuidelinesScreen({ navController.popBackStack() }) }
+            composable<AppPolicyGuidelines> {
+                AppPolicyGuidelinesScreen {
+                    navController.popBackStack()
+                }
+            }
+
             composable(EntrantDestination.SEARCH.route) {
                 SearchCampsiteScreen(
                     navController = navController,
@@ -204,31 +246,43 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     }
                 )
             }
+
             composable<CampsiteDetails> {
                 val campsite = selectedCampsite
 
                 if (campsite == null) {
-                    LaunchedEffect(Unit) { navController.popBackStack() }
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
                 } else {
-                    var lottery by remember { mutableStateOf<Lottery?>(null) }
+                    var lottery by remember {
+                        mutableStateOf<Lottery?>(null)
+                    }
 
                     LaunchedEffect(campsite) {
-                        lotteryDB.getLotteriesByOwner(ownerId = campsite.ownerId) {
+                        lotteryDB.getLotteriesByOwner(
+                            ownerId = campsite.ownerId
+                        ) {
                             lottery = it.firstOrNull()
                         }
                     }
 
                     CampsiteDetailsScreen(
                         campsite = campsite,
-                        isWinner = false,  // TODO: check the lotteryWinners collection for this entrant
-                        onReserve = { navController.navigate(CampsiteReserve) },
+                        isWinner = false,
+                        onReserve = {
+                            navController.navigate(CampsiteReserve)
+                        },
                         onBack = {
                             if (!navController.popBackStack()) {
-                                navController.navigate(EntrantDestination.SEARCH.route)
+                                navController.navigate(
+                                    EntrantDestination.SEARCH.route
+                                )
                             }
                         },
                         onSubmit = {
                             val currentLottery = lottery
+
                             if (currentLottery != null) {
                                 userDB.readEntrant(androidId) { entrant ->
                                     if (entrant != null) {
@@ -237,6 +291,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                                             lotteryDB,
                                             entrant
                                         )
+
                                         navController.popBackStack(
                                             EntrantDestination.HOME.route,
                                             inclusive = false
@@ -246,42 +301,64 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             }
                         }
                     )
-
-
                 }
             }
+
             composable<CampsiteReserve> {
                 CampsiteReserveScreen(
-                    onBack = { navController.popBackStack() },
-                    onUserAcceptedRules = { userDB.setRulesAccepted(androidId, true) },
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onUserAcceptedRules = {
+                        userDB.setRulesAccepted(
+                            androidId,
+                            true
+                        )
+                    },
                     campsiteId = campsiteToReserve?.ID ?: "",
                     onReserved = {
                         resultTitle = "Campsite Reserved"
-                        resultMessage = "Your reservation was placed successfully!"
+                        resultMessage =
+                            "Your reservation was placed successfully!"
+
                         navController.navigate(CampsiteResult)
                     }
                 )
             }
+
             composable<CampsiteResult> {
-                CampsiteResultScreen({ navController.popBackStack() }, title = resultTitle, message = resultMessage)
+                CampsiteResultScreen(
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    title = resultTitle,
+                    message = resultMessage
+                )
             }
+
             composable<EntrantViewReservations> {
-              // Grab active reservations everytime view reservations is loaded
+                // Grab active reservations every time view reservations is loaded
                 LaunchedEffect(Unit) {
-                    reservationDB.getActiveReservationsByEntrant(entrantID = androidId) {
+                    reservationDB.getActiveReservationsByEntrant(
+                        entrantID = androidId
+                    ) {
                         activeReservations = it
                     }
                 }
+
                 EntrantViewReservationsScreen(
                     activeReservations = activeReservations,
                     campsiteDB = campsiteDB,
                     onCancelled = {
                         resultTitle = "Campsite Cancelled"
-                        resultMessage = "Your reservation was cancelled."
+                        resultMessage =
+                            "Your reservation was cancelled."
+
                         navController.navigate(CampsiteResult)
                     }
                 )
             }
+
             composable<Profile> {
                 ProfileScreen(
                     navController,
@@ -295,32 +372,54 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     }
                 )
             }
+
             composable<EditProfile> {
-                EditProfileScreen(navController,
+                EditProfileScreen(
+                    navController,
                     curUser,
                     onUpdateProfile = {
                         userDB.updateUser(it)
-                        // curUser = it  // Not needed because curUser is modified inside EditProfileScreen
                     }
-
                 )
             }
+
             // Settings tab
             composable(EntrantDestination.SETTINGS.route) {
                 SettingsScreen(
-                    onProfile = { navController.navigate(Profile) },
-                    onViewReservations = { navController.navigate(EntrantViewReservations) },
-                    onAppPolicy = { navController.navigate(AppPolicyGuidelines) },
-                    onComingSoon = { navController.navigate(ComingSoon) }
+                    onProfile = {
+                        navController.navigate(Profile)
+                    },
+                    onViewReservations = {
+                        navController.navigate(
+                            EntrantViewReservations
+                        )
+                    },
+                    onAppPolicy = {
+                        navController.navigate(
+                            AppPolicyGuidelines
+                        )
+                    },
+                    onComingSoon = {
+                        navController.navigate(ComingSoon)
+                    }
                 )
             }
+
             // Scan QR tab (US 01.12.01 not done yet)
             composable(EntrantDestination.SCAN_QR.route) {
-                ComingSoonScreen(title = "Scan QR")
+                ComingSoonScreen(
+                    title = "Scan QR"
+                )
             }
+
             // Notifications and Messages from Settings (not done yet)
             composable<ComingSoon> {
-                ComingSoonScreen(title = "Coming soon", onBack = { navController.popBackStack() })
+                ComingSoonScreen(
+                    title = "Coming soon",
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

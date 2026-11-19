@@ -58,6 +58,7 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
  * lotteries, reserve a campsite after winning, or open their reservations.
  *
  * @param onMyReservations Opens the entrant's reservations.
+ * @param onNotifications Opens the entrant notifications screen.
  * @param lotteries Lotteries that the entrant has joined.
  * @param curEntrant The entrant currently using the app.
  * @param onReserveLottery Called when a lottery winner chooses to reserve.
@@ -67,6 +68,7 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
 @Composable
 fun EntrantHomeScreen(
     onMyReservations: () -> Unit,
+    onNotifications: () -> Unit,
     lotteries: List<Lottery>,
     curEntrant: Entrant?,
     onReserveLottery: (lottery: Lottery) -> Unit,
@@ -109,7 +111,9 @@ fun EntrantHomeScreen(
                  * Reuse the shared inbox component here rather than
                  * duplicating notification behaviour in the home screen.
                  */
-                NotifsInbox()
+                NotifsInbox(
+                    onInboxClicked = onNotifications
+                )
             }
 
             if (lotteries.isEmpty()) {
@@ -512,6 +516,7 @@ private fun EntrantHomeScreenPreview() {
     MagpiepineconeTheme {
         EntrantHomeScreen(
             onMyReservations = {},
+            onNotifications = {},
             lotteries = listOf(
                 activeLottery,
                 wonLottery,
