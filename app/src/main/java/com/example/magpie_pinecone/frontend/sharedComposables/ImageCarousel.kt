@@ -1,0 +1,73 @@
+package com.example.magpie_pinecone.frontend.sharedComposables
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.example.magpie_pinecone.R
+import coil3.compose.AsyncImage
+
+// TODO: Change onUpload argument type to whatever type an image is
+@Composable
+fun ImageCarousel(imgUrls: List<String>, height: Dp = 200.dp, allowUploading: Boolean = false, onUpload: () -> Unit = {}) {
+    LazyRow(modifier = Modifier.height(height).fillMaxWidth()) {
+
+        items(imgUrls) { url ->
+            ImageCard(url, height)
+        }
+
+        if (allowUploading){
+            item (key = "Upload Button") {
+                // The add new images button
+                IconButton(onClick = onUpload) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.outline_add_24),
+                        contentDescription = "Add new images"
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ImageCard(url: String, height: Dp) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.height(height).width(height * 16f/9)) {
+        AsyncImage(
+            model = url,
+            contentDescription = "Image card",
+            placeholder = painterResource(android.R.drawable.ic_menu_gallery),
+            error = painterResource(android.R.drawable.ic_menu_report_image),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.height(height).width(height * 16f/9)
+        )
+    }
+}
+
+@Composable
+@Preview
+fun ImageCarouselPreview() {
+    val context = LocalContext.current
+    val packageName = context.packageName
+
+    ImageCarousel(listOf(
+        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
+        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
+        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
+        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
+    ), allowUploading = true) { }
+}
