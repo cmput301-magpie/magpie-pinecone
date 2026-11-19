@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
@@ -139,13 +140,14 @@ fun WelcomeScreen(
             Text(
                 text = "Welcome to",
                 color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.titleLarge
             )
 
             Text(
                 text = "Pinecone",
                 color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -173,7 +175,8 @@ fun WelcomeScreen(
         ) {
             Text(
                 text = "Get Started",
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
