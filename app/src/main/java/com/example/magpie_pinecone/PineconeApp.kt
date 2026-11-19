@@ -18,6 +18,7 @@ import com.example.magpie_pinecone.frontend.userScreens.NewUserApp
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import com.example.magpie_pinecone.frontend.userScreens.AccountDeletedScreen
 
 /**
  * Indicates the state of the app at startup.
@@ -27,8 +28,14 @@ enum class StartState {
     NONE,
     ENTRANT,
     OWNER,
+    ACCOUNT_DELETED,
+
     ERROR
 }
+/**
+ * Displays the correct app flow for the account stored on this device.
+ */
+
 
 @Composable
 fun PineconeApp(androidId: String) {
@@ -52,8 +59,16 @@ fun PineconeApp(androidId: String) {
     when (state) {
         StartState.LOADING -> Box(Modifier.fillMaxSize())  // Empty screen while awaiting Firestore search
         StartState.NONE -> NewUserApp(onUserSignedUp = { state = StartState.LOADING })
-        StartState.ENTRANT -> EntrantApp(androidId, onProfileDeleted = { state = StartState.LOADING })
+        StartState.ENTRANT -> EntrantApp(androidId, onProfileDeleted = { state = StartState.ACCOUNT_DELETED })
         StartState.OWNER -> OwnerApp(androidId)
+        StartState.ACCOUNT_DELETED -> {
+            AccountDeletedScreen(
+                onBackToWelcome = {
+                    state = StartState.NONE
+                }
+            )
+        }
+
         StartState.ERROR -> Column(  // Display simple page notifying user of error, with a button to try searching again.
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center ,
