@@ -53,7 +53,7 @@ fun OwnerHomeScreen(
     onEditCampsite: (Campsite) -> Unit,
     onCreateCampsite: () -> Unit,
     onPreviewCampsite: (Campsite) -> Unit,
-    onDatesBooked: () -> Unit,
+    onDatesBooked: (Campsite) -> Unit,
     onViewReservations: () -> Unit
 ) {
     // Tab Navigation
@@ -236,12 +236,14 @@ fun MyCampsites(
     onEditCampsite: (Campsite) -> Unit,
     onCreateCampsite: () -> Unit,
     onPreviewCampsite: (Campsite) -> Unit,
-    onDatesBooked: () -> Unit,
+    onDatesBooked: (Campsite) -> Unit,
     onViewReservations: () -> Unit
 ) {
 
 
-    Box(modifier = Modifier.fillMaxSize().padding(5.dp)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(5.dp)) {
         LazyColumn(modifier = Modifier.padding(vertical = 10.dp)) {
             // For each campsite, display a card with the details
             items(campsites) { campsite ->
@@ -250,7 +252,7 @@ fun MyCampsites(
                     menuItems = listOf(
                         "Edit" to { onEditCampsite(campsite) },
                         "Preview" to { onPreviewCampsite(campsite) },
-                        "Dates Booked" to onDatesBooked
+                        "Dates Booked" to { onDatesBooked(campsite) }
                     )
                 )
             }

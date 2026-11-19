@@ -83,6 +83,8 @@ fun OwnerApp(androidId: String) {
     // null = creating a new campsite, not null = editing existing campsite
     var campsiteToEdit by remember { mutableStateOf<Campsite?>(null) }
     var campsiteToView by remember { mutableStateOf<Campsite?>(null) }
+    var campsiteForDates by remember { mutableStateOf<Campsite?>(null) }
+    var campsiteReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
     var campsites by remember { mutableStateOf<List<Campsite>>(emptyList()) }
 
     // Reservation Variables
@@ -179,11 +181,31 @@ fun OwnerApp(androidId: String) {
                         campsiteToView = campsite
                         navController.navigate(route = ViewCampsite)
                     },
-                    onDatesBooked = { navController.navigate(route = DatesBooked) },
+                    onDatesBooked = { campsite ->
+                        campsiteForDates = campsite
+                        campsiteReservations = emptyList()
+                        navController.navigate(route = DatesBooked)
+                    },
                     onViewReservations = { navController.navigate(route = ViewReservations) }
                 )
             }
-            composable<DatesBooked> { DatesBookedScreen({ navController.popBackStack() }) }
+            composable<DatesBooked> {
+                val campsite = campsiteForDates
+                if (campsite == null) {
+                    LaunchedEffect(Unit) { navController.popBackStack() }
+                } else {
+                    LaunchedEffect(campsite.ID) {
+                        reservationDB.getActiveReservationsByCampsite(campsite.ID) {
+                            campsiteReservations = it
+                        }
+                    }
+                    DatesBookedScreen(
+                        campsite = campsite,
+                        reservations = campsiteReservations,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
             composable<EditCampsite> {
                 val existing = campsiteToEdit
                 val isEdit = existing != null
