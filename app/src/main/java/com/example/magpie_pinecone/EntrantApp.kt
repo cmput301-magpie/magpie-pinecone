@@ -283,10 +283,15 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 )
             }
             composable<Profile> {
-                ProfileScreen(navController,
+                ProfileScreen(
+                    navController,
                     curUser = curUser,
                     onProfileDeleted = {
-                        curUser?.let { userDB.deleteUser(it) }
+                        curUser?.let { user ->
+                            userDB.deleteUser(user) {
+                                onProfileDeleted()
+                            }
+                        }
                     }
                 )
             }

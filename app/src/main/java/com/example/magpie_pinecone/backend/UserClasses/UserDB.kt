@@ -36,9 +36,13 @@ class UserDB {
 
     /**
      * Deletes a [user] from the database.
+     *
+     * [onDeleted] is called after Firestore confirms the deletion.
      */
-    fun deleteUser(user: User) {
-
+    fun deleteUser(
+        user: User,
+        onDeleted: () -> Unit = {}
+    ) {
         if (user.id.isEmpty()) {
             Log.e("UserDB", "Cannot delete user with empty ID")
             return
@@ -48,6 +52,7 @@ class UserDB {
             .delete()
             .addOnSuccessListener {
                 Log.d("UserDB", "User deleted: ${user.id}")
+                onDeleted()
             }
             .addOnFailureListener { exception ->
                 Log.e("UserDB", "Failed to delete user", exception)
