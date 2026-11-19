@@ -27,6 +27,10 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import android.provider.Settings
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
@@ -34,6 +38,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
+import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -48,7 +54,9 @@ import java.util.Locale
 fun EntrantViewReservationsScreen(
     activeReservations: List<Reservation>,
     campsiteDB: CampsiteDB,
-    onCancelled: () -> Unit = {}) {
+    onCancelled: () -> Unit = {},
+    onBack: () -> Boolean,
+    ) {
     // Tab Navigation
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("Active", "Past")
@@ -58,12 +66,9 @@ fun EntrantViewReservationsScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title
-        Text(
-            modifier = Modifier.padding(20.dp),
-            text = "View Reservations",
-            fontSize = 36.sp
-        )
+        Spacer(modifier = Modifier.height(20.dp))
+        PineconeTopBar("Reservations", onBack = {onBack()})
+
 
         // Tabs
         PrimaryTabRow(
@@ -209,5 +214,5 @@ fun PastEntrantReservations() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowEntrantViewReservationsScreenPreview() {
-    EntrantViewReservationsScreen(listOf(), CampsiteDB())
+    EntrantViewReservationsScreen(listOf(), CampsiteDB(), onBack = {true})
 }

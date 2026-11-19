@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
 /**
  * TO-DO
@@ -26,7 +27,7 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 @Composable
 fun ViewCampsiteScreen(
     campsite: Campsite,
-    onBack: () -> Boolean,
+    onBack: () -> Unit,
     onEdit: () -> Unit
 ) {
     Column(
@@ -38,24 +39,13 @@ fun ViewCampsiteScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack() }
-            ) {
-                Text("<--")
-            }
 
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = "View Campsite",
-                    fontSize = 36.sp
-                )
+                PineconeTopBar("View Campsite", onBack = onBack)
 
                 // Image Picker Placeholder
                 Text(

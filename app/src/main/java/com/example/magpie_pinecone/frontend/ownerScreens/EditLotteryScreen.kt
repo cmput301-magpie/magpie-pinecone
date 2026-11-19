@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -44,7 +45,7 @@ fun EditLotteryScreen(
     isEdit: Boolean,
     lottery: Lottery,
     availableCampsites: List<Campsite>,  // the campsites the owner can add to the lottery
-    onBack: () -> Boolean,
+    onBack: () -> Unit,
     onSubmit: (Lottery) -> Unit,
 ) {
     var numberOfWinners by remember { mutableStateOf(lottery.numberOfWinners.toString()) }
@@ -83,12 +84,6 @@ fun EditLotteryScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack() }
-            ) {
-                Text("<--")
-            }
 
             // Scrollable, since there are too many fields to fit on one screen
             Column(
@@ -98,12 +93,8 @@ fun EditLotteryScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = if (isEdit) "Update Lottery" else "Start Lottery",
-                    fontSize = 36.sp
-                )
+
+                PineconeTopBar(if (isEdit) "Update Lottery" else "Start Lottery", onBack = { onBack() } )
 
                 // Campsite selection
                 Text("Campsites", fontSize = 20.sp)
