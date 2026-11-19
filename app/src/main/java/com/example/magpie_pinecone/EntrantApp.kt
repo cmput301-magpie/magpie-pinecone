@@ -40,20 +40,30 @@ import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavDestination.Companion.hasRoute
+import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
+import com.example.magpie_pinecone.ui.components.ComingSoonScreen
 
 /**
- * Provide destinations for the navigation bar at the bottom of the app.
+ * The 4 tabs of the bottom navigation bar, matching Figma: Home, Search, Settings, Scan QR.
  */
 enum class EntrantDestination(
     val route: String,
     val label: String,
-    @DrawableRes val icon: Int,
+    val icon: ImageVector,
 ) {
-    HOME("entrantHome", "Home", R.drawable.ic_home),  // icons are temporary -Albert
-    SEARCH("searchCampsite", "Search", R.drawable.ic_home),
-    PROFILE("viewProfile", "Profile", R.drawable.ic_favorite)
+    HOME("entrantHome", "Home", Icons.Filled.Menu),
+    SEARCH("searchCampsite", "Search", Icons.Filled.Search),
+    SETTINGS("entrantSettings", "Settings", Icons.Filled.Settings),
+    SCAN_QR("entrantScanQr", "Scan QR", Icons.Filled.QrCodeScanner)
 }
-
 // Objects to represent routes
 @Serializable
 object AppPolicyGuidelines
@@ -71,6 +81,8 @@ object EntrantViewReservations
 @Serializable
 object EditProfile
 
+@Serializable
+object ComingSoon
 @Composable
 fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
@@ -114,13 +126,19 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
     // Screen is vertical (i.e. phone screen) -> bottom navbar
     // Screen is horizontal (i.e. tablet screen) -> sidebar
+    // Figma shows no nav bar on the Campsite Details and Reserve screens, so hide it there
+    val hideNavBar = currentDestination?.hasRoute(CampsiteDetails::class) == true ||
+            currentDestination?.hasRoute(CampsiteReserve::class) == true
+
     NavigationSuiteScaffold(
+        // None = no bar, NavigationBar = the normal bottom bar
+        layoutType = if (hideNavBar) NavigationSuiteType.None else NavigationSuiteType.NavigationBar,
         navigationSuiteItems = {
             EntrantDestination.entries.forEach { destination ->
                 item(
                     icon = {
                         Icon(
-                            painter = painterResource(destination.icon),
+                            imageVector = destination.icon,
                             contentDescription = null // label already describes it
                         )
                     },
@@ -279,7 +297,25 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         userDB.updateUser(it)
                         // curUser = it  // Not needed because curUser is modified inside EditProfileScreen
                     }
+
                 )
+            }
+            // Settings tab
+            composable(EntrantDestination.SETTINGS.route) {
+                SettingsScreen(
+                    onProfile = { navController.navigate(Profile) },
+                    onViewReservations = { navController.navigate(EntrantViewReservations) },
+                    onAppPolicy = { navController.navigate(AppPolicyGuidelines) },
+                    onComingSoon = { navController.navigate(ComingSoon) }
+                )
+            }
+            // Scan QR tab (US 01.12.01 not done yet)
+            composable(EntrantDestination.SCAN_QR.route) {
+                ComingSoonScreen(title = "Scan QR")
+            }
+            // Notifications and Messages from Settings (not done yet)
+            composable<ComingSoon> {
+                ComingSoonScreen(title = "Coming soon", onBack = { navController.popBackStack() })
             }
         }
     }
