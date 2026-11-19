@@ -15,12 +15,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,7 +43,7 @@ import java.util.Date
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun Date.toLocalDate(): LocalDate =
+private fun Date.toLocalDate(): LocalDate =  // Get the local date on device
     toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 
 /** Every day covered by any reservation (start and end both inclusive). */
@@ -60,7 +58,6 @@ private fun bookedDays(reservations: List<Reservation>): Set<LocalDate> =
     }.toSet()
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatesBookedScreen(
     campsite: Campsite,
@@ -105,6 +102,7 @@ fun DatesBookedScreen(
     }
 }
 
+// Toggle month
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun MonthHeader(month: YearMonth, onPrev: () -> Unit, onNext: () -> Unit) {
@@ -122,6 +120,8 @@ private fun MonthHeader(month: YearMonth, onPrev: () -> Unit, onNext: () -> Unit
     }
 }
 
+
+// Custom calendar
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun MonthGrid(month: YearMonth, booked: Set<LocalDate>) {
