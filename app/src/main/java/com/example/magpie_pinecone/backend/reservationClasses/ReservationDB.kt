@@ -3,6 +3,7 @@ package com.example.magpie_pinecone.backend.reservationClasses
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
+import kotlin.time.Clock.System.now
 
 
 /**
@@ -196,6 +197,29 @@ class ReservationDB {
 
                 val reservations = snapshot.documents.mapNotNull { document ->
                     document.toObject(Reservation::class.java)
+                }
+
+                onResult(reservations)
+            }
+    }
+
+    /**
+     * Fetches active reservations by a specified [campsiteID] from the database.
+     */
+    fun getActiveReservationsByCampsite(
+        campsiteID: String,
+        onResult: (List<Reservation>) -> Unit
+    ) {
+        val currentDate = Date()
+
+        reservationCollection
+            .whereEqualTo("ID", campsiteID)
+            .whereGreaterThanOrEqualTo("endDate", currentDate)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val reservations = snapshot.documents.mapNotNull {
+                    it.toObject(Reservation::class.java)
                 }
 
                 onResult(reservations)
