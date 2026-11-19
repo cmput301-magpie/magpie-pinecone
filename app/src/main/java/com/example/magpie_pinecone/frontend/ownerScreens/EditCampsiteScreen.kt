@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
 /**
  * TO-DO
@@ -38,7 +39,7 @@ fun EditCampsiteScreen(
     ownerId: String,
     isEdit: Boolean,
     campsite: Campsite,
-    onBack: () -> Boolean,
+    onBack: () -> Unit,
     onSubmit: (Campsite) -> Unit,
 ) {
 
@@ -59,12 +60,7 @@ fun EditCampsiteScreen(
     ) {
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center) {
-            Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack() }
-            ) {
-                Text("<--")
-            }
+
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -73,17 +69,9 @@ fun EditCampsiteScreen(
             ) {
                 // Title
                 if (isEdit) {
-                    Text(
-                        modifier = Modifier.padding(20.dp),
-                        text = "Edit Campsite",
-                        fontSize = 36.sp
-                    )
+                    PineconeTopBar("Edit Campsite", onBack = { onBack() } )
                 } else {
-                    Text(
-                        modifier = Modifier.padding(20.dp),
-                        text = "Create Campsite",
-                        fontSize = 36.sp
-                    )
+                    PineconeTopBar("Create Campsite", onBack = { onBack() })
                 }
 
                 // Image Picker Placeholder

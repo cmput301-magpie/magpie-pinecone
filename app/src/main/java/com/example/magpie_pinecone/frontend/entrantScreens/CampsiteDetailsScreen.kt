@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.R
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
 /**
  * Displays campsite details.
@@ -56,14 +59,7 @@ fun CampsiteDetailsScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Campsite name
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = campsite.name,
-                    fontSize = 36.sp,
-                    textAlign = TextAlign.Center
-                )
-
+                PineconeTopBar(campsite.name, onBack = { onBack() })
                 // Campsite details
                 Column(
                     modifier = Modifier
@@ -182,12 +178,7 @@ fun CampsiteDetailsScreen(
                     }
                 }
             }
-            Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = onBack
-            ) {
-                Text("<--")
-            }
+
 
             ExtendedFloatingActionButton(
                 modifier = Modifier
@@ -228,7 +219,7 @@ fun ShowCampsiteDetailsScreenPreview() {
             description = "A sample campsite used for previewing the details screen.",
             tags = listOf("Forest", "Camping", "Family")
         ),
-        onBack = { },
+        onBack = { true },
         onSubmit = { }
     )
 }

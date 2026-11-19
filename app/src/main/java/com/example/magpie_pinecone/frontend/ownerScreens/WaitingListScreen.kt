@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
 /**
  * Shows the entrants who joined the waitlist of a campsite lottery.
@@ -30,7 +31,7 @@ import com.example.magpie_pinecone.backend.UserClasses.User
 @Composable
 fun WaitingListScreen(
     entrants: List<User>,
-    onBack: () -> Boolean
+    onBack: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -40,24 +41,13 @@ fun WaitingListScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box() {
-            Button(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = { onBack() }
-            ) {
-                Text("<--")
-            }
 
             Column(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Title
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = "Waiting List",
-                    fontSize = 36.sp
-                )
-
+                PineconeTopBar("Waiting List", onBack = onBack)
                 // Message when nobody has joined the waitlist
                 if (entrants.isEmpty()) {
                     Text(

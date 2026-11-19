@@ -279,7 +279,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         resultTitle = "Campsite Cancelled"
                         resultMessage = "Your reservation was cancelled."
                         navController.navigate(CampsiteResult)
-                    }
+                    },
+                    onBack = {navController.popBackStack()}
                 )
             }
             composable<Profile> {

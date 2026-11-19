@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
 /**
  * TO-DO
@@ -35,7 +36,8 @@ import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 @Composable
 fun ViewReservationsScreen(
     activeReservations: List<Reservation>,
-    campsiteDB: CampsiteDB
+    campsiteDB: CampsiteDB,
+    onBack: () -> Unit,
 ) {
     // Tab Navigation
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -46,12 +48,7 @@ fun ViewReservationsScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title
-        Text(
-            modifier = Modifier.padding(20.dp),
-            text = "View Reservations",
-            fontSize = 36.sp
-        )
+        PineconeTopBar("Reservations", onBack = onBack)
 
         // Tabs
         PrimaryTabRow(
@@ -169,5 +166,5 @@ fun CancelledReservations() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShowViewReservationsScreenPreview() {
-    ViewReservationsScreen(listOf(), campsiteDB = CampsiteDB())
+    ViewReservationsScreen(listOf(), campsiteDB = CampsiteDB(), onBack = {})
 }
