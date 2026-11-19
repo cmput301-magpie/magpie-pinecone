@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -173,14 +172,10 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         ?.any { it.route == destination.route } == true,
                     onClick = {
                         navController.navigate(destination.route) {
-                            popUpTo(
-                                navController.graph.findStartDestination().id
-                            ) {
-                                saveState = true
+                            popUpTo(EntrantDestination.HOME.route) {
+                                inclusive = false
                             }
-
                             launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 )
