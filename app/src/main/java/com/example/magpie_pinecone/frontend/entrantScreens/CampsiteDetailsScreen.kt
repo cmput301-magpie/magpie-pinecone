@@ -70,16 +70,6 @@ fun CampsiteDetailsScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
 
-                    // TODO: Temporary image carousel, replace with actual image carousel
-                    val context = LocalContext.current
-                    val packageName = context.packageName
-
-                    ImageCarousel(listOf(
-                        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
-                        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
-                        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
-                        "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}",
-                    ), allowUploading = true)
                     // Maximum occupancy
                     Row {
                         Text(
