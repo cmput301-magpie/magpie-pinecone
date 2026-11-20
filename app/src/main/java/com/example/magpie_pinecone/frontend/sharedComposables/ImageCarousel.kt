@@ -1,5 +1,10 @@
 package com.example.magpie_pinecone.frontend.sharedComposables
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,10 +26,14 @@ import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
 import coil3.compose.AsyncImage
 
-// TODO: Change onUpload argument type to whatever type an image is
 @Composable
-fun ImageCarousel(imgUrls: List<String>, height: Dp = 200.dp, allowUploading: Boolean = false, onUpload: () -> Unit = {}) {
-    LazyRow(modifier = Modifier.height(height).fillMaxWidth()) {
+fun ImageCarousel(imgUrls: List<String>, height: Dp = 200.dp, allowUploading: Boolean = false, onUpload: (uris: List<Uri>) -> Unit = {}) {
+    val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10),
+        onResult = { uris -> onUpload(uris) }
+    )
+
+    LazyRow(modifier = Modifier.height(height).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
 
         items(imgUrls) { url ->
             ImageCard(url, height)
@@ -33,7 +42,11 @@ fun ImageCarousel(imgUrls: List<String>, height: Dp = 200.dp, allowUploading: Bo
         if (allowUploading){
             item (key = "Upload Button") {
                 // The add new images button
-                IconButton(onClick = onUpload) {
+                IconButton(onClick = {
+                    multiplePhotoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.outline_add_24),
                         contentDescription = "Add new images"
@@ -44,6 +57,7 @@ fun ImageCarousel(imgUrls: List<String>, height: Dp = 200.dp, allowUploading: Bo
     }
 }
 
+// TODO: Accommodate different aspect ratios? Right now it forces images to 16:9
 @Composable
 fun ImageCard(url: String, height: Dp) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.height(height).width(height * 16f/9)) {
