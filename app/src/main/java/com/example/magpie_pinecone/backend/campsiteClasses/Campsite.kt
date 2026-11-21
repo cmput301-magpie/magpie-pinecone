@@ -1,4 +1,5 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
+import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
 import java.util.Date
 import com.google.firebase.firestore.GeoPoint
 
@@ -32,7 +33,7 @@ class Campsite(
     var maxOccupancy: Int = 0,
     var price: Double = 0.0,
     var rating: Double = 0.0,
-    var imageUrl: String? = null,
+    var images: List<ImageData> = emptyList(),
     var rulesAndPolicy: String = "",
     var availableDates: List<Date> = emptyList(),
     var bookedDates: List<Date> = emptyList(),
