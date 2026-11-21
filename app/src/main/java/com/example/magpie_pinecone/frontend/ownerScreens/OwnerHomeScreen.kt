@@ -41,6 +41,18 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/*
+ * OwnerHomeScreen.kt contains all relevant functions for displaying the campsite owner's home screen.
+ *
+ * Composable Functions:
+ * OwnerHomeScreen displays the owner home screen (landing page).
+ * MyLotteries displays the list of lotteries belonging to the owner.
+ * LotteryCard displays a card containing a single lottery and its important information.
+ * MyCampsites displays the list of campsites belonging to the owner.
+ * CampsiteCard displays a card containing a single campsite and its important information.
+ * ShowOwnerHomeScreenPreview displays a preview of OwnerHomeScreen for reference.
+ */
+
 @Composable
 fun OwnerHomeScreen(
     campsites: List<Campsite>,

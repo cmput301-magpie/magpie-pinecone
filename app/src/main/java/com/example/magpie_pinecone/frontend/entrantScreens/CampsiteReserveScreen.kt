@@ -33,13 +33,20 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/*
+ * CampsiteReserveScreen.kt contains all relevant functions for displaying a reserve campsite screen.
+ *
+ * Composable Functions:
+ * CampsiteReserveScreen displays the reserve campsite screen. THIS IS STILL WIP!
+ * ShowCampsiteReserveScreenPreview displays a preview of CampsiteReserveScreen for reference.
+ */
+
 /**
  * Display's Campsite for Entrant to Reserve
  * TO-DO
  * Link actual reservation/decline functionality
  * Make actual date picker
  */
-
 @Composable
 fun CampsiteReserveScreen(
     onBack: () -> Boolean,

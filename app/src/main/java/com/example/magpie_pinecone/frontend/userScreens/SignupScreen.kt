@@ -45,6 +45,16 @@ import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import androidx.compose.foundation.layout.PaddingValues
 
+/*
+ * SignupScreen.kt contains all relevant functions for displaying the new user sign-up screen.
+ *
+ * Composable Functions:
+ * SignupScreen displays the new user sign-up screen, with field inputs and toggle to be an entrant or owner.
+ * ProfileTextField displays a text field in the SignupScreen.
+ * SignupButton displays a button to sign the entrant/owner up.
+ * SignupScreenPreview displays a preview of SignupScreen for reference.
+ */
+
 /**
  * Displays the profile setup screen for a new user.
  *

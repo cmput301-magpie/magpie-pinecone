@@ -28,6 +28,14 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
+/*
+ * CampsiteDetailsScreen.kt contains all relevant functions for displaying the details of a campsite.
+ *
+ * Composable Functions:
+ * CampsiteDetailsScreen displays details of a campsite, with a button to enter a lottery for the campsite.
+ * ShowCampsiteDetailsScreenPreview displays a preview of CampsiteDetailsScreen for reference.
+ */
+
 /**
  * Displays campsite details.
  *

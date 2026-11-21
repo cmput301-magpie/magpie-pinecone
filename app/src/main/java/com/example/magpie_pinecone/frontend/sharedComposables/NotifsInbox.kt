@@ -9,6 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 
+/*
+ * NotifsInbox.kt contains all relevant functions for a notification inbox icon used in the app.
+ *
+ * Composable Functions:
+ * NotifsInbox displays a notification inbox icon, for use in all screens needing it for UI consistency.
+ * NotifsInboxPreview displays a preview of NotifsInbox for reference.
+ */
+
 @Composable
 fun NotifsInbox(onInboxClicked: () -> Unit = {}, modifier: Modifier = Modifier) {
     IconButton (onClick = onInboxClicked, modifier = modifier) {

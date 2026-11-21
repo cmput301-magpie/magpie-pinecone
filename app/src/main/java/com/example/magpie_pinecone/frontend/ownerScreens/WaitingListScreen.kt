@@ -22,8 +22,15 @@ import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
+/*
+ * WaitingListScreen.kt contains all relevant functions for displaying entrants who joined the waitlist of a campsite lottery.
+ *
+ * Composable Functions:
+ * WaitingListScreen displays all entrants who joined the waitlist for a campsite lottery.
+ * ShowWaitingListScreenPreview displays a preview of WaitingListScreen for reference.
+ */
+
 /**
- * Shows the entrants who joined the waitlist of a campsite lottery.
  * TO-DO
  * Pass in the selected lottery's real waitlist
  */

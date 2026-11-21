@@ -7,8 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 
-
-
+/**
+ * Creates the activity and gets the Android device ID for use in login/signup
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
