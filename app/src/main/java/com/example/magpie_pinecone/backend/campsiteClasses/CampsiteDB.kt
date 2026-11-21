@@ -7,7 +7,7 @@ import java.util.Date
  * Provides actions for interfacing with the campsite database
  *
  */
-
+// TODO: Add support for images
 class CampsiteDB {
     private val db = FirebaseFirestore.getInstance()
     private val campsitesCollection = db.collection("campsites")
