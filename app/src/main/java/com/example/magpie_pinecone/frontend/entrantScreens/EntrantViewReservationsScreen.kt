@@ -43,13 +43,22 @@ import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/*
+ * EntrantViewReservationsScreen.kt contains all relevant functions for displaying the entrant's reservations.
+ *
+ * Composable Functions:
+ * EntrantViewReservationsScreen displays the entrant's reservations, filtering by active and past reservations, and with an option to cancel active reservations.
+ * ActiveEntrantReservations displays the entrant's active reservations, with an option to cancel.
+ * PastEntrantReservations displays the entrant's past reservations
+ * ShowEntrantViewReservationsScreenPreview displays a preview of EntrantViewReservationsScreen for reference.
+ */
+
 /**
  * Display's Entrant's Reservations (Active and Past)
  * TO-DO
  * Link active and past campsite reservations to iterate over
  * Make actual cancel campsite reservation functionality
  */
-
 @Composable
 fun EntrantViewReservationsScreen(
     activeReservations: List<Reservation>,

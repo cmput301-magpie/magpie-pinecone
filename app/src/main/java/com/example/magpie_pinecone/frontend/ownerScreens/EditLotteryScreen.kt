@@ -34,6 +34,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/*
+ * EditLotteryScreen.kt contains all relevant functions for displaying the screen to create/edit a lottery.
+ *
+ * Composable Functions:
+ * EditLotteryScreen displays the screen to create/edit a lottery, with fields for each required detail.
+ * DateRangeFields displays a pair of two fields for entering the start/end dates for a period
+ * ShowEditLotteryScreenPreview displays a preview of EditLotteryScreen for reference
+ */
+
 /**
  * TO-DO
  * Implement Date Pickers (dates are currently typed in as MM/DD/YYYY)

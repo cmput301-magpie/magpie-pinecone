@@ -18,6 +18,14 @@ import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
+/*
+ * ViewCampsiteScreen.kt contains all relevant functions for displaying the details of a campsite.
+ *
+ * Composable Functions:
+ * ViewCampsiteScreen displays the details for a campsite, along with a button to edit the campsite.
+ * ShowViewCampsiteScreenPreview displays a preview of ViewCampsiteScreen for reference.
+ */
+
 /**
  * TO-DO
  * Link actual campsite data to text, implement image and map location

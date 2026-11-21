@@ -20,6 +20,13 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import com.example.magpie_pinecone.frontend.userScreens.AccountDeletedScreen
 
+/*
+ * PineconeApp.kt contains all relevant functions for determining the start state and first screen for the user.
+ *
+ * Composable Functions:
+ * PineconeApp displays the correct app flow for the account stored on the device.
+ */
+
 /**
  * Indicates the state of the app at startup.
  */
@@ -32,11 +39,11 @@ enum class StartState {
 
     ERROR
 }
+
+
 /**
  * Displays the correct app flow for the account stored on this device.
  */
-
-
 @Composable
 fun PineconeApp(androidId: String) {
     var state by rememberSaveable { mutableStateOf(StartState.LOADING) }  // Remember the state of the app

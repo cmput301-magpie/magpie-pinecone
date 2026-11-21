@@ -50,6 +50,18 @@ import com.example.magpie_pinecone.ui.theme.OutlineLavender
 import com.example.magpie_pinecone.ui.theme.PineconePurple
 import com.example.magpie_pinecone.ui.theme.ReserveGreen
 
+/*
+ * EntrantHomeScreen.kt contains all relevant functions for displaying the entrant's home screen.
+ *
+ * Composable Functions:
+ * EntrantHomeScreen displays the entrant home screen (landing page).
+ * HomeWelcomeBanner displays the welcome banner at the top of the entrant home screen.
+ * EntrantHomeScreenLotteryCard displays a single card containing the entrant's entry in a campsite lottery.
+ * WinnerActions displays within a lottery card a "Reserve" button for when the entrant wins a lottery.
+ * LotteryEntryActions displays within a lottery card "Details" and "Leave" buttons for when the entrant has entered an active lottery.
+ * ShowEntrantHomeScreenPreview displays a preview of EntrantHomeScreen for reference.
+ */
+
 /**
  * Displays the entrant landing page.
  *

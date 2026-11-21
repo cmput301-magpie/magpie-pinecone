@@ -17,6 +17,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.ui.theme.PineconePurple
 
+/*
+ * BackButton.kt contains all relevant functions for a back button used in the app.
+ *
+ * Composable Functions:
+ * BackButton displays a back button, for use in all screens needing it for UI consistency.
+ * PreviewBackButton displays a preview of BackButton for reference.
+ */
+
 @Composable
 fun BackButton(modifier: Modifier = Modifier, onBack: () -> Unit) {
     IconButton(

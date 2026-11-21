@@ -29,6 +29,14 @@ import com.example.magpie_pinecone.backend.sharedDataClasses.ImageViewModel
 import com.example.magpie_pinecone.frontend.sharedComposables.ImageCarousel
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
+/*
+ * EditCampsiteScreen.kt contains all relevant functions for displaying the screen to create/edit a campsite.
+ *
+ * Composable Functions:
+ * EditCampsiteScreen displays the screen to create/edit a campsite, with fields for each required detail.
+ * ShowEditCampsiteScreenPreview displays a preview of EditCampsiteScreen for reference.
+ */
+
 /**
  * TO-DO
  * Implement Image Picking
