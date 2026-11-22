@@ -50,6 +50,14 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
 
+/*
+ * EntrantApp.kt contains all relevant functions for navigating between entrant screens.
+ * Additionally, EntrantApp.kt stores persistent data for use across entrant screens.
+ *
+ * Composable Functions:
+ * EntrantApp handles navigation and data persistence across entrant screens.
+ */
+
 /**
  * The 4 tabs of the bottom navigation bar, matching Figma: Home, Search, Settings, Scan QR.
  */

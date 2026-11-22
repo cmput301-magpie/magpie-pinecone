@@ -2,6 +2,10 @@ package com.example.magpie_pinecone.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+/*
+ * Color.kt contains an assortment of colors for use across the app, for UI consistency.
+ */
+
 // ---------- Light mode colors ----------
 // Colors sampled from the Figma mockup (may be slightly off)
 val PineconePurple = Color(0xFF6155F5)   // header banner, Get Started, Enter lottery

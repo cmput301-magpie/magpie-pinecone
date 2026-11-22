@@ -21,13 +21,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.magpie_pinecone.R
 
+/*
+ * CampsiteResultScreen.kt contains all relevant functions for displaying the result of reserving/cancelling a campsite reservation.
+ *
+ * Composable Functions:
+ * CampsiteResultScreen displays the result of reserving/cancelling a campsite, with an option to download a csv copy.
+ * ShowCampsiteResultScreenPreview displays a preview of CampsiteResultScreen for reference.
+ */
+
 /**
  * Display's Entrant's Campsite Results from Cancelling or Reserving
  * TO-DO
  * Add actual download csv functionality
  * Link actual campsite information
  */
-
 @Composable
 fun CampsiteResultScreen(
     onBack: () -> Boolean,

@@ -39,6 +39,15 @@ import com.example.magpie_pinecone.ui.theme.AvatarLavender
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import com.example.magpie_pinecone.ui.theme.PillPurple
 
+/*
+ * SettingsScreen.kt contains all relevant functions for displaying the entrant's settings screen.
+ *
+ * Composable Functions:
+ * SettingsScreen displays the entrant settings screen.
+ * SettingsRow displays one option row in the settings screen.
+ * ShowSettingsScreenPreview displays a preview of SettingsScreen for reference.
+ */
+
 /**
  * Settings tab for entrants (US 01.11.01).
  * Each row just calls one of the functions passed in, so EntrantApp decides where it goes.

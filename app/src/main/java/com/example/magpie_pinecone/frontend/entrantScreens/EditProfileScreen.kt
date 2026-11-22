@@ -38,6 +38,13 @@ import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.AvatarLavender
 import com.example.magpie_pinecone.ui.theme.PillPurple
 
+/*
+ * EditProfileScreen.kt contains all relevant functions for displaying the entrant profile edit screen.
+ *
+ * Composable Functions:
+ * EditProfileScreen displays the screen to edit a profile, with editable fields.
+ */
+
 /**
  * Lets the current user update their name, email and phone number.
  *

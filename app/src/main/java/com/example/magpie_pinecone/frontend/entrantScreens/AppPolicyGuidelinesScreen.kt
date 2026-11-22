@@ -21,6 +21,14 @@ import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import androidx.compose.ui.text.font.FontWeight
 
+/*
+ * AppPolicyGuidelinesScreen.kt contains all relevant functions for displaying the app policy and guidelines.
+ *
+ * Composable Functions:
+ * AppPolicyGuidelinesScreen displays the app policy and guidelines.
+ * ShowAppPolicyGuidelinesScreenPreview displays a preview of AppPolicyGuidelinesScreen for reference.
+ */
+
 /**
  * Displays the app policy and guidelines.
  *

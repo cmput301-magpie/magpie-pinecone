@@ -43,6 +43,16 @@ import java.time.format.TextStyle
 import java.util.Date
 import java.util.Locale
 
+/*
+ * DatesBookedScreen.kt contains all relevant functions for displaying the booked dates for the owner's specified campsite.
+ *
+ * Composable Functions:
+ * DatesBookedScreen displays a calendar on which days that have booked reservations are highlighted.
+ * MonthHeader displays the selected month with buttons for previous/next month.
+ * MonthGrid displays the body of the calendar, highlighting booked days, indenting with blanks to align dates with days of the week.
+ * ShowDatesBookedScreenPreview displays a preview of DatesBookedScreen for reference.
+ */
+
 @RequiresApi(Build.VERSION_CODES.O)
 private fun Date.toLocalDate(): LocalDate =  // Get the local date on device
     toInstant().atZone(ZoneId.systemDefault()).toLocalDate()

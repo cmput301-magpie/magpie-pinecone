@@ -27,12 +27,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.foundation.clickable
+
+/*
+ * SearchCampsiteScreen.kt contains all relevant functions for displaying the entrant's settings screen.
+ *
+ * Composable Functions:
+ * SearchCampsiteScreen displays the campsite search screen, with options to search by campsite name, location, date, and guest number.
+ */
+
 /**
  * Displays a list of campsites that entrants can search through.
  *
  * @param navController Controls navigation between entrant screens.
  */
-
 @Composable
 fun SearchCampsiteScreen(
     navController: NavController,

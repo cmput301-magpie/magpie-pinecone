@@ -27,6 +27,17 @@ import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 
+/*
+ * ViewReservationsScreen.kt contains all relevant functions for displaying all reservations for the owner's campsites.
+ *
+ * Composable Functions:
+ * ViewReservationsScreen displays all reservations booked at the owner's campsites, filtering by active, past, and cancelled reservations.
+ * ActiveReservations displays all active reservations (booking end date is in the future).
+ * PastReservations displays all past reservations (booking end date is in the past).
+ * CancelledReservations displays all cancelled reservations.
+ * ShowViewReservationsScreenPreview displays a preview of ViewReservationsScreen for reference.
+ */
+
 /**
  * TO-DO
  * Link actual reservation data to loop over (Active, Past, Cancelled)

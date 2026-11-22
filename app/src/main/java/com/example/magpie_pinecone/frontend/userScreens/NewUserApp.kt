@@ -5,6 +5,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+/*
+ * NewUserApp.kt contains all relevant functions for navigating between new user screens.
+ *
+ * Composable Functions:
+ * NewUserApp handles navigation across new user screens.
+ */
+
 /**
  * Screens used during the new-user onboarding flow.
  */

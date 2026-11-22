@@ -19,6 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 
+/*
+ * ComingSoonScreen.kt contains all relevant functions for displaying a coming-soon screen for unimplemented features.
+ *
+ * Composable Functions:
+ * ComingSoonScreen displays a coming-soon screen for unimplemented features.
+ * ComingSoonScreenPreview displays a preview of ComingSoonScreen for reference.
+ */
+
 /**
  * Placeholder screen for features that are not built yet (Scan QR, Notifications, Messages...).
  * Leave onBack as null when this screen is a bottom-nav tab (tabs have no back arrow).

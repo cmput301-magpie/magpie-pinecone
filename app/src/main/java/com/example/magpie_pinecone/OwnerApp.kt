@@ -43,6 +43,14 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
 
+/*
+ * OwnerApp.kt contains all relevant functions for navigating between campsite owner screens.
+ * Additionally, OwnerApp.kt stores persistent data for use across campsite owner screens.
+ *
+ * Composable Functions:
+ * OwnerApp handles navigation and data persistence across owner screens.
+ */
+
 /**
  * The 4 tabs of the bottom navigation bar, matching Figma: Home, Search, Settings, Scan QR.
  * Only Home is built for owners so far; the others show a "Coming soon" screen.
