@@ -35,6 +35,7 @@ enum class StartState {
     NONE,
     ENTRANT,
     OWNER,
+    ADMIN,
     ACCOUNT_DELETED,
 
     ERROR
@@ -55,6 +56,7 @@ fun PineconeApp(androidId: String) {
                 when (doc.getString("accountType")) {
                     "Owner" -> StartState.OWNER
                     "Entrant" -> StartState.ENTRANT
+                    "Admin" -> StartState.ADMIN
                     else -> StartState.NONE
                 }
             } catch (e: Exception) {  // An error occurred during searching
@@ -68,6 +70,7 @@ fun PineconeApp(androidId: String) {
         StartState.NONE -> NewUserApp(onUserSignedUp = { state = StartState.LOADING })
         StartState.ENTRANT -> EntrantApp(androidId, onProfileDeleted = { state = StartState.ACCOUNT_DELETED })
         StartState.OWNER -> OwnerApp(androidId)
+        StartState.ADMIN -> AdminApp(androidId)
         StartState.ACCOUNT_DELETED -> {
             AccountDeletedScreen(
                 onBackToWelcome = {
