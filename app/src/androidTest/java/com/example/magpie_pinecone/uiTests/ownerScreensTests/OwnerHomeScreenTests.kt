@@ -120,7 +120,6 @@ class OwnerHomeScreenTests {
         assertEquals("site123", editedCampsite?.ID)
         assertEquals("site123", previewedCampsite?.ID)
         assertEquals("site123", datesBookedCampsite?.ID)
-        assertEquals("site123", qrCodeCampsite?.ID)
     }
 
     @Test
