@@ -43,8 +43,6 @@ class OwnerHomeScreenTests {
     private var editedCampsite: Campsite? = null
     private var previewedCampsite: Campsite? = null
     private var datesBookedCampsite: Campsite? = null
-
-    private var qrCodeCampsite: Campsite? = null
     private var createCampsitePressed = false
     private var reservationsPressed = false
 
@@ -61,8 +59,8 @@ class OwnerHomeScreenTests {
                     onCreateCampsite = { createCampsitePressed = true },
                     onPreviewCampsite = { previewedCampsite = it },
                     onDatesBooked = { datesBookedCampsite = it },
-                    onViewReservations = { reservationsPressed = true },
-                    onQRCode = { qrCodeCampsite = it })
+                    onViewReservations = { reservationsPressed = true }
+                )
             }
         }
     }
@@ -111,14 +109,10 @@ class OwnerHomeScreenTests {
         composeTestRule.onNodeWithText("...").performClick()
         composeTestRule.onNodeWithText("Dates Booked").performClick()
 
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("Get QR Code").performClick()
-
         // Each option should send back the campsite it belongs to
         assertEquals("site123", editedCampsite?.ID)
         assertEquals("site123", previewedCampsite?.ID)
         assertEquals("site123", datesBookedCampsite?.ID)
-        assertEquals("site123", qrCodeCampsite?.ID)
     }
 
     @Test
