@@ -115,6 +115,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     // What the result screen should say (reserved or cancelled)
     var resultTitle by remember { mutableStateOf("Campsite Reserved") }
     var resultMessage by remember { mutableStateOf("") }
+    var resultCampsite by remember { mutableStateOf<Campsite?>(null) }  // Campsite shown on the result screen
 
     var campsiteToReserve by remember {
         mutableStateOf<Campsite?>(null)
@@ -327,9 +328,11 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     },
                     campsiteId = campsiteToReserve?.ID ?: "",
                     onReserved = {
+                        resultCampsite = campsiteToReserve   // Show this campsite on the result screen
                         resultTitle = "Campsite Reserved"
                         resultMessage =
                             "Your reservation was placed successfully!"
+
 
                         navController.navigate(CampsiteResult)
                     }
@@ -342,7 +345,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         navController.popBackStack()
                     },
                     title = resultTitle,
-                    message = resultMessage
+                    message = resultMessage,
+                    campsite = resultCampsite
                 )
             }
 
@@ -359,7 +363,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 EntrantViewReservationsScreen(
                     activeReservations = activeReservations,
                     campsiteDB = campsiteDB,
-                    onCancelled = {
+                    onCancelled = { cancelledCampsite ->
+                    resultCampsite = cancelledCampsite   // Show the cancelled campsite on the result screen
                         resultTitle = "Campsite Cancelled"
                         resultMessage =
                             "Your reservation was cancelled."
