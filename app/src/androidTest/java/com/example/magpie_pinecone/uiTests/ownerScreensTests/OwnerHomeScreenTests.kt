@@ -2,6 +2,7 @@ package com.example.magpie_pinecone.uiTests.ownerScreensTests
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
@@ -43,7 +44,6 @@ class OwnerHomeScreenTests {
     private var editedCampsite: Campsite? = null
     private var previewedCampsite: Campsite? = null
     private var datesBookedCampsite: Campsite? = null
-
     private var qrCodeCampsite: Campsite? = null
     private var createCampsitePressed = false
     private var reservationsPressed = false
@@ -62,17 +62,26 @@ class OwnerHomeScreenTests {
                     onPreviewCampsite = { previewedCampsite = it },
                     onDatesBooked = { datesBookedCampsite = it },
                     onViewReservations = { reservationsPressed = true },
-                    onQRCode = { qrCodeCampsite = it })
+                    onQRCode = { qrCodeCampsite = it }
+                )
             }
         }
+    }
+
+    /** Opens the "..." menu on the card and picks one option. */
+    private fun pickFromMenu(option: String) {
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+        composeTestRule.onNodeWithText(option).performClick()
     }
 
     @Test
     fun showsWelcomeAndTabs() {
         showOwnerHomeScreen(emptyList(), emptyList())
 
-        // Title and both tabs should be on screen
-        composeTestRule.onNodeWithText("Welcome Back, Owner!").assertIsDisplayed()
+        // The banner says "Welcome back,\nOwner!" so we look for part of the text
+        composeTestRule.onNodeWithText("Owner!", substring = true).assertIsDisplayed()
+
+        // Both parts of the tab switch should be on screen
         composeTestRule.onNodeWithText("My Lotteries").assertIsDisplayed()
         composeTestRule.onNodeWithText("My Campsites").assertIsDisplayed()
     }
@@ -81,38 +90,31 @@ class OwnerHomeScreenTests {
     fun noCampsites_showsEmptyMessage() {
         showOwnerHomeScreen(emptyList(), emptyList())
 
-        // My Campsites is the tab that opens first.
-        // The message sits under the list, so we only check that it exists
-        composeTestRule.onNodeWithText("You have no campsites yet.").assertExists()
+        // My Campsites is the tab that opens first
+        composeTestRule.onNodeWithText("You have no campsites yet.").assertIsDisplayed()
     }
 
     @Test
     fun campsiteCard_showsDetails() {
         showOwnerHomeScreen(listOf(campsite), emptyList())
 
-        // The card shows the campsite's info
+        // Name, address, price (38.0 is shown as $38), rating and occupancy
         composeTestRule.onNodeWithText("Gronk Campground").assertIsDisplayed()
         composeTestRule.onNodeWithText("1234 Rizz St").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Rating: 5.0").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Max Occupancy: 5").assertIsDisplayed()
+        composeTestRule.onNodeWithText("\$38").assertIsDisplayed()
+        composeTestRule.onNodeWithText("5.0").assertIsDisplayed()
+        composeTestRule.onNodeWithText("5").assertIsDisplayed()
     }
 
     @Test
-    fun campsiteMenu_callsEditPreviewAndDatesBooked() {
+    fun campsiteMenu_callsEveryOption() {
         showOwnerHomeScreen(listOf(campsite), emptyList())
 
         // Open the "..." menu and pick each option one at a time
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("Edit").performClick()
-
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("Preview").performClick()
-
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("Dates Booked").performClick()
-
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("Get QR Code").performClick()
+        pickFromMenu("Edit")
+        pickFromMenu("Preview")
+        pickFromMenu("Dates Booked")
+        pickFromMenu("Get QR Code")
 
         // Each option should send back the campsite it belongs to
         assertEquals("site123", editedCampsite?.ID)
@@ -125,7 +127,7 @@ class OwnerHomeScreenTests {
     fun campsiteButtons_callTheirFunctions() {
         showOwnerHomeScreen(emptyList(), emptyList())
 
-        composeTestRule.onNodeWithText("+ Campsite").performClick()
+        composeTestRule.onNodeWithText("Campsite").performClick()
         composeTestRule.onNodeWithText("Campsite Resv.").performClick()
 
         assertTrue(createCampsitePressed)
@@ -139,7 +141,7 @@ class OwnerHomeScreenTests {
         // Switch to the lotteries tab first
         composeTestRule.onNodeWithText("My Lotteries").performClick()
 
-        composeTestRule.onNodeWithText("You have no lotteries yet.").assertExists()
+        composeTestRule.onNodeWithText("You have no lotteries yet.").assertIsDisplayed()
     }
 
     @Test
@@ -151,6 +153,9 @@ class OwnerHomeScreenTests {
         composeTestRule.onNodeWithText("Gronk Campground").assertIsDisplayed()
         composeTestRule.onNodeWithText("Winners: 3").assertIsDisplayed()
         composeTestRule.onNodeWithText("Waitlist capacity: 50").assertIsDisplayed()
+
+        // No registration end date was set, so it says TBD
+        composeTestRule.onNodeWithText("Registration ends TBD").assertIsDisplayed()
     }
 
     @Test
@@ -158,11 +163,8 @@ class OwnerHomeScreenTests {
         showOwnerHomeScreen(emptyList(), listOf(lottery))
         composeTestRule.onNodeWithText("My Lotteries").performClick()
 
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("Edit").performClick()
-
-        composeTestRule.onNodeWithText("...").performClick()
-        composeTestRule.onNodeWithText("View waitlist").performClick()
+        pickFromMenu("Edit")
+        pickFromMenu("View waitlist")
 
         // Both options should send back this lottery
         assertEquals("lottery1", editedLottery?.id)
@@ -174,7 +176,7 @@ class OwnerHomeScreenTests {
         showOwnerHomeScreen(emptyList(), emptyList())
         composeTestRule.onNodeWithText("My Lotteries").performClick()
 
-        composeTestRule.onNodeWithText("+ Lottery").performClick()
+        composeTestRule.onNodeWithText("Lottery").performClick()
         assertTrue(createLotteryPressed)
     }
 }

@@ -2,10 +2,13 @@ package com.example.magpie_pinecone.uiTests.ownerScreensTests
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.frontend.ownerScreens.EditCampsiteScreen
@@ -26,7 +29,7 @@ class EditCampsiteScreenTests {
     private var backPressed = false
 
     /**
-     * isEdit = false means "Create Campsite", true means "Edit Campsite".
+     * isEdit = false means "Register Campsite", true means "Edit Campsite".
      */
     private fun showEditCampsiteScreen(campsite: Campsite, isEdit: Boolean) {
         composeTestRule.setContent {
@@ -42,13 +45,26 @@ class EditCampsiteScreenTests {
         }
     }
 
+    /**
+     * Types into the box with this label.
+     * The screen scrolls, so we scroll to the box first.
+     */
+    private fun typeInto(label: String, text: String) {
+        composeTestRule.onNodeWithText(label)
+            .performScrollTo()
+            .performTextInput(text)
+    }
+
+    /** The submit button is the clickable node with this text (the title can have the same words). */
+    private fun submitButton(text: String) =
+        composeTestRule.onNode(hasText(text) and hasClickAction())
+
     @Test
-    fun newCampsite_showsCreateTitle() {
+    fun newCampsite_showsRegisterTitleAndButton() {
         showEditCampsiteScreen(Campsite(), isEdit = false)
 
-        // A new campsite uses the "create" words
-        composeTestRule.onNodeWithText("Create Campsite").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Register Campsite").assertIsDisplayed()
+        // A new campsite uses the "register" words, like Figma
+        submitButton("Register Campsite").assertIsDisplayed()
     }
 
     @Test
@@ -56,9 +72,9 @@ class EditCampsiteScreenTests {
         val campsite = Campsite(name = "Gronk Campground", location = "1234 Rizz St")
         showEditCampsiteScreen(campsite, isEdit = true)
 
-        // Editing uses the "edit" words
+        // Editing uses the "edit" title and a "save" button
         composeTestRule.onNodeWithText("Edit Campsite").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Save Campsite").assertIsDisplayed()
+        submitButton("Save Campsite").assertIsDisplayed()
 
         // The boxes start with the campsite's current values
         composeTestRule.onNodeWithText("Name").assertTextContains("Gronk Campground")
@@ -70,14 +86,14 @@ class EditCampsiteScreenTests {
         showEditCampsiteScreen(Campsite(), isEdit = false)
 
         // Type into every box (each box is found by its label)
-        composeTestRule.onNodeWithText("Name").performTextInput("Gronk Campground")
-        composeTestRule.onNodeWithText("Location").performTextInput("1234 Rizz St")
-        composeTestRule.onNodeWithText("Price ($)").performTextInput("38")
-        composeTestRule.onNodeWithText("Description").performTextInput("Quiet spot by the river")
-        composeTestRule.onNodeWithText("Max Occupancy").performTextInput("5")
-        composeTestRule.onNodeWithText("Tags").performTextInput("River, Lake")
+        typeInto("Name", "Gronk Campground")
+        typeInto("Location", "1234 Rizz St")
+        typeInto("Price ($)", "38")
+        typeInto("Description", "Quiet spot by the river")
+        typeInto("Max Occupancy", "5")
+        typeInto("Tags", "River, Lake")
 
-        composeTestRule.onNodeWithText("Register Campsite").performClick()
+        submitButton("Register Campsite").performClick()
 
         // The campsite sent back should hold everything we typed
         assertNotNull(submittedCampsite)
@@ -97,8 +113,8 @@ class EditCampsiteScreenTests {
         showEditCampsiteScreen(Campsite(), isEdit = false)
 
         // Only fill in the name, leave price and occupancy empty
-        composeTestRule.onNodeWithText("Name").performTextInput("Gronk Campground")
-        composeTestRule.onNodeWithText("Register Campsite").performClick()
+        typeInto("Name", "Gronk Campground")
+        submitButton("Register Campsite").performClick()
 
         // Empty number boxes should not crash, they just save as 0
         assertEquals(0.0, submittedCampsite!!.price, 0.0)
