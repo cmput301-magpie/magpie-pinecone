@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone
 
 import android.provider.Settings
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -45,10 +46,14 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.example.magpie_pinecone.frontend.entrantScreens.ScanQRCodeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 
 /*
  * EntrantApp.kt contains all relevant functions for navigating between entrant screens.
@@ -100,6 +105,8 @@ object ComingSoon
 @Composable
 fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
+
+    val context = LocalContext.current
 
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
@@ -409,10 +416,20 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 )
             }
 
-            // Scan QR tab (US 01.12.01 not done yet)
+            // Scan QR tab (US 01.12.01)
             composable(EntrantDestination.SCAN_QR.route) {
-                ComingSoonScreen(
-                    title = "Scan QR"
+                ScanQRCodeScreen(
+                    onBack = {navController.popBackStack()},
+                    onScanSuccessful = {
+                        campsiteDB.readCampsite(it, {
+                            if (it != null) {
+                                selectedCampsite = it
+                                navController.navigate(CampsiteDetails)
+                            } else {
+                                Toast.makeText(context, "Invalid campsite ID", Toast.LENGTH_SHORT).show()
+                            }
+                        })
+                    }
                 )
             }
 

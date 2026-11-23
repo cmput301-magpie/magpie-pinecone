@@ -66,7 +66,8 @@ fun OwnerHomeScreen(
     onCreateCampsite: () -> Unit,
     onPreviewCampsite: (Campsite) -> Unit,
     onDatesBooked: (Campsite) -> Unit,
-    onViewReservations: () -> Unit
+    onViewReservations: () -> Unit,
+    onQRCode: (Campsite) -> Unit
 ) {
     // Tab Navigation
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(1) }
@@ -117,7 +118,8 @@ fun OwnerHomeScreen(
                 onCreateCampsite,
                 onPreviewCampsite,
                 onDatesBooked,
-                onViewReservations
+                onViewReservations,
+                onQRCode
             )
         }
     }
@@ -249,7 +251,8 @@ fun MyCampsites(
     onCreateCampsite: () -> Unit,
     onPreviewCampsite: (Campsite) -> Unit,
     onDatesBooked: (Campsite) -> Unit,
-    onViewReservations: () -> Unit
+    onViewReservations: () -> Unit,
+    onQRCode: (Campsite) -> Unit,
 ) {
 
 
@@ -264,7 +267,8 @@ fun MyCampsites(
                     menuItems = listOf(
                         "Edit" to { onEditCampsite(campsite) },
                         "Preview" to { onPreviewCampsite(campsite) },
-                        "Dates Booked" to { onDatesBooked(campsite) }
+                        "Dates Booked" to { onDatesBooked(campsite) },
+                        "Get QR Code" to { onQRCode(campsite) }
                     )
                 )
             }
@@ -371,6 +375,7 @@ fun ShowOwnerHomeScreenPreview() {
         onCreateCampsite = {},
         onPreviewCampsite = {},
         onDatesBooked = {},
-        onViewReservations = {}
+        onViewReservations = {},
+        onQRCode = {}
     )
 }
