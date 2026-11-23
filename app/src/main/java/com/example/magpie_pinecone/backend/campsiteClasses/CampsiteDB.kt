@@ -72,22 +72,28 @@ class CampsiteDB {
         campsiteID: String,
         onResult: (Campsite?) -> Unit
     ) {
-        val document = campsitesCollection.document(campsiteID)
+        try {
+            val document = campsitesCollection.document(campsiteID)
 
-        document.get()
-            .addOnSuccessListener { snapshot ->
+            document.get()
+                .addOnSuccessListener { snapshot ->
 
-                if (snapshot.exists()) {
-                    val campsite = snapshot.toObject(Campsite::class.java)
-                    onResult(campsite)
-                } else {
+                    if (snapshot.exists()) {
+                        val campsite = snapshot.toObject(Campsite::class.java)
+                        onResult(campsite)
+                    } else {
+                        onResult(null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("CampsiteDB", "Failed to read campsite", exception)
                     onResult(null)
                 }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("CampsiteDB", "Failed to read campsite", exception)
-                onResult(null)
-            }}
+        } catch (e: Exception) {
+            Log.e("CampsiteDB", "Invalid campsite ID format: $campsiteID", e)
+            onResult(null)
+        }
+    }
     /**
      * Fetches all campsites from the database
      */
