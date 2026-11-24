@@ -213,7 +213,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 }
 
                 EntrantHomeScreen(
-                    lotteries = lotteries,
+                    lotteryDB = lotteryDB,
                     onMyReservations = {
                         navController.navigate(
                             route = EntrantViewReservations
@@ -237,6 +237,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                                 lottery,
                                 curEntrant!!
                             )
+
                         }
                     }
                 )
