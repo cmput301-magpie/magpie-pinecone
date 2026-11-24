@@ -38,7 +38,7 @@ class ViewReservationsScreenTests {
     fun showsTitleAndThreeTabs() {
         showViewReservationsScreen()
 
-        composeTestRule.onNodeWithText("Reservations").assertIsDisplayed()
+        composeTestRule.onNodeWithText("View Reservations").assertIsDisplayed()
         composeTestRule.onNodeWithText("Active").assertIsDisplayed()
         composeTestRule.onNodeWithText("Past").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancelled").assertIsDisplayed()
@@ -48,16 +48,16 @@ class ViewReservationsScreenTests {
     fun switchingTabs_changesTheList() {
         showViewReservationsScreen()
 
-        // No active reservations, so no rows yet
-        composeTestRule.onNodeWithText("View Details").assertDoesNotExist()
+        // No active reservations, so the Active tab says so
+        composeTestRule.onNodeWithText("You have no active reservations.").assertIsDisplayed()
 
-        // The Past tab shows its row
+        // The Past tab shows its own message
         composeTestRule.onNodeWithText("Past").performClick()
-        composeTestRule.onNodeWithText("View Details").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Past reservations will appear here.").assertIsDisplayed()
 
-        // So does the Cancelled tab
+        // So does the cancelled reservations tab
         composeTestRule.onNodeWithText("Cancelled").performClick()
-        composeTestRule.onNodeWithText("View Details").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cancelled reservations will appear here.").assertIsDisplayed()
     }
 
     @Test

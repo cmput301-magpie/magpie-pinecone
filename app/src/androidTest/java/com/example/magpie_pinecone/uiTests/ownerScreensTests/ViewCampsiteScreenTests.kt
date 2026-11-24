@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.frontend.ownerScreens.ViewCampsiteScreen
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
@@ -22,6 +23,7 @@ class ViewCampsiteScreenTests {
         name = "Gronk Campground",
         location = "1234 Rizz St",
         maxOccupancy = 5,
+        price = 38.0,
         description = "Quiet spot by the river",
         tags = listOf("River", "Lake")
     )
@@ -43,18 +45,26 @@ class ViewCampsiteScreenTests {
     }
 
     @Test
-    fun showsCampsiteInfo() {
+    fun showsCampsiteLikeEntrantsSeeIt() {
         showViewCampsiteScreen()
 
-        // Every piece of campsite info should be on screen
-        composeTestRule.onNodeWithText("View Campsite").assertIsDisplayed()
+        // Same details page as entrants: name as the title, price and description
         composeTestRule.onNodeWithText("Gronk Campground").assertIsDisplayed()
-        composeTestRule.onNodeWithText("1234 Rizz St").assertIsDisplayed()
+        composeTestRule.onNodeWithText("\$38").assertIsDisplayed()
         composeTestRule.onNodeWithText("Quiet spot by the river").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Max Occupancy: 5").assertIsDisplayed()
 
-        // Tags are joined with commas
-        composeTestRule.onNodeWithText("Tags: River, Lake").assertIsDisplayed()
+        // Tags and location are further down
+        composeTestRule.onNodeWithText("River").assertExists()
+        composeTestRule.onNodeWithText("Lake").assertExists()
+        composeTestRule.onNodeWithText("1234 Rizz St").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun ownerDoesNotSeeLotteryButton() {
+        showViewCampsiteScreen()
+
+        // Owners can't enter a lottery for their own campsite
+        composeTestRule.onNodeWithText("Enter lottery").assertDoesNotExist()
     }
 
     @Test

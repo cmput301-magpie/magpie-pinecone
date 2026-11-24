@@ -51,9 +51,10 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
  *
  * Composable Functions:
  * CampsiteDetailsScreen displays details of a campsite, with a button to enter a lottery for the campsite.
+ * CampsiteDetailsLayout displays the details page shared by entrants and owners, with any buttons pinned at the bottom.
  * CampsiteSummaryRow displays the campsite's price, maximum occupancy and rating.
  * CampsitePhotos displays the campsite's images, or a placeholder if it has none.
- * SectionLabel displays a small grey heading with a divider line under it.
+ * SectionLabel displays a small gray heading with a divider line under it.
  * ExpandableDescription displays the description, with "read more..." when it is too long.
  * TagChip displays one campsite tag inside an outlined box.
  * RateCampsiteRow displays the "Rate this campsite" row of stars.
@@ -61,10 +62,7 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
  */
 
 /**
- * Displays campsite details.
- *
- * The content scrolls, while the lottery buttons stay pinned at the bottom
- * so the entrant can always reach them.
+ * Displays campsite details to an entrant, with the lottery buttons at the bottom.
  *
  * @param campsite The campsite whose information is being displayed.
  * @param onBack Returns to the previous screen.
@@ -79,6 +77,50 @@ fun CampsiteDetailsScreen(
     onSubmit: () -> Unit = {},
     isWinner: Boolean = false,
     onReserve: () -> Unit = {}
+) {
+    CampsiteDetailsLayout(
+        campsite = campsite,
+        onBack = onBack
+    ) {
+        // Only lottery winners can go on to reserve dates
+        if (isWinner) {
+            PillButton(
+                text = "Reserve",
+                onClick = onReserve,
+                containerColor = ReserveGreen,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            )
+        }
+
+        PillButton(
+            text = "Enter lottery",
+            onClick = onSubmit,
+            containerColor = PineconePurple,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+        )
+    }
+}
+
+/**
+ * The campsite details page shared by entrants and owners.
+ *
+ * The details scroll, while the buttons passed in stay pinned at the
+ * bottom. Entrants get the lottery buttons; owners previewing their own
+ * campsite get an "Edit Campsite" button instead.
+ *
+ * @param campsite The campsite whose information is being displayed.
+ * @param onBack Returns to the previous screen.
+ * @param bottomButtons The buttons pinned at the bottom of the screen.
+ */
+@Composable
+fun CampsiteDetailsLayout(
+    campsite: Campsite,
+    onBack: () -> Unit,
+    bottomButtons: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -145,33 +187,14 @@ fun CampsiteDetailsScreen(
             RateCampsiteRow()
         }
 
-        // Action buttons pinned at the bottom of the screen
+        // Buttons pinned at the bottom of the screen
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Only lottery winners can go on to reserve dates
-            if (isWinner) {
-                PillButton(
-                    text = "Reserve",
-                    onClick = onReserve,
-                    containerColor = ReserveGreen,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                )
-            }
-
-            PillButton(
-                text = "Enter lottery",
-                onClick = onSubmit,
-                containerColor = PineconePurple,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            )
+            bottomButtons()
         }
     }
 }
