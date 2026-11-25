@@ -1,10 +1,13 @@
 package com.example.magpie_pinecone.backend.sharedDataClasses
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.magpie_pinecone.backend.uploadImageToFirebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * A ViewModel for managing image data. Makes it survive screen rotations
@@ -23,9 +26,10 @@ class ImageViewModel : ViewModel() {
      *
      * @param image The image to add
      */
-    fun addImages(images: List<ImageData>) {
-        _images.update { it + images }
+    private fun addImage(image: ImageData) {
+        _images.update { it + image }
     }
+
 
     /**
      * Deletes an image from the list of images.
@@ -34,5 +38,22 @@ class ImageViewModel : ViewModel() {
      */
     fun deleteImage(image: ImageData) {
         _images.update { it - image }
+    }
+
+    /**
+     * Uploads images to firebase
+     */
+    fun addImagesAndUploadToDB(images: List<ImageData>) {
+        images.forEach { imageData ->
+            viewModelScope.launch {
+                val uri = imageData.localUri ?: return@launch
+
+                uploadImageToFirebase(uri).onSuccess { downloadUrl ->
+                    imageData.localUri = null
+                    imageData.url = downloadUrl
+                }
+            }
+        }
+
     }
 }

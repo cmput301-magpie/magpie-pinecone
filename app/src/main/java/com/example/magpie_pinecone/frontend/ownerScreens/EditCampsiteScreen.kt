@@ -1,5 +1,6 @@
 package com.example.magpie_pinecone.frontend.ownerScreens
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,7 +92,7 @@ fun EditCampsiteScreen(
                 ImageCarousel(
                     imageDataList,
                     onUpload = {
-                        imageViewModel.addImages(it)
+                        imageViewModel.addImagesAndUploadToDB(it)
                     },
                     onDelete = {
                         imageViewModel.deleteImage(it)
@@ -159,6 +160,7 @@ fun EditCampsiteScreen(
                     campsite.maxOccupancy = maxOccupancy.toIntOrNull() ?: 0
                     // TEMPORARY, adding tags is not finished.
                     campsite.tags = tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    campsite.images = imageViewModel.images.value
 
                     onSubmit(campsite)
                 }
