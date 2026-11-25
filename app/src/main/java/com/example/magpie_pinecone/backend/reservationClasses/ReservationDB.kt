@@ -3,7 +3,6 @@ package com.example.magpie_pinecone.backend.reservationClasses
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
-import kotlin.time.Clock.System.now
 
 
 /**
@@ -18,8 +17,13 @@ class ReservationDB {
 
     /**
      * Adds a [reservation] to the reservation database.
+     *
+     * [onResult] is called with true once Firestore confirms the write, or false if it failed.
      */
-    fun addReservation(reservation: Reservation) {
+    fun addReservation(
+        reservation: Reservation,
+        onResult: (Boolean) -> Unit = {}
+    ) {
         val document = reservationCollection.document()
 
         reservation.ID = document.id
@@ -27,9 +31,11 @@ class ReservationDB {
         document.set(reservation)
             .addOnSuccessListener {
                 Log.d("ReservationDB", "Successfully added reservation")
+                onResult(true)
             }
             .addOnFailureListener { e ->
                 Log.e("ReservationDB", "Failed to add reservation", e)
+                onResult(false)
             }
     }
 
@@ -204,7 +210,7 @@ class ReservationDB {
     }
 
     /**
-     * Fetches active reservations by a specified [campsiteID] from the database.
+     * Fetches active (not cancelled, not yet ended) reservations for a specified [campsiteID].
      */
     fun getActiveReservationsByCampsite(
         campsiteID: String,
@@ -213,16 +219,20 @@ class ReservationDB {
         val currentDate = Date()
 
         reservationCollection
-            .whereEqualTo("ID", campsiteID)
+            .whereEqualTo("campsiteID", campsiteID)
             .whereGreaterThanOrEqualTo("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull {
-                    it.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { !it.isCancelled }
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read campsite reservations", e)
+                onResult(emptyList())
             }
     }
 }
