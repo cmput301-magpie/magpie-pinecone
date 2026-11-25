@@ -115,6 +115,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     // What the result screen should say (reserved or cancelled)
     var resultTitle by remember { mutableStateOf("Campsite Reserved") }
     var resultMessage by remember { mutableStateOf("") }
+    var resultCampsite by remember { mutableStateOf<Campsite?>(null) }  // Campsite shown on the result screen
 
     var campsiteToReserve by remember {
         mutableStateOf<Campsite?>(null)
@@ -212,7 +213,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 }
 
                 EntrantHomeScreen(
-                    lotteries = lotteries,
+                    lotteryDB = lotteryDB,
                     onMyReservations = {
                         navController.navigate(
                             route = EntrantViewReservations
@@ -236,6 +237,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                                 lottery,
                                 curEntrant!!
                             )
+
                         }
                     }
                 )
@@ -281,6 +283,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         campsite = campsite,
                         isWinner = false,
                         onReserve = {
+                            campsiteToReserve = campsite   // The reserve screen reads this campsite
                             navController.navigate(CampsiteReserve)
                         },
                         onBack = {
@@ -326,12 +329,33 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         )
                     },
                     campsiteId = campsiteToReserve?.ID ?: "",
-                    onReserved = {
-                        resultTitle = "Campsite Reserved"
-                        resultMessage =
-                            "Your reservation was placed successfully!"
+                    onReserved = { startDate, endDate ->
+                        val campsiteForReservation = campsiteToReserve
 
-                        navController.navigate(CampsiteResult)
+                        if (campsiteForReservation != null) {
+                            entrantHandler.reserveCampsite(
+                                reservationDB = reservationDB,
+                                campsite = campsiteForReservation,
+                                entrantId = androidId,
+                                startDate = startDate,
+                                endDate = endDate
+                            ) { success ->
+                                if (success) {
+                                    resultCampsite = campsiteForReservation   // Show this campsite on the result screen
+                                    resultTitle = "Campsite Reserved"
+                                    resultMessage =
+                                        "Your reservation was placed successfully!"
+
+                                    navController.navigate(CampsiteResult)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Could not reserve those dates. They may already be booked.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
                     }
                 )
             }
@@ -342,7 +366,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         navController.popBackStack()
                     },
                     title = resultTitle,
-                    message = resultMessage
+                    message = resultMessage,
+                    campsite = resultCampsite
                 )
             }
 
@@ -359,7 +384,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 EntrantViewReservationsScreen(
                     activeReservations = activeReservations,
                     campsiteDB = campsiteDB,
-                    onCancelled = {
+                    onCancelled = { cancelledCampsite ->
+                        resultCampsite = cancelledCampsite   // Show the cancelled campsite on the result screen
                         resultTitle = "Campsite Cancelled"
                         resultMessage =
                             "Your reservation was cancelled."

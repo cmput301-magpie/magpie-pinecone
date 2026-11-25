@@ -11,7 +11,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.frontend.ownerScreens.EditLotteryScreen
@@ -20,6 +20,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class EditLotteryScreenTests {
 
@@ -30,6 +33,27 @@ class EditLotteryScreenTests {
 
     // Remember what the screen sent back
     private var submittedLottery: Lottery? = null
+
+    /** Turns "01/31/2027" into a Date, the same way the screen shows dates. */
+    private fun date(text: String): Date =
+        SimpleDateFormat("MM/dd/yyyy", Locale.US).parse(text)!!
+
+    /**
+     * A lottery with everything filled in. A fresh copy is made for every test,
+     * because submitting changes the lottery object.
+     */
+    private fun filledLottery() = Lottery(
+        id = "lottery1",
+        campsites = mutableListOf(Campsite(ID = "site123", name = "Gronk Campground")),
+        numberOfWinners = 3,
+        waitlistCapacity = 50,
+        registrationStartDate = date("01/01/2027"),
+        registrationEndDate = date("01/31/2027"),
+        bookingStartDate = date("02/01/2027"),
+        bookingEndDate = date("02/07/2027"),
+        activeStartDate = date("06/01/2027"),
+        activeEndDate = date("08/31/2027")
+    )
 
     private fun showEditLotteryScreen(
         lottery: Lottery,
@@ -48,17 +72,6 @@ class EditLotteryScreenTests {
                 )
             }
         }
-    }
-
-    /**
-     * Types a date into one of the Start/End boxes.
-     * index 0 = Registration, 1 = Booking, 2 = Active.
-     * The screen scrolls, so we scroll to the box first.
-     */
-    private fun typeDate(label: String, index: Int, date: String) {
-        composeTestRule.onAllNodesWithText(label)[index]
-            .performScrollTo()
-            .performTextInput(date)
     }
 
     /** The submit button is the clickable node with this text (the title has the same words). */
@@ -88,58 +101,29 @@ class EditLotteryScreenTests {
         showEditLotteryScreen(Lottery(), isEdit = false)
 
         // No campsite picked and no dates yet, so the button is off
-        submitButton("Start Lottery").performScrollTo().assertIsNotEnabled()
+        submitButton("Start Lottery").assertIsNotEnabled()
     }
 
     @Test
-    fun endBeforeStart_showsError() {
-        showEditLotteryScreen(Lottery(), isEdit = false)
+    fun filledForm_submitsLottery() {
+        showEditLotteryScreen(filledLottery(), isEdit = false)
 
-        // Registration ends before it starts
-        typeDate("Start", 0, "02/10/2027")
-        typeDate("End", 0, "02/01/2027")
+        // Everything is filled in, so the button is on
+        submitButton("Start Lottery").assertIsEnabled().performClick()
 
-        // The end box warns us and the button stays off
-        composeTestRule.onNodeWithText("Before start").assertExists()
-        submitButton("Start Lottery").performScrollTo().assertIsNotEnabled()
-    }
-
-    @Test
-    fun validForm_submitsLottery() {
-        showEditLotteryScreen(Lottery(), isEdit = false)
-
-        // Pick the campsite (the whole row is clickable)
-        composeTestRule.onNodeWithText("Gronk Campground").performClick()
-
-        // Fill in all three periods
-        typeDate("Start", 0, "01/01/2027")
-        typeDate("End", 0, "01/31/2027")
-        typeDate("Start", 1, "02/01/2027")
-        typeDate("End", 1, "02/07/2027")
-        typeDate("Start", 2, "06/01/2027")
-        typeDate("End", 2, "08/31/2027")
-
-        // Now everything is valid, so the button turns on
-        submitButton("Start Lottery").performScrollTo().assertIsEnabled().performClick()
-
-        // The lottery sent back should hold what we entered
+        // The lottery sent back should hold the owner, campsite, numbers and dates
         assertNotNull(submittedLottery)
         assertEquals("abc123", submittedLottery!!.ownerId)
         assertEquals(listOf("site123"), submittedLottery!!.campsites.map { it.ID })
-        assertNotNull(submittedLottery!!.registrationStartDate)
-        assertNotNull(submittedLottery!!.bookingEndDate)
-        assertNotNull(submittedLottery!!.activeEndDate)
+        assertEquals(3, submittedLottery!!.numberOfWinners)
+        assertEquals(50, submittedLottery!!.waitlistCapacity)
+        assertEquals(date("01/01/2027"), submittedLottery!!.registrationStartDate)
+        assertEquals(date("08/31/2027"), submittedLottery!!.activeEndDate)
     }
 
     @Test
-    fun existingLottery_showsUpdateAndCurrentValues() {
-        val lottery = Lottery(
-            id = "lottery1",
-            campsites = mutableListOf(campsite),
-            numberOfWinners = 3,
-            waitlistCapacity = 50
-        )
-        showEditLotteryScreen(lottery, isEdit = true)
+    fun existingLottery_showsCurrentValues() {
+        showEditLotteryScreen(filledLottery(), isEdit = true)
 
         // Editing uses "Update Lottery"
         composeTestRule.onAllNodesWithText("Update Lottery")[0].assertIsDisplayed()
@@ -147,5 +131,44 @@ class EditLotteryScreenTests {
         // The number boxes start with the lottery's current values
         composeTestRule.onNodeWithText("Num. winners").assertTextContains("3")
         composeTestRule.onNodeWithText("Max. waitlist cap.").assertTextContains("50")
+
+        // The registration period shows both of its dates
+        composeTestRule.onNodeWithText("Registration period")
+            .performScrollTo()
+            .assertTextContains("01/01/2027 - 01/31/2027")
+    }
+
+    @Test
+    fun untickingCampsite_turnsSubmitOff() {
+        showEditLotteryScreen(filledLottery(), isEdit = true)
+
+        // The lottery's campsite starts ticked, so the button is on
+        submitButton("Update Lottery").assertIsEnabled()
+
+        // Untick it: a lottery needs at least one campsite
+        composeTestRule.onNodeWithText("Gronk Campground").performClick()
+        submitButton("Update Lottery").assertIsNotEnabled()
+    }
+
+    @Test
+    fun zeroWinners_showsHintAndTurnsSubmitOff() {
+        showEditLotteryScreen(filledLottery(), isEdit = false)
+
+        composeTestRule.onNodeWithText("Num. winners").performTextReplacement("0")
+
+        // A lottery needs at least one winner
+        composeTestRule.onNodeWithText("Enter at least 1 winner").assertIsDisplayed()
+        submitButton("Start Lottery").assertIsNotEnabled()
+    }
+
+    @Test
+    fun tappingPeriod_opensCalendar() {
+        showEditLotteryScreen(Lottery(), isEdit = false)
+
+        composeTestRule.onNodeWithText("Booking period").performScrollTo().performClick()
+
+        // The calendar pop-up has OK and Cancel buttons
+        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
+        composeTestRule.onNodeWithText("OK").assertIsDisplayed()
     }
 }

@@ -56,6 +56,14 @@ class WaitingListScreenTests {
     }
 
     @Test
+    fun showsHowManyEntrants() {
+        showWaitingListScreen(listOf(babyGronk, kaiCenat))
+
+        // Two entrants joined, so the subtitle counts them
+        composeTestRule.onNodeWithText("2 entrants on the waitlist").assertIsDisplayed()
+    }
+
+    @Test
     fun backButton_callsOnBack() {
         showWaitingListScreen(emptyList())
 

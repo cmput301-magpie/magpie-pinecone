@@ -1,7 +1,6 @@
 package com.example.magpie_pinecone.uiTests.ownerScreensTests
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -85,13 +84,13 @@ class DatesBookedScreenTests {
         showDatesBookedScreen(emptyList())
         val thisMonth = YearMonth.now()
 
-        // ">" goes forward one month
-        composeTestRule.onNodeWithText(">").performClick()
+        // The right arrow goes forward one month
+        composeTestRule.onNodeWithContentDescription("Next month").performClick()
         composeTestRule.onNodeWithText(monthText(thisMonth.plusMonths(1))).assertIsDisplayed()
 
-        // "<" twice goes back to last month
-        composeTestRule.onNodeWithText("<").performClick()
-        composeTestRule.onNodeWithText("<").performClick()
+        // The left arrow twice goes back to last month
+        composeTestRule.onNodeWithContentDescription("Previous month").performClick()
+        composeTestRule.onNodeWithContentDescription("Previous month").performClick()
         composeTestRule.onNodeWithText(monthText(thisMonth.minusMonths(1))).assertIsDisplayed()
     }
 

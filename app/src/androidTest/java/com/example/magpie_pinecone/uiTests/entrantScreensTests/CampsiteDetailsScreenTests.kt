@@ -11,6 +11,7 @@ import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import androidx.compose.ui.test.performScrollTo
 
 class CampsiteDetailsScreenTests {
 
@@ -54,7 +55,7 @@ class CampsiteDetailsScreenTests {
         // Title, description, location and tags come from the campsite
         composeTestRule.onNodeWithText("Gronk Campground").assertIsDisplayed()
         composeTestRule.onNodeWithText("Quiet spot by the river").assertIsDisplayed()
-        composeTestRule.onNodeWithText("1234 Rizz St").assertIsDisplayed()
+        composeTestRule.onNodeWithText("1234 Rizz St").performScrollTo().assertIsDisplayed()
         composeTestRule.onNodeWithText("River").assertIsDisplayed()
     }
 
@@ -62,7 +63,7 @@ class CampsiteDetailsScreenTests {
     fun enterLottery_callsOnSubmit() {
         showDetailsScreen()
 
-        composeTestRule.onNodeWithText("Enter Lottery").performClick()
+        composeTestRule.onNodeWithText("Enter lottery").performClick()
         assertTrue(enteredLottery)
     }
 
