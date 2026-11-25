@@ -1,6 +1,13 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
+import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
+import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
+import com.example.magpie_pinecone.backend.uploadImageToFirebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 /**
@@ -11,6 +18,13 @@ import java.util.Date
 class CampsiteDB {
     private val db = FirebaseFirestore.getInstance()
     private val campsitesCollection = db.collection("campsites")
+    private val campsiteDbScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    fun uploadCampsiteImage(imageUri: Uri, onResult: (String?) -> Unit) {
+        campsiteDbScope.launch {
+            onResult(uploadImageToFirebase(imageUri).getOrNull())
+        }
+    }
 
     /**
      * Adds a new [campsite] to the database

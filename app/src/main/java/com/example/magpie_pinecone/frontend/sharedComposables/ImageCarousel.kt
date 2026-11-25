@@ -1,5 +1,6 @@
 package com.example.magpie_pinecone.frontend.sharedComposables
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,11 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
@@ -25,16 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.example.magpie_pinecone.R
@@ -59,11 +55,11 @@ fun ImageCarousel(imgDataList: List<ImageData>, height: Dp = 200.dp, allowModify
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10),
         onResult = { uris ->
-            val imageDataList: MutableList<ImageData> = mutableListOf()
+            val imageUriList: MutableList<ImageData> = mutableListOf()
             for (uri in uris) {
-                imageDataList.add(ImageData(uri, getImageAspectRatio(uri, context)))
+                imageUriList.add(ImageData(null, getImageAspectRatio(uri, context), uri))
             }
-            onUpload(imageDataList.toList())
+            onUpload(imageUriList.toList())
         }
     )
 
@@ -125,7 +121,7 @@ private fun ImageCard(imageData: ImageData, height: Dp, allowModifying: Boolean,
             .clip(RoundedCornerShape(8.dp))
     ) {
         AsyncImage(
-            model = imageData.uri,
+            model = imageData.localUri ?: imageData.url,
             contentDescription = "Image card",
             placeholder = painterResource(android.R.drawable.ic_menu_gallery),
             error = painterResource(android.R.drawable.ic_menu_report_image),
@@ -162,6 +158,6 @@ fun ImageCarouselPreview() {
     val packageName = context.packageName
 
     ImageCarousel(listOf(
-        ImageData("android.resource://$packageName/${R.drawable.placeholdercampsiteimage}".toUri(), 16f/9),
+        ImageData("", 16f/9, "android.resource://$packageName/${R.drawable.placeholdercampsiteimage}".toUri()),
     ), allowModifying = true) { }
 }
