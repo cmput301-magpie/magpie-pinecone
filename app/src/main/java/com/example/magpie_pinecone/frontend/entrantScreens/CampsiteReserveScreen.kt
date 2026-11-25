@@ -45,6 +45,7 @@ import com.example.magpie_pinecone.ui.theme.DeclineRed
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import com.example.magpie_pinecone.ui.theme.ReserveGreen
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -69,7 +70,7 @@ import java.util.TimeZone
  * @param onBack Returns to the previous screen.
  * @param onUserAcceptedRules Records that the entrant accepted the campsite rules.
  * @param campsiteId ID of the campsite being reserved.
- * @param onReserved Called after the entrant reserves the campsite.
+ * @param onReserved Called with the start and end dates after the entrant reserves the campsite.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +78,7 @@ fun CampsiteReserveScreen(
     onBack: () -> Boolean,
     onUserAcceptedRules: () -> Unit,
     campsiteId: String = "",
-    onReserved: () -> Unit = {}
+    onReserved: (startDate: Date, endDate: Date) -> Unit = { _, _ -> }
 ) {
     var checked by remember { mutableStateOf(false) }   // Whether the rules box is ticked
     val campsiteDB = remember { CampsiteDB() }
@@ -85,6 +86,7 @@ fun CampsiteReserveScreen(
     var rules by remember { mutableStateOf("Loading rules...") }
     var availableDates by remember { mutableStateOf<List<Date>>(emptyList()) }
     var isLoaded by remember { mutableStateOf(false) }  // Whether the campsite has finished loading
+    var selectedDateMillis by remember { mutableStateOf<Long?>(null) }  // Picked day (UTC midnight)
 
     // Load the campsite's name, rules and available dates
     LaunchedEffect(campsiteId) {
@@ -121,7 +123,8 @@ fun CampsiteReserveScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             ReserveDatePicker(
-                availableDates = availableDates
+                availableDates = availableDates,
+                onDateSelected = { selectedDateMillis = it }
             )
 
             // Only say "no dates" after loading, so it doesn't flash on screen first
@@ -171,12 +174,16 @@ fun CampsiteReserveScreen(
             PillButton(
                 text = "Reserve",
                 onClick = {
-                    // Record that this user confirmed the rules, then reserve
-                    onUserAcceptedRules()
-                    onReserved()
+                    val pickedMillis = selectedDateMillis
+                    if (pickedMillis != null) {
+                        val day = utcMillisToLocalDate(pickedMillis)
+                        // Record that this user confirmed the rules, then reserve
+                        onUserAcceptedRules()
+                        onReserved(day, day)
+                    }
                 },
                 containerColor = ReserveGreen,
-                enabled = checked,   // Cannot reserve until the rules are confirmed
+                enabled = checked && selectedDateMillis != null,   // Rules ticked and a day picked
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
@@ -206,14 +213,19 @@ fun CampsiteReserveScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReserveDatePicker(
-    availableDates: List<Date>
+    availableDates: List<Date>,
+    onDateSelected: (Long?) -> Unit
 ) {
-    // key() rebuilds the calendar once the dates arrive from the database
     key(availableDates) {
         val datePickerState = rememberDatePickerState(
             initialDisplayedMonthMillis = availableDates.minOrNull()?.time,
             selectableDates = availableDatesOnly(availableDates)
         )
+
+        // Tell the screen which day is picked whenever it changes
+        LaunchedEffect(datePickerState.selectedDateMillis) {
+            onDateSelected(datePickerState.selectedDateMillis)
+        }
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -286,6 +298,16 @@ private fun availableDatesOnly(
             return utcFormat.format(Date(utcTimeMillis)) in availableDays
         }
     }
+}
+
+// The calendar returns the picked day as midnight UTC. Rebuild it as midnight on the
+// device's clock, otherwise users west of UTC (like Edmonton) would get the day before.
+private fun utcMillisToLocalDate(utcMillis: Long): Date {
+    val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply { timeInMillis = utcMillis }
+    return Calendar.getInstance().apply {
+        clear()
+        set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH))
+    }.time
 }
 
 @Preview(
