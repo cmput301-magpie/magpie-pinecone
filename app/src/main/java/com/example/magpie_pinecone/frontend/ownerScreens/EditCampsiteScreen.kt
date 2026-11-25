@@ -95,7 +95,7 @@ fun EditCampsiteScreen(
                         imageViewModel.addImagesAndUploadToDB(it)
                     },
                     onDelete = {
-                        imageViewModel.deleteImage(it)
+                        imageViewModel.deleteImageAndDeleteFromDB(it)
                     },
                     allowModifying = true
                 )

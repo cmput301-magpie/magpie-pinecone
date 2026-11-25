@@ -25,3 +25,18 @@ suspend fun uploadImageToFirebase(imageUri: Uri): Result<String> {
         Result.failure(e)
     }
 }
+
+/**
+ * Deletes an image from firebase, given a url
+ */
+suspend fun deleteImageFromFirebase(imageUrl: String): Result<Unit> {
+    return try {
+        val imageRef = Firebase.storage.getReferenceFromUrl(imageUrl)
+
+        imageRef.delete().await()
+
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}

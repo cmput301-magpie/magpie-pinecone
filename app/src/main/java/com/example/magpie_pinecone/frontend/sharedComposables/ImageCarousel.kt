@@ -57,7 +57,7 @@ fun ImageCarousel(imgDataList: List<ImageData>, height: Dp = 200.dp, allowModify
         onResult = { uris ->
             val imageUriList: MutableList<ImageData> = mutableListOf()
             for (uri in uris) {
-                imageUriList.add(ImageData("", getImageAspectRatio(uri, context), uri))
+                imageUriList.add(ImageData(null, getImageAspectRatio(uri, context), uri))
             }
             onUpload(imageUriList.toList())
         }

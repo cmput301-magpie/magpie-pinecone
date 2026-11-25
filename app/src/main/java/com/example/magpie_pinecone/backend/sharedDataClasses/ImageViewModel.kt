@@ -1,7 +1,9 @@
 package com.example.magpie_pinecone.backend.sharedDataClasses
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.magpie_pinecone.backend.deleteImageFromFirebase
 import com.example.magpie_pinecone.backend.uploadImageToFirebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,12 +38,12 @@ class ImageViewModel : ViewModel() {
      *
      * @param image The image to delete
      */
-    fun deleteImage(image: ImageData) {
+    private fun deleteImage(image: ImageData) {
         _images.update { it - image }
     }
 
     /**
-     * Uploads images to firebase
+     * Uploads images to firebase and adds them to the list of images.
      */
     fun addImagesAndUploadToDB(images: List<ImageData>) {
         images.forEach { imageData ->
@@ -54,6 +56,22 @@ class ImageViewModel : ViewModel() {
                 }
             }
         }
+    }
 
+    /**
+     * Deletes an image from firebase and also removes it from the list of images
+     */
+    fun deleteImageAndDeleteFromDB(image: ImageData) {
+        viewModelScope.launch {
+            val url = image.url ?: return@launch
+
+            deleteImageFromFirebase(url).onSuccess {
+                _images.update { list ->
+                    list.filterNot { it == image }
+                }
+            }.onFailure { exception ->
+                Log.e("Failed to delete image from database: ", exception.message ?: "")
+            }
+        }
     }
 }
