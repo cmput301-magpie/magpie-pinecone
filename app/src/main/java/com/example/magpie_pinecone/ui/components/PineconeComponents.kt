@@ -140,7 +140,7 @@ fun PillButton(
 /**
  * Five gold stars plus the number, e.g. "5.0".
  * Campsite.rating is a Double, so pass campsite.rating directly.
- * Pass ratingCount (Campsite.ratingCount) to show "4.5 (12)", or "No reviews" when it is 0.
+ * Pass ratingCount (Campsite.ratingCount) to show e.g. "4.5 (12)", or "No reviews" when it is 0.
  */
 @Composable
 fun StarRating(rating: Double, modifier: Modifier = Modifier, ratingCount: Int? = null) {
@@ -162,6 +162,31 @@ fun StarRating(rating: Double, modifier: Modifier = Modifier, ratingCount: Int? 
             },
             style = MaterialTheme.typography.labelSmall
         )
+    }
+}
+
+/**
+ * Five tappable gold stars for choosing a rating from 1 to 5.
+ * [rating] is the current choice (0 = nothing chosen yet) tapping a star calls [onRatingChange]
+ * with the corresponding integer.
+ */
+@Composable
+fun StarRatingInput(
+    rating: Int,
+    onRatingChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        for (i in 1..5) {
+            IconButton(onClick = { onRatingChange(i) }) {
+                Icon(
+                    imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                    contentDescription = if (i == 1) "1 star" else "$i stars",
+                    tint = StarGold,
+                    modifier = Modifier.size(32.dp)  // bigger than StarRating for easier tapping
+                )
+            }
+        }
     }
 }
 
