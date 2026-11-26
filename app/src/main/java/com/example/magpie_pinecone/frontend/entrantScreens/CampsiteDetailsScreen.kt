@@ -33,18 +33,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.reviewClasses.Review
 import com.example.magpie_pinecone.frontend.sharedComposables.ImageCarousel
 import com.example.magpie_pinecone.ui.components.CampsiteImage
 import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
+import com.example.magpie_pinecone.ui.components.ReviewCard
 import com.example.magpie_pinecone.ui.components.StarRating
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import com.example.magpie_pinecone.ui.theme.PineconePurple
 import com.example.magpie_pinecone.ui.theme.ReserveGreen
+import java.util.Date
 
 /*
  * CampsiteDetailsScreen.kt contains all relevant functions for displaying the details of a campsite.
@@ -57,7 +61,8 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
  * SectionLabel displays a small gray heading with a divider line under it.
  * ExpandableDescription displays the description, with "read more..." when it is too long.
  * TagChip displays one campsite tag inside an outlined box.
- * RateCampsiteRow displays the "Rate this campsite" row of stars.
+ * ReviewsSection displays the campsite's reviews, or "No reviews yet.", and the write-review action.
+ * WriteReviewAction displays the "Write a review" button, disabled until the entrant has reserved.
  * ShowCampsiteDetailsScreenPreview displays a preview of CampsiteDetailsScreen for reference.
  */
 
@@ -69,6 +74,10 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
  * @param onSubmit Called when the entrant enters the campsite's lottery.
  * @param isWinner Whether the entrant won this campsite's lottery.
  * @param onReserve Called when a lottery winner chooses to reserve.
+ * @param reviews The reviews of this campsite, newest first
+ * @param canReview Whether the entrant has reserved this campsite and can write a review.
+ * @param hasReviewed Whether the entrant already reviewed it (the button then says "Edit your review").
+ * @param onWriteReview Opens the write-review screen.
  */
 @Composable
 fun CampsiteDetailsScreen(
@@ -76,11 +85,23 @@ fun CampsiteDetailsScreen(
     onBack: () -> Unit,
     onSubmit: () -> Unit = {},
     isWinner: Boolean = false,
-    onReserve: () -> Unit = {}
+    onReserve: () -> Unit = {},
+    reviews: List<Review> = emptyList(),
+    canReview: Boolean = false,
+    hasReviewed: Boolean = false,
+    onWriteReview: () -> Unit = {}
 ) {
     CampsiteDetailsLayout(
         campsite = campsite,
-        onBack = onBack
+        onBack = onBack,
+        reviews = reviews,
+        reviewAction = {
+            WriteReviewAction(
+                canReview = canReview,
+                hasReviewed = hasReviewed,
+                onWriteReview = onWriteReview
+            )
+        }
     ) {
         // Only lottery winners can go on to reserve dates
         if (isWinner) {
@@ -115,11 +136,15 @@ fun CampsiteDetailsScreen(
  * @param campsite The campsite whose information is being displayed.
  * @param onBack Returns to the previous screen.
  * @param bottomButtons The buttons pinned at the bottom of the screen.
+ * @param reviews Reviews shown in the Reviews section.
+ * @param reviewAction Optional action under the reviews (entrants get "Write a review").
  */
 @Composable
 fun CampsiteDetailsLayout(
     campsite: Campsite,
     onBack: () -> Unit,
+    reviews: List<Review> = emptyList(),
+    reviewAction: (@Composable () -> Unit)? = null,
     bottomButtons: @Composable () -> Unit
 ) {
     Column(
@@ -184,7 +209,10 @@ fun CampsiteDetailsLayout(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            RateCampsiteRow()
+            ReviewsSection(
+                reviews = reviews,
+                action = reviewAction
+            )
         }
 
         // Buttons pinned at the bottom of the screen
@@ -237,7 +265,8 @@ private fun CampsiteSummaryRow(
             }
 
             StarRating(
-                rating = campsite.rating
+                rating = campsite.rating,
+                ratingCount = campsite.ratingCount
             )
         }
     }
@@ -358,32 +387,85 @@ private fun TagChip(
     )
 }
 
+// Most reviews shown at once. Reviews arrive newest first.
+private const val MAX_REVIEWS_SHOWN = 5
+
 /**
- * "Rate this campsite" row with five empty stars.
+ * Shows the review section, sorted by most recent reviews.
  *
- * Rating is its own user story (US 01.13.01), so the stars are only
- * displayed for now and do not save anything yet.
+ * @param reviews Reviews of the campsite, newest first.
+ * @param action Optional composable shown under the reviews.
  */
 @Composable
-private fun RateCampsiteRow() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+private fun ReviewsSection(
+    reviews: List<Review>,
+    action: (@Composable () -> Unit)?
+) {
+    SectionLabel(
+        text = "Reviews"
+    )
+
+    if (reviews.isEmpty()) {
         Text(
-            text = "Rate this campsite",
+            text = "No reviews yet.",
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    } else {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            reviews.take(MAX_REVIEWS_SHOWN).forEach { review ->
+                ReviewCard(
+                    reviewerName = review.entrantName,
+                    date = review.createdAt,
+                    rating = review.rating,
+                    comment = review.comment
+                )
+            }
+        }
+    }
+
+    if (action != null) {
+        Spacer(modifier = Modifier.height(16.dp))
+        action()
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+}
+
+/**
+ * Shows the "Write a review" button. It is disabled until the entrant has reserved the campsite.
+ * It reads "Edit your review" if the entrant have already posted a review.
+ *
+ * @param canReview Whether the entrant has reserved this campsite.
+ * @param hasReviewed Whether the entrant already posted a review.
+ * @param onWriteReview Opens the write-review screen.
+ */
+@Composable
+private fun WriteReviewAction(
+    canReview: Boolean,
+    hasReviewed: Boolean,
+    onWriteReview: () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        PillButton(
+            text = if (hasReviewed) "Edit your review" else "Write a review",
+            onClick = onWriteReview,
+            containerColor = PineconePurple,
+            enabled = canReview,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
         )
 
-        repeat(5) {
-            Icon(
-                imageVector = Icons.Outlined.StarBorder,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
+        if (!canReview) {
+            Text(
+                text = "Reserve this campsite to leave a review.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -418,7 +500,22 @@ fun ShowCampsiteDetailsScreenPreview() {
                 price = 38.0,
                 rating = 4.5,
                 description = "A sample campsite used for previewing the details screen.",
-                tags = listOf("Forest", "Camping", "Family")
+                tags = listOf("Forest", "Camping", "Family"),
+                ratingCount = 2,
+            ),
+            reviews = listOf(
+                Review(
+                    entrantName = "Happy Person",
+                    rating = 5,
+                    comment = "This is the best campsite ever!",
+                    createdAt = Date()
+                ),
+                Review(
+                    entrantName = "Angry Person",
+                    rating = 1,
+                    comment = "This is the worst campsite ever!",
+                    createdAt = Date()
+                )
             ),
             onBack = { },
             onSubmit = { },
