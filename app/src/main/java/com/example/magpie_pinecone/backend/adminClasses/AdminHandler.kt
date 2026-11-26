@@ -5,14 +5,32 @@ import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
+import com.google.firebase.firestore.FirebaseFirestore
 
 /**
  * Provides actions for admins when interacting with the app.
  * @constructor Creates an AdminHandler.
  */
 class AdminHandler {
-    fun browseProfiles(userDB: UserDB): List<User> {
-        TODO("Get a list of all users in the database")
+    private val db = FirebaseFirestore.getInstance()
+    private val campsitesCollection = db.collection("campsites")
+    private val usersCollection = db.collection("users")
+
+    /**
+     * Gets a list of all users in the database
+     */
+    fun browseProfiles(
+        onResult: (List<User>) -> Unit
+    ) {
+        usersCollection.get()
+            .addOnSuccessListener { snapshot ->
+
+                val users = snapshot.documents.mapNotNull { document ->
+                    document.toObject(User::class.java)
+                }
+
+                onResult(users)
+            }
     }
 
     fun removeProfile(userDB: UserDB, user: User) {
