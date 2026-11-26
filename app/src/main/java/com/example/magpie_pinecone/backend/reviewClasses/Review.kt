@@ -24,5 +24,3 @@ class Review (
     var comment: String = "",
     var createdAt: Date = Date()
 )
-
-enum class ReviewResult { Success, InvalidRating, EmptyComment, NotReserved, Failed }

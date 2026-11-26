@@ -8,6 +8,8 @@ import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
+import com.example.magpie_pinecone.backend.reviewClasses.Review
+import com.example.magpie_pinecone.backend.reviewClasses.ReviewDB
 import java.util.Calendar
 import java.util.Date
 
@@ -40,10 +42,47 @@ class EntrantHandler {
     }
 
     /**
-     * Takes in parameters campsite, campsiteDB, and rating to allow entrant to rate a campsite
+     * Takes in parameters [reservationDB], [reviewDB], [campsite], [entrant], [rating], [comment],
+     * and [onResult] to post/edit [entrant]'s review of [campsite].
+     *
+     * Requires rating between 1 and 5 (inclusive), non-blank text, and a reservation for the campsite.
+     * [onResult] is called with true if the review was saved, false if any requirement listed above
+     * failed or the write failed.
      */
-    fun giveCampsiteRating(campsite: Campsite, campsiteDB: CampsiteDB, rating: Int): Unit{
-        // TODO: Add campsite ratings
+    fun postReview(
+        reservationDB: ReservationDB,
+        reviewDB: ReviewDB,
+        campsite: Campsite,
+        entrant: Entrant,
+        rating: Int,
+        comment: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        val text = comment.trim()
+
+        // Fail if rating is invalid (not between 1 and 5 inclusive)
+        if (rating !in 1..5 || text.isEmpty()) {
+            onResult(false)
+            return
+        }
+
+        reservationDB.hasReservedCampsite(entrant.id, campsite.ID) { reserved ->
+            if (!reserved) {
+                onResult(false)
+                return@hasReservedCampsite
+            }
+
+            reviewDB.submitReview(
+                Review(
+                    campsiteID = campsite.ID,
+                    entrantID = entrant.id,
+                    entrantName = entrant.name.ifBlank { "Anonymous" },
+                    rating = rating,
+                    comment = text
+                ),
+                onResult
+            )
+        }
     }
 
     /**
