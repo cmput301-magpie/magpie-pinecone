@@ -16,6 +16,8 @@ class AdminHandler {
     private val db = FirebaseFirestore.getInstance()
     private val campsitesCollection = db.collection("campsites")
     private val usersCollection = db.collection("users")
+    private val userDB = UserDB()
+    private val campsiteDB = CampsiteDB()
 
     /**
      * Gets a list of all users in the database
@@ -55,6 +57,8 @@ class AdminHandler {
             .addOnFailureListener { exception ->
                 Log.e("UserDB", "Failed to delete user", exception)
             }
+
+
     }
 
     /**
@@ -63,15 +67,7 @@ class AdminHandler {
     fun browseCampsites(
         onResult: (List<Campsite>) -> Unit
     ) {
-        campsitesCollection.get()
-            .addOnSuccessListener { snapshot ->
-
-                val campsites = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Campsite::class.java)
-                }
-
-                onResult(campsites)
-            }
+        campsiteDB.getAllCampsites(onResult)
     }
 
     /**
