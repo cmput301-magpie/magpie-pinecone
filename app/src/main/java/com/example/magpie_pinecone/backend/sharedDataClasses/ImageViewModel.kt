@@ -53,9 +53,14 @@ class ImageViewModel : ViewModel() {
                 uploadImageToFirebase(uri).onSuccess { downloadUrl ->
                     imageData.localUri = null
                     imageData.url = downloadUrl
+                    addImage(imageData)
                 }
             }
         }
+    }
+
+    fun setImages(images: List<ImageData>) {
+        _images.value = images
     }
 
     /**
