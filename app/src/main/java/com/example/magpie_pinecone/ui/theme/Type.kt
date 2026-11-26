@@ -6,6 +6,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/*
+ * Color.kt contains text sizes for use in the app, for UI consistency.
+ */
+
 // Text sizes used across the app. Screens should use these instead of fontSize = 36.sp
 val Typography = Typography(
     headlineMedium = TextStyle(   // screen titles like "Profile"

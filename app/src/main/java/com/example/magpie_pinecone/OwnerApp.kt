@@ -41,7 +41,17 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.toRoute
+import com.example.magpie_pinecone.frontend.ownerScreens.CampsiteQRCodeScreen
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
+
+/*
+ * OwnerApp.kt contains all relevant functions for navigating between campsite owner screens.
+ * Additionally, OwnerApp.kt stores persistent data for use across campsite owner screens.
+ *
+ * Composable Functions:
+ * OwnerApp handles navigation and data persistence across owner screens.
+ */
 
 /**
  * The 4 tabs of the bottom navigation bar, matching Figma: Home, Search, Settings, Scan QR.
@@ -55,7 +65,7 @@ enum class OwnerDestination(
     HOME("ownerHome", "Home", Icons.Filled.Menu),
     SEARCH("ownerSearch", "Search", Icons.Filled.Search),
     SETTINGS("ownerSettings", "Settings", Icons.Filled.Settings),
-    SCAN_QR("ownerScanQr", "Scan QR", Icons.Filled.QrCodeScanner)
+    SCAN_QR("ownerScanQr", "Scan QR", Icons.Filled.QrCodeScanner),
 }
 
 // Objects to represent routes
@@ -71,6 +81,9 @@ object ViewCampsite
 object ViewReservations
 @Serializable
 object WaitingList
+
+@Serializable
+data class CampsiteQRCodeRoute (val campsiteID: String, val campsiteName: String)
 
 @Composable
 fun OwnerApp(androidId: String) {
@@ -186,7 +199,10 @@ fun OwnerApp(androidId: String) {
                         campsiteReservations = emptyList()
                         navController.navigate(route = DatesBooked)
                     },
-                    onViewReservations = { navController.navigate(route = ViewReservations) }
+                    onViewReservations = { navController.navigate(route = ViewReservations) },
+                    onQRCode = { campsite ->
+                        navController.navigate(CampsiteQRCodeRoute(campsiteID = campsite.ID, campsiteName = campsite.name))
+                    }
                 )
             }
             composable<DatesBooked> {
@@ -299,10 +315,15 @@ fun OwnerApp(androidId: String) {
                     )
                 }
             }
+            composable<CampsiteQRCodeRoute> { backStackEntry ->
+                val args: CampsiteQRCodeRoute = backStackEntry.toRoute()
+                CampsiteQRCodeScreen(args.campsiteID, args.campsiteName, onBack = { navController.popBackStack() })
+            }
             // Tabs that are not built for owners yet
             composable(OwnerDestination.SEARCH.route) { ComingSoonScreen(title = "Search") }
             composable(OwnerDestination.SETTINGS.route) { ComingSoonScreen(title = "Settings") }
             composable(OwnerDestination.SCAN_QR.route) { ComingSoonScreen(title = "Scan QR") }
+
         }
     }
 }

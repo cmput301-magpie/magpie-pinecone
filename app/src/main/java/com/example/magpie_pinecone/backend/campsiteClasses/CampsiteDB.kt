@@ -1,6 +1,13 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
+import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
+import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
+import com.example.magpie_pinecone.backend.uploadImageToFirebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
@@ -8,10 +15,17 @@ import java.util.TimeZone
  * Provides actions for interfacing with the campsite database
  *
  */
-
+// TODO: Add support for images
 class CampsiteDB {
     private val db = FirebaseFirestore.getInstance()
     private val campsitesCollection = db.collection("campsites")
+    private val campsiteDbScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    fun uploadCampsiteImage(imageUri: Uri, onResult: (String?) -> Unit) {
+        campsiteDbScope.launch {
+            onResult(uploadImageToFirebase(imageUri).getOrNull())
+        }
+    }
 
     /**
      * Adds a new [campsite] to the database
@@ -73,22 +87,28 @@ class CampsiteDB {
         campsiteID: String,
         onResult: (Campsite?) -> Unit
     ) {
-        val document = campsitesCollection.document(campsiteID)
+        try {
+            val document = campsitesCollection.document(campsiteID)
 
-        document.get()
-            .addOnSuccessListener { snapshot ->
+            document.get()
+                .addOnSuccessListener { snapshot ->
 
-                if (snapshot.exists()) {
-                    val campsite = snapshot.toObject(Campsite::class.java)
-                    onResult(campsite)
-                } else {
+                    if (snapshot.exists()) {
+                        val campsite = snapshot.toObject(Campsite::class.java)
+                        onResult(campsite)
+                    } else {
+                        onResult(null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("CampsiteDB", "Failed to read campsite", exception)
                     onResult(null)
                 }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("CampsiteDB", "Failed to read campsite", exception)
-                onResult(null)
-            }}
+        } catch (e: Exception) {
+            Log.e("CampsiteDB", "Invalid campsite ID format: $campsiteID", e)
+            onResult(null)
+        }
+    }
     /**
      * Fetches all campsites from the database
      */

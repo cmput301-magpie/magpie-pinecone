@@ -40,6 +40,14 @@ import com.example.magpie_pinecone.ui.theme.AvatarLavender
 import com.example.magpie_pinecone.ui.theme.DeclineRed
 import com.example.magpie_pinecone.ui.theme.PillPurple
 
+/*
+ * ProfileScreen.kt contains all relevant functions for displaying the entrant's profile.
+ *
+ * Composable Functions:
+ * ProfileScreen displays the entrant's profile, including profile picture, name, email, phone number, etc. An option to delete profile is provided.
+ * ProfileDetail displays a formatted label and value for a detail within ProfileScreen (i.e. name)
+ */
+
 /**
  * Displays the entrant's profile information.
  *

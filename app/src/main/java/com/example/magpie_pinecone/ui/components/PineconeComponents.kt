@@ -40,6 +40,18 @@ import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import com.example.magpie_pinecone.ui.theme.StarGold
 
+/*
+ * PineconeComponents.kt contains an assortment of composable functions for use across the app's screens.
+ *
+ * Composable Functions:
+ * PineconeTopBar displays a title and back button for use across many screens.
+ * PineconeTextField displays a text field for use across many screens.
+ * PillButton displays a rounded button for use across many screens.
+ * StarRating displays a row of 5 stars for use in ratings.
+ * CampsiteImage displays an image, with a placeholder being a stock campsite image.
+ * PineconeComponentsPreview displays a preview of the assorted components for reference.
+ */
+
 /**
  * Top bar used on every screen: back arrow on the left, title in the middle.
  * Leave onBack as null for screens with no back arrow.

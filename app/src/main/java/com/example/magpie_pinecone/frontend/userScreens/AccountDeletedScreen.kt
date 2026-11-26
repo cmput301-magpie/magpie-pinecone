@@ -18,6 +18,14 @@ import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 
+/*
+ * AccountDeletedScreen.kt contains all relevant functions for displaying the account deletion confirmation screen.
+ *
+ * Composable Functions:
+ * AccountDeletedScreen displays the account deletion confirmation screen, with option to return to welcome screen.
+ * AccountDeletedScreenPreview displays a preview of AccountDeletedScreen for reference.
+ */
+
 /**
  * Confirms that the user's account has been deleted.
  *

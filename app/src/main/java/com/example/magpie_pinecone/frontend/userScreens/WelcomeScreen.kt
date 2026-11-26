@@ -28,6 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 
+/*
+ * WelcomeScreen.kt contains all relevant functions for displaying the new user welcome screen.
+ *
+ * Composable Functions:
+ * WelcomeScreen displays the new user welcome screen, with button to sign up.
+ * WelcomeScreenPreview displays a preview of WelcomeScreen for reference.
+ */
+
 // Welcome screen specific colors from the Figma design.
 private val WelcomeGradientTop = Color(0xFF75E6E7)
 private val WelcomeGradientBottom = Color(0xFF2D6EA7)

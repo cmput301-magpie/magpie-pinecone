@@ -20,6 +20,13 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import com.example.magpie_pinecone.frontend.userScreens.AccountDeletedScreen
 
+/*
+ * PineconeApp.kt contains all relevant functions for determining the start state and first screen for the user.
+ *
+ * Composable Functions:
+ * PineconeApp displays the correct app flow for the account stored on the device.
+ */
+
 /**
  * Indicates the state of the app at startup.
  */
@@ -28,15 +35,16 @@ enum class StartState {
     NONE,
     ENTRANT,
     OWNER,
+    ADMIN,
     ACCOUNT_DELETED,
 
     ERROR
 }
+
+
 /**
  * Displays the correct app flow for the account stored on this device.
  */
-
-
 @Composable
 fun PineconeApp(androidId: String) {
     var state by rememberSaveable { mutableStateOf(StartState.LOADING) }  // Remember the state of the app
@@ -48,6 +56,7 @@ fun PineconeApp(androidId: String) {
                 when (doc.getString("accountType")) {
                     "Owner" -> StartState.OWNER
                     "Entrant" -> StartState.ENTRANT
+                    "Admin" -> StartState.ADMIN
                     else -> StartState.NONE
                 }
             } catch (e: Exception) {  // An error occurred during searching
@@ -61,6 +70,7 @@ fun PineconeApp(androidId: String) {
         StartState.NONE -> NewUserApp(onUserSignedUp = { state = StartState.LOADING })
         StartState.ENTRANT -> EntrantApp(androidId, onProfileDeleted = { state = StartState.ACCOUNT_DELETED })
         StartState.OWNER -> OwnerApp(androidId)
+        StartState.ADMIN -> AdminApp(androidId)
         StartState.ACCOUNT_DELETED -> {
             AccountDeletedScreen(
                 onBackToWelcome = {

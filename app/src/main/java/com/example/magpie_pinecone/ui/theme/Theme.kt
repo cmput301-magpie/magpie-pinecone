@@ -7,6 +7,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+/*
+ * Color.kt contains color definitions for light mode and dark mode in the app, for UI consistency.
+ */
+
 // Light mode: the Figma colors
 private val PineconeLightColorScheme = lightColorScheme(
     primary = PineconePurple,            // default Button color

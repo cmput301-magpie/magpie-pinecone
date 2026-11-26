@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone
 
 import android.provider.Settings
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -45,10 +46,22 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.example.magpie_pinecone.frontend.entrantScreens.ScanQRCodeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
+
+/*
+ * EntrantApp.kt contains all relevant functions for navigating between entrant screens.
+ * Additionally, EntrantApp.kt stores persistent data for use across entrant screens.
+ *
+ * Composable Functions:
+ * EntrantApp handles navigation and data persistence across entrant screens.
+ */
 
 /**
  * The 4 tabs of the bottom navigation bar, matching Figma: Home, Search, Settings, Scan QR.
@@ -93,6 +106,8 @@ object ComingSoon
 fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
 
+    val context = LocalContext.current
+
     var selectedCampsite by remember {
         mutableStateOf<Campsite?>(null)
     }
@@ -100,6 +115,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     // What the result screen should say (reserved or cancelled)
     var resultTitle by remember { mutableStateOf("Campsite Reserved") }
     var resultMessage by remember { mutableStateOf("") }
+    var resultCampsite by remember { mutableStateOf<Campsite?>(null) }  // Campsite shown on the result screen
 
     var campsiteToReserve by remember {
         mutableStateOf<Campsite?>(null)
@@ -197,7 +213,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 }
 
                 EntrantHomeScreen(
-                    lotteries = lotteries,
+                    lotteryDB = lotteryDB,
                     onMyReservations = {
                         navController.navigate(
                             route = EntrantViewReservations
@@ -221,6 +237,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                                 lottery,
                                 curEntrant!!
                             )
+
                         }
                     }
                 )
@@ -266,6 +283,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         campsite = campsite,
                         isWinner = false,
                         onReserve = {
+                            campsiteToReserve = campsite   // The reserve screen reads this campsite
                             navController.navigate(CampsiteReserve)
                         },
                         onBack = {
@@ -311,12 +329,33 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         )
                     },
                     campsiteId = campsiteToReserve?.ID ?: "",
-                    onReserved = {
-                        resultTitle = "Campsite Reserved"
-                        resultMessage =
-                            "Your reservation was placed successfully!"
+                    onReserved = { startDate, endDate ->
+                        val campsiteForReservation = campsiteToReserve
 
-                        navController.navigate(CampsiteResult)
+                        if (campsiteForReservation != null) {
+                            entrantHandler.reserveCampsite(
+                                reservationDB = reservationDB,
+                                campsite = campsiteForReservation,
+                                entrantId = androidId,
+                                startDate = startDate,
+                                endDate = endDate
+                            ) { success ->
+                                if (success) {
+                                    resultCampsite = campsiteForReservation   // Show this campsite on the result screen
+                                    resultTitle = "Campsite Reserved"
+                                    resultMessage =
+                                        "Your reservation was placed successfully!"
+
+                                    navController.navigate(CampsiteResult)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Could not reserve those dates. They may already be booked.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
                     }
                 )
             }
@@ -327,7 +366,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         navController.popBackStack()
                     },
                     title = resultTitle,
-                    message = resultMessage
+                    message = resultMessage,
+                    campsite = resultCampsite
                 )
             }
 
@@ -344,7 +384,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 EntrantViewReservationsScreen(
                     activeReservations = activeReservations,
                     campsiteDB = campsiteDB,
-                    onCancelled = {
+                    onCancelled = { cancelledCampsite ->
+                        resultCampsite = cancelledCampsite   // Show the cancelled campsite on the result screen
                         resultTitle = "Campsite Cancelled"
                         resultMessage =
                             "Your reservation was cancelled."
@@ -401,10 +442,20 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 )
             }
 
-            // Scan QR tab (US 01.12.01 not done yet)
+            // Scan QR tab (US 01.12.01)
             composable(EntrantDestination.SCAN_QR.route) {
-                ComingSoonScreen(
-                    title = "Scan QR"
+                ScanQRCodeScreen(
+                    onBack = {navController.popBackStack()},
+                    onScanSuccessful = {
+                        campsiteDB.readCampsite(it, {
+                            if (it != null) {
+                                selectedCampsite = it
+                                navController.navigate(CampsiteDetails)
+                            } else {
+                                Toast.makeText(context, "Invalid campsite ID", Toast.LENGTH_SHORT).show()
+                            }
+                        })
+                    }
                 )
             }
 
