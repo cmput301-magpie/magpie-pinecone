@@ -1,5 +1,6 @@
 package com.example.magpie_pinecone.frontend.entrantScreens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
+import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.frontend.sharedComposables.NotifsInbox
 import com.example.magpie_pinecone.ui.components.CampsiteImage
 import com.example.magpie_pinecone.ui.components.PillButton
@@ -81,16 +89,27 @@ import com.example.magpie_pinecone.ui.theme.ReserveGreen
 fun EntrantHomeScreen(
     onMyReservations: () -> Unit,
     onNotifications: () -> Unit,
-    lotteries: List<Lottery>,
+    lotteryDB: LotteryDB,
+//    lotteries: List<Lottery>,
     curEntrant: Entrant?,
     onReserveLottery: (lottery: Lottery) -> Unit,
     onLotteryDetails: (lottery: Lottery) -> Unit,
     onLeaveLottery: (lottery: Lottery) -> Unit
 ) {
+
+
+    var lotteries by remember {mutableStateOf<List<Lottery>>(emptyList())}
+
     if (curEntrant == null) {
         return
     }
 
+    // gets the lotteries on refresh from the database now to show accurate lotteries joined and left
+    LaunchedEffect(curEntrant?.id) {
+        curEntrant.id.let { id ->
+            lotteryDB.getLotteriesByEntrant(id) { lotteries = it }
+        }
+    }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -163,22 +182,25 @@ fun EntrantHomeScreen(
                          * cannot crash the entire home screen.
                          */
                         if (campsite != null) {
-                            EntrantHomeScreenLotteryCard(
-                                wonLottery = lottery.winners.any {
-                                    it.id == curEntrant.id
-                                },
-                                lottery = lottery,
-                                campsite = campsite,
-                                onReserveLottery = {
-                                    onReserveLottery(lottery)
-                                },
-                                onLotteryDetails = {
-                                    onLotteryDetails(lottery)
-                                },
-                                onLeaveLottery = {
-                                    onLeaveLottery(lottery)
-                                }
-                            )
+
+                                EntrantHomeScreenLotteryCard(
+                                    wonLottery = lottery.winners.any {
+                                        it.id == curEntrant.id
+                                    },
+                                    lottery = lottery,
+                                    campsite = campsite,
+                                    onReserveLottery = {
+                                        onReserveLottery(lottery)
+                                    },
+                                    onLotteryDetails = {
+                                        onLotteryDetails(lottery)
+                                    },
+                                    onLeaveLottery = {
+                                        onLeaveLottery(lottery)
+                                        lotteries = lotteries - lottery
+                                    }
+                                )
+
                         }
                     }
                 }
@@ -529,11 +551,12 @@ private fun EntrantHomeScreenPreview() {
         EntrantHomeScreen(
             onMyReservations = {},
             onNotifications = {},
-            lotteries = listOf(
-                activeLottery,
-                wonLottery,
-                activeLottery
-            ),
+            lotteryDB = LotteryDB(),
+//            lotteries = listOf(
+//                activeLottery,
+//                wonLottery,
+//                activeLottery
+//            ),
             curEntrant = entrant,
             onReserveLottery = {},
             onLotteryDetails = {},

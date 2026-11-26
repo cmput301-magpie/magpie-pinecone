@@ -1,6 +1,8 @@
 package com.example.magpie_pinecone.frontend.ownerScreens
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +25,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
+import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
 import com.example.magpie_pinecone.backend.sharedDataClasses.ImageViewModel
 import com.example.magpie_pinecone.frontend.sharedComposables.ImageCarousel
 import com.example.magpie_pinecone.ui.components.PillButton
@@ -64,6 +68,7 @@ import com.example.magpie_pinecone.ui.theme.PineconePurple
  * @param onSubmit Called with the filled-in campsite when the owner submits.
  * @param imageViewModel Holds the campsite's images (a parameter so tests can replace it).
  */
+
 @Composable
 fun EditCampsiteScreen(
     ownerId: String,
@@ -73,6 +78,7 @@ fun EditCampsiteScreen(
     onSubmit: (Campsite) -> Unit,
     imageViewModel: ImageViewModel = viewModel()  // This is in parameters so it can be modified easily in tests
 ) {
+
     var name by remember { mutableStateOf(campsite.name) }
     var location by remember { mutableStateOf(campsite.location) }
     var price by remember { mutableStateOf(if (campsite.price == 0.0) "" else campsite.price.toString()) }
@@ -80,6 +86,7 @@ fun EditCampsiteScreen(
     var maxOccupancy by remember { mutableStateOf(if (campsite.maxOccupancy == 0) "" else campsite.maxOccupancy.toString()) }
     var tags by remember { mutableStateOf(campsite.tags.joinToString(", ")) }
     val imageDataList by imageViewModel.images.collectAsStateWithLifecycle()
+    //    var mapLocation by remember { mutableStateOf("")}  // TEMPORARY, NEED TO IMPLEMENT MAP
 
     Column(
         modifier = Modifier
@@ -102,17 +109,16 @@ fun EditCampsiteScreen(
                 onBack = onBack
             )
 
-            // Image picker and carousel (owners can add and remove photos here)
-            ImageCarousel(
-                imageDataList,
-                onUpload = {
-                    imageViewModel.addImages(it)
-                },
-                onDelete = {
-                    imageViewModel.deleteImage(it)
-                },
-                allowModifying = true
-            )
+                ImageCarousel(
+                    imageDataList,
+                    onUpload = {
+                        imageViewModel.addImagesAndUploadToDB(it)
+                    },
+                    onDelete = {
+                        imageViewModel.deleteImageAndDeleteFromDB(it)
+                    },
+                    allowModifying = true
+                )
 
             // Campsite details
             PineconeTextField(

@@ -243,7 +243,10 @@ class LotteryDB {
                     .addOnFailureListener { onResult(emptyList()) }
             }
 
-            .addOnFailureListener { onResult(emptyList()) }
+            // wasnt working before, needed index to do a whereIn search, wasnt setup properly but now is
+            .addOnFailureListener {
+                Log.e("LotteryDB", "getLotteriesByEntrant failed", it)
+                onResult(emptyList()) }
     }
 
     fun addEntrant(lottery: Lottery, entrant: Entrant){
