@@ -1,5 +1,6 @@
 package com.example.magpie_pinecone.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,8 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,8 +40,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
 import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
+import com.example.magpie_pinecone.ui.theme.LavenderSurface
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
+import com.example.magpie_pinecone.ui.theme.OutlineLavender
 import com.example.magpie_pinecone.ui.theme.StarGold
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /*
  * PineconeComponents.kt contains an assortment of composable functions for use across the app's screens.
@@ -191,6 +199,55 @@ fun StarRatingInput(
 }
 
 /**
+ * Card showing one campsite review.
+ * [trailingContent] is an optional slot at the bottom of the card, empty by default.
+ * For example the Admin screen could use it for a "Remove" button.
+ */
+@Composable
+fun ReviewCard(
+    reviewerName: String,
+    date: Date,
+    rating: Int,
+    comment: String,
+    modifier: Modifier = Modifier,
+    trailingContent: (@Composable () -> Unit)? = null
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(width = 1.dp, color = OutlineLavender),
+        colors = CardDefaults.cardColors(containerColor = LavenderSurface)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = reviewerName,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(date),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            StarRating(rating = rating.toDouble())
+
+            Text(
+                text = comment,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            trailingContent?.invoke()
+        }
+    }
+}
+
+/**
  * Campsite picture with rounded corners.
  * Uses the placeholder drawable until real images are stored.
  */
@@ -216,7 +273,16 @@ fun PineconeComponentsPreview() {
             PineconeTopBar(title = "Profile", onBack = {})
             PineconeTextField(value = "David", onValueChange = {}, label = "First name")
             PillButton(text = "Edit Profile", onClick = {}, icon = Icons.Filled.Edit)
-            StarRating(rating = 5.0)
+            StarRating(rating = 4.5, ratingCount = 12)
+            StarRating(rating = 0.0, ratingCount = 0)
+            StarRating(rating = 2.2)
+            StarRatingInput(rating = 3, onRatingChange = {})
+            ReviewCard(
+                reviewerName = "Shrek",
+                date = Date(),
+                rating = 4,
+                comment = "Nice swampy water. Feels like home."
+            )
             CampsiteImage(modifier = Modifier.size(120.dp))
         }
     }
