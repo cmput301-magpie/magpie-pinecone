@@ -74,16 +74,7 @@ class AdminHandler {
      * Remove a campsite from the database
      */
     fun removeCampsite(campsite: Campsite) {
-        if (campsite.ID.isEmpty()) {
-            Log.e("CampsiteDB", "Cannot delete campsite with empty ID")
-            return
-        }
-
-        campsitesCollection.document(campsite.ID)
-            .delete()
-            .addOnSuccessListener {
-                Log.d("CampsiteDB", "Campsite deleted: ${campsite.ID}")
-            }
+        campsiteDB.deleteCampsite(campsite)
     }
 
     fun browseNotifications(): List<Notification> {
