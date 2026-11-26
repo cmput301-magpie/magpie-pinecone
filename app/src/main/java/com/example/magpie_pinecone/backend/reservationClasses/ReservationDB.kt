@@ -2,7 +2,6 @@ package com.example.magpie_pinecone.backend.reservationClasses
 
 import android.util.Log
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
-import com.example.magpie_pinecone.backend.reviewClasses.ReviewResult
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 
