@@ -28,6 +28,8 @@ class CampsiteTests {
         assertEquals("", campsite.description)
         assertNull(campsite.mapLocation)
         assertTrue(campsite.tags.isEmpty())
+        assertEquals(0, campsite.ratingTotal)
+        assertEquals(0, campsite.ratingCount)
     }
 
     @Test
@@ -50,7 +52,9 @@ class CampsiteTests {
             ownerId = "abc123",
             description = "Quiet spot by the lake",
             mapLocation = location,
-            tags = listOf("lake", "pet friendly")
+            tags = listOf("lake", "pet friendly"),
+            ratingTotal = 9,
+            ratingCount = 2
         )
 
         assertEquals("campsite123", campsite.ID)
@@ -67,6 +71,8 @@ class CampsiteTests {
         assertEquals("Quiet spot by the lake", campsite.description)
         assertEquals(location, campsite.mapLocation)
         assertEquals(listOf("lake", "pet friendly"), campsite.tags)
+        assertEquals(9, campsite.ratingTotal)
+        assertEquals(2, campsite.ratingCount)
     }
 
     @Test
