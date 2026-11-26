@@ -11,7 +11,7 @@ import com.google.firebase.firestore.GeoPoint
  * @property location The location of this campsite.
  * @property maxOccupancy The maximum number of guests that can occupy this campsite.
  * @property price The price of renting this campsite for one day.
- * @property rating The rating of this campsite.
+ * @property rating The average rating of this campsite (rating = ratingTotal / ratingCount)
  * @property images The images associated with this campsite.
  * @property rulesAndPolicy The rules and policy of this campsite.
  * @property availableDates The dates that are unbooked and are currently available to reserve.
@@ -22,6 +22,8 @@ import com.google.firebase.firestore.GeoPoint
  * @property amenities The amenities of this campsite
  * @property mapLocation The map location of this campsite.
  * @property tags The tags associated with this campsite
+ * @property ratingTotal The sum of all review ratings
+ * @property ratingCount The number of reviews
  * @constructor Creates a campsite class
  */
 
@@ -42,5 +44,7 @@ class Campsite(
     var description: String = "",
 //    var amenities: String = "",
     var mapLocation: GeoPoint? = null,
-    var tags: List<String> = emptyList()
+    var tags: List<String> = emptyList(),
+    var ratingTotal: Int = 0,
+    var ratingCount: Int = 0    // Number of reviews; rating = ratingTotal / ratingCount
 )

@@ -1,5 +1,6 @@
 package com.example.magpie_pinecone.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,8 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,8 +40,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
 import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
+import com.example.magpie_pinecone.ui.theme.LavenderSurface
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
+import com.example.magpie_pinecone.ui.theme.OutlineLavender
 import com.example.magpie_pinecone.ui.theme.StarGold
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /*
  * PineconeComponents.kt contains an assortment of composable functions for use across the app's screens.
@@ -47,7 +55,9 @@ import com.example.magpie_pinecone.ui.theme.StarGold
  * PineconeTopBar displays a title and back button for use across many screens.
  * PineconeTextField displays a text field for use across many screens.
  * PillButton displays a rounded button for use across many screens.
- * StarRating displays a row of 5 stars for use in ratings.
+ * StarRating displays a row of 5 stars for use in ratings, with an optional review count.
+ * StarRatingInput displays 5 tappable stars for choosing a rating from 1 to 5.
+ * ReviewCard displays one campsite review: reviewer name, date, stars and comment.
  * CampsiteImage displays an image, with a placeholder being a stock campsite image.
  * PineconeComponentsPreview displays a preview of the assorted components for reference.
  */
@@ -138,9 +148,10 @@ fun PillButton(
 /**
  * Five gold stars plus the number, e.g. "5.0".
  * Campsite.rating is a Double, so pass campsite.rating directly.
+ * Pass ratingCount (Campsite.ratingCount) to show e.g. "4.5 (12)", or "No reviews" when it is 0.
  */
 @Composable
-fun StarRating(rating: Double, modifier: Modifier = Modifier) {
+fun StarRating(rating: Double, modifier: Modifier = Modifier, ratingCount: Int? = null) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         for (i in 1..5) {
             Icon(
@@ -151,7 +162,88 @@ fun StarRating(rating: Double, modifier: Modifier = Modifier) {
             )
         }
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = "%.1f".format(rating), style = MaterialTheme.typography.labelSmall)
+        Text(
+            text = when (ratingCount) {
+                null -> "%.1f".format(rating)  // Not including rating count
+                0 -> "No reviews"  // No reviews yet, so no 0.0 rating
+                else -> "%.1f (%d)".format(rating, ratingCount)  // Including rating count
+            },
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
+}
+
+/**
+ * Five tappable gold stars for choosing a rating from 1 to 5.
+ * [rating] is the current choice (0 = nothing chosen yet) tapping a star calls [onRatingChange]
+ * with the corresponding integer.
+ */
+@Composable
+fun StarRatingInput(
+    rating: Int,
+    onRatingChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        for (i in 1..5) {
+            IconButton(onClick = { onRatingChange(i) }) {
+                Icon(
+                    imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                    contentDescription = if (i == 1) "1 star" else "$i stars",
+                    tint = StarGold,
+                    modifier = Modifier.size(32.dp)  // bigger than StarRating for easier tapping
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Card showing one campsite review.
+ * [trailingContent] is an optional slot at the bottom of the card, empty by default.
+ * For example the Admin screen could use it for a "Remove" button.
+ */
+@Composable
+fun ReviewCard(
+    reviewerName: String,
+    date: Date,
+    rating: Int,
+    comment: String,
+    modifier: Modifier = Modifier,
+    trailingContent: (@Composable () -> Unit)? = null
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(width = 1.dp, color = OutlineLavender),
+        colors = CardDefaults.cardColors(containerColor = LavenderSurface)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = reviewerName,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(date),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            StarRating(rating = rating.toDouble())
+
+            Text(
+                text = comment,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            trailingContent?.invoke()
+        }
     }
 }
 
@@ -181,7 +273,16 @@ fun PineconeComponentsPreview() {
             PineconeTopBar(title = "Profile", onBack = {})
             PineconeTextField(value = "David", onValueChange = {}, label = "First name")
             PillButton(text = "Edit Profile", onClick = {}, icon = Icons.Filled.Edit)
-            StarRating(rating = 5.0)
+            StarRating(rating = 4.5, ratingCount = 12)
+            StarRating(rating = 0.0, ratingCount = 0)
+            StarRating(rating = 2.2)
+            StarRatingInput(rating = 3, onRatingChange = {})
+            ReviewCard(
+                reviewerName = "Shrek",
+                date = Date(),
+                rating = 4,
+                comment = "Nice swampy water. Feels like home."
+            )
             CampsiteImage(modifier = Modifier.size(120.dp))
         }
     }
