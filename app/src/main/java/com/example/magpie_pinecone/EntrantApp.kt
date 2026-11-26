@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.magpie_pinecone.frontend.entrantScreens.ScanQRCodeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.NotificationSettingsScreen
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
@@ -100,6 +101,9 @@ object EntrantViewReservations
 object EditProfile
 
 @Serializable
+object NotificationSettings
+
+@Serializable
 object ComingSoon
 
 @Composable
@@ -128,6 +132,10 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
 
     var curEntrant by remember {
         mutableStateOf<Entrant?>(null)
+    }
+
+    var receiveNotifications by remember {
+        mutableStateOf(true)
     }
 
     LaunchedEffect(Unit) {
@@ -185,7 +193,9 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         Text(destination.label)
                     },
                     selected = currentDestination?.hierarchy
-                        ?.any { it.route == destination.route } == true,
+                        ?.any { it.route == destination.route } == true ||
+                            (destination == EntrantDestination.SETTINGS &&
+                                    currentDestination?.hasRoute(NotificationSettings::class) == true),
                     onClick = {
                         navController.navigate(destination.route) {
                             popUpTo(EntrantDestination.HOME.route) {
@@ -436,8 +446,23 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             AppPolicyGuidelines
                         )
                     },
+                    onNotifications = {
+                        navController.navigate(NotificationSettings)
+                    },
                     onComingSoon = {
                         navController.navigate(ComingSoon)
+                    }
+                )
+            }
+
+            composable<NotificationSettings> {
+                NotificationSettingsScreen(
+                    receiveNotifications = receiveNotifications,
+                    onNotificationChange = {
+                        receiveNotifications = it
+                    },
+                    onBack = {
+                        navController.popBackStack()
                     }
                 )
             }
@@ -459,7 +484,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 )
             }
 
-            // Notifications and Messages from Settings (not done yet)
+            // Screens that are not implemented yet
             composable<ComingSoon> {
                 ComingSoonScreen(
                     title = "Coming soon",
