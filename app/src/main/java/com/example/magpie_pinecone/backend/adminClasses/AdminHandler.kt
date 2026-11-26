@@ -37,8 +37,21 @@ class AdminHandler {
         TODO("Remove a user from the database")
     }
 
-    fun browseCampsite(campsiteDB: CampsiteDB): List<Campsite> {
-        TODO("Get a list of all campsites in the database")
+    /**
+     * Gets a list of all campsites in the database
+     */
+    fun browseCampsites(
+        onResult: (List<Campsite>) -> Unit
+    ) {
+        campsitesCollection.get()
+            .addOnSuccessListener { snapshot ->
+
+                val campsites = snapshot.documents.mapNotNull { document ->
+                    document.toObject(Campsite::class.java)
+                }
+
+                onResult(campsites)
+            }
     }
 
     fun removeCampsite(campsiteDB: CampsiteDB, campsite: Campsite) {
