@@ -34,8 +34,27 @@ class AdminHandler {
             }
     }
 
-    fun removeProfile(userDB: UserDB, user: User) {
-        TODO("Remove a user from the database")
+    /**
+     * Remove a user from the database
+     */
+    fun removeProfile(
+        user: User,
+        onDeleted: () -> Unit = {}
+    ) {
+        if (user.id.isEmpty()) {
+            Log.e("UserDB", "Cannot delete user with empty ID")
+            return
+        }
+
+        usersCollection.document(user.id)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("UserDB", "User deleted: ${user.id}")
+                onDeleted()
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to delete user", exception)
+            }
     }
 
     /**
