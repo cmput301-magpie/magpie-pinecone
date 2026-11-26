@@ -438,7 +438,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     },
                     onComingSoon = {
                         navController.navigate(ComingSoon)
-                    }
+                    },
+                    curUser = curUser
                 )
             }
 
