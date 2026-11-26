@@ -47,7 +47,9 @@ import com.example.magpie_pinecone.ui.theme.StarGold
  * PineconeTopBar displays a title and back button for use across many screens.
  * PineconeTextField displays a text field for use across many screens.
  * PillButton displays a rounded button for use across many screens.
- * StarRating displays a row of 5 stars for use in ratings.
+ * StarRating displays a row of 5 stars for use in ratings, with an optional review count.
+ * StarRatingInput displays 5 tappable stars for choosing a rating from 1 to 5.
+ * ReviewCard displays one campsite review: reviewer name, date, stars and comment.
  * CampsiteImage displays an image, with a placeholder being a stock campsite image.
  * PineconeComponentsPreview displays a preview of the assorted components for reference.
  */
@@ -138,9 +140,10 @@ fun PillButton(
 /**
  * Five gold stars plus the number, e.g. "5.0".
  * Campsite.rating is a Double, so pass campsite.rating directly.
+ * Pass ratingCount (Campsite.ratingCount) to show "4.5 (12)", or "No reviews" when it is 0.
  */
 @Composable
-fun StarRating(rating: Double, modifier: Modifier = Modifier) {
+fun StarRating(rating: Double, modifier: Modifier = Modifier, ratingCount: Int? = null) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         for (i in 1..5) {
             Icon(
@@ -151,7 +154,14 @@ fun StarRating(rating: Double, modifier: Modifier = Modifier) {
             )
         }
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = "%.1f".format(rating), style = MaterialTheme.typography.labelSmall)
+        Text(
+            text = when (ratingCount) {
+                null -> "%.1f".format(rating)  // Not including rating count
+                0 -> "No reviews"  // No reviews yet, so no 0.0 rating
+                else -> "%.1f (%d)".format(rating, ratingCount)  // Including rating count
+            },
+            style = MaterialTheme.typography.labelSmall
+        )
     }
 }
 
