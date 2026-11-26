@@ -29,11 +29,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.example.magpie_pinecone.EditProfile
 import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.frontend.sharedComposables.ProfileImage
 import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.AvatarLavender
@@ -101,22 +105,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 // Profile avatar from the Figma design.
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .background(
-                            color = AvatarLavender,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Person,
-                        contentDescription = "Profile",
-                        tint = PillPurple,
-                        modifier = Modifier.size(82.dp)
-                    )
-                }
+                ProfileImage(curUser.imageData)
 
                 Spacer(modifier = Modifier.height(44.dp))
 

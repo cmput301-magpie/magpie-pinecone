@@ -1,5 +1,7 @@
 package com.example.magpie_pinecone.backend.UserClasses
 
+import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
+
 enum class AccountType {
     Entrant,
     Owner,
@@ -23,5 +25,6 @@ open class User(
     var email: String = "",
     var phoneNumber: String = "",
     var accountType: AccountType = AccountType.Entrant,
-    var rulesAccepted: Boolean = false
+    var rulesAccepted: Boolean = false,
+    var imageData: ImageData? = null
 )
