@@ -1,6 +1,8 @@
 package com.example.magpie_pinecone.backend.reservationClasses
 
 import android.util.Log
+import com.example.magpie_pinecone.backend.entrantClasses.Entrant
+import com.example.magpie_pinecone.backend.reviewClasses.ReviewResult
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 
@@ -233,6 +235,32 @@ class ReservationDB {
             .addOnFailureListener { e ->
                 Log.e("ReservationDB", "Failed to read campsite reservations", e)
                 onResult(emptyList())
+            }
+    }
+
+    /**
+     * Checks whether [entrantID] has a non-cancelled reservation for [campsiteID], including past reservations.
+     * Used for reviewing eligibility, since only entrants that have reserved the campsite completely should
+     * be able to review it.
+     */
+    fun hasReservedCampsite(
+        entrantID: String,
+        campsiteID: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        reservationCollection
+            .whereEqualTo("entrantID", entrantID)
+            .whereEqualTo("campsiteID", campsiteID)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val reserved = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .any { !it.isCancelled }
+                onResult(reserved)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to check reservation", e)
+                onResult(false)
             }
     }
 }
