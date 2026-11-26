@@ -3,6 +3,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 /**
  * Provides actions for interfacing with the campsite database
  *
@@ -135,6 +136,31 @@ class CampsiteDB {
         guests: Int?,
         onResult: (List<Campsite>) -> Unit
     ) {
+        searchCampsitesInRange(
+            name,
+            location,
+            date,
+            date,
+            guests,
+            onResult
+        )
+    }
+
+    /**
+     * Fetches campsites that are available throughout the selected date range
+     * and match the other search filters.
+     */
+    fun searchCampsitesInRange(
+        name: String,
+        location: String,
+        startDate: Date?,
+        endDate: Date?,
+        guests: Int?,
+        onResult: (List<Campsite>) -> Unit
+    ) {
+        val startMillis = startDate?.let { localDateToUtcMillis(it) }
+        val endMillis = endDate?.let { localDateToUtcMillis(it) }
+
         getAllCampsites { campsites ->
 
             val filteredCampsites = campsites.filter { campsite ->
@@ -151,11 +177,23 @@ class CampsiteDB {
                     guests == null ||
                             guests <= campsite.maxOccupancy
 
-                val matchesDate =
-                    date == null ||
-                            campsite.availableDates.any { availableDate ->
-                                isSameDay(availableDate, date)
-                            }
+                val matchesDate = when {
+                    startMillis == null && endMillis == null -> true
+
+                    startMillis != null && endMillis != null -> {
+                        val availableDays = campsite.availableDates
+                            .map { localDateToUtcMillis(it) }
+                            .toSet()
+
+                        hasAvailableDateRange(
+                            availableDays,
+                            startMillis,
+                            endMillis
+                        )
+                    }
+
+                    else -> false
+                }
 
                 matchesName &&
                         matchesLocation &&
@@ -166,20 +204,51 @@ class CampsiteDB {
             onResult(filteredCampsites)
         }
     }
-    /**
-     * Checks whether two dates represent the same calendar day.
-     */
-    private fun isSameDay(date1: Date, date2: Date): Boolean {
-        val calendar1 = Calendar.getInstance().apply {
-            time = date1
-        }
-
-        val calendar2 = Calendar.getInstance().apply {
-            time = date2
-        }
-
-        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
-                calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR)
-    }
 }
 
+/**
+ * Converts a local date to midnight UTC so calendar days can be compared.
+ */
+internal fun localDateToUtcMillis(date: Date): Long {
+    val local = Calendar.getInstance().apply {
+        time = date
+    }
+
+    return Calendar.getInstance(
+        TimeZone.getTimeZone("UTC")
+    ).apply {
+        clear()
+        set(
+            local.get(Calendar.YEAR),
+            local.get(Calendar.MONTH),
+            local.get(Calendar.DAY_OF_MONTH)
+        )
+    }.timeInMillis
+}
+
+/**
+ * Checks whether every day in the selected date range is available.
+ * Both the start and end dates are included.
+ */
+internal fun hasAvailableDateRange(
+    availableDays: Set<Long>,
+    startMillis: Long,
+    endMillis: Long
+): Boolean {
+    if (startMillis > endMillis) {
+        return false
+    }
+
+    var day = startMillis
+
+    while (day <= endMillis) {
+        if (day !in availableDays) {
+            return false
+        }
+
+        // Move to the next UTC calendar day
+        day += 24 * 60 * 60 * 1000L
+    }
+
+    return true
+}
