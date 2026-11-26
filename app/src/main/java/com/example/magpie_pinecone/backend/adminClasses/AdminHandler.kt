@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.adminClasses
 
 import android.app.Notification
+import android.util.Log
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.UserClasses.UserDB
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
@@ -54,8 +55,20 @@ class AdminHandler {
             }
     }
 
-    fun removeCampsite(campsiteDB: CampsiteDB, campsite: Campsite) {
-        TODO("Remove a campsite from the database")
+    /**
+     * Remove a campsite from the database
+     */
+    fun removeCampsite(campsite: Campsite) {
+        if (campsite.ID.isEmpty()) {
+            Log.e("CampsiteDB", "Cannot delete campsite with empty ID")
+            return
+        }
+
+        campsitesCollection.document(campsite.ID)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("CampsiteDB", "Campsite deleted: ${campsite.ID}")
+            }
     }
 
     fun browseNotifications(): List<Notification> {
