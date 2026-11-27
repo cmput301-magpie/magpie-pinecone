@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
-import com.example.magpie_pinecone.frontend.sharedComposables.ImageCarousel
+import com.example.magpie_pinecone.ui.components.ImageCarousel
 import com.example.magpie_pinecone.ui.components.CampsiteImage
 import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTopBar

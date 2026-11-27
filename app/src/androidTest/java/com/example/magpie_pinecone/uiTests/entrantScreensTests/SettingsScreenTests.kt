@@ -29,7 +29,8 @@ class SettingsScreenTests {
                     onProfile = { profilePressed = true },
                     onViewReservations = { reservationsPressed = true },
                     onAppPolicy = { policyPressed = true },
-                    onComingSoon = { comingSoonCount++ }
+                    onComingSoon = { comingSoonCount++ },
+                    curUser = null
                 )
             }
         }

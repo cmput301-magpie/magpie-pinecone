@@ -43,6 +43,11 @@ import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.foundation.layout.Row            
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
+import com.example.magpie_pinecone.ui.theme.DeclineRed
 
 /*
  * ViewReservationsScreen.kt contains all relevant functions for displaying the owner's campsite reservations.
@@ -53,7 +58,8 @@ import java.util.Locale
  * ActiveReservations displays the owner's active reservations.
  * PastReservations displays the owner's past reservations.
  * CancelledReservations displays the owner's cancelled reservations.
- * OwnerReservationRow displays one reservation's campsite name and dates.
+ * OwnerReservationList displays a list of reservations, used by all three tabs.
+ * OwnerReservationRow displays one reservation's campsite name and dates, with an optional Reject button.
  * EmptyReservationsMessage displays a grey message when a tab has no reservations.
  * ShowViewReservationsScreenPreview displays a preview of ViewReservationsScreen for reference.
  */
@@ -63,13 +69,19 @@ import java.util.Locale
  * Active, Past and Cancelled tabs.
  *
  * @param activeReservations The owner's active reservations.
+ * @param pastReservations The owner's past reservations.
+ * @param cancelledReservations The owner's cancelled and rejected reservations.
  * @param campsiteDB Database used to look up each reservation's campsite.
+ * @param onReject Called when the owner confirms rejecting an active reservation.
  * @param onBack Returns to the previous screen.
  */
 @Composable
 fun ViewReservationsScreen(
     activeReservations: List<Reservation>,
+    pastReservations: List<Reservation> = emptyList(),
+    cancelledReservations: List<Reservation> = emptyList(),
     campsiteDB: CampsiteDB,
+    onReject: (Reservation) -> Unit = {},
     onBack: () -> Unit,
 ) {
     // Tab Navigation
@@ -121,9 +133,9 @@ fun ViewReservationsScreen(
 
         // Body, depending on the tab
         when (selectedTabIndex) {
-            0 -> ActiveReservations(activeReservations, campsiteDB)
-            1 -> PastReservations()
-            2 -> CancelledReservations()
+            0 -> ActiveReservations(activeReservations, campsiteDB, onReject)
+            1 -> PastReservations(pastReservations, campsiteDB)
+            2 -> CancelledReservations(cancelledReservations, campsiteDB)
         }
     }
 }
@@ -157,22 +169,86 @@ private fun ReservationTab(
 }
 
 /**
- * Displays the owner's active reservations in one rounded card.
+ * Displays the owner's active reservations, each with a Reject button (US 02.08.01).
  *
  * @param activeReservations The owner's active reservations.
  * @param campsiteDB Database used to look up each reservation's campsite.
+ * @param onReject Called when the owner confirms rejecting a reservation.
  */
 @Composable
 fun ActiveReservations(
     activeReservations: List<Reservation>,
+    campsiteDB: CampsiteDB,
+    onReject: (Reservation) -> Unit
+) {
+    OwnerReservationList(
+        reservations = activeReservations,
+        campsiteDB = campsiteDB,
+        emptyText = "You have no active reservations.",
+        onReject = onReject
+    )
+}
+
+/**
+ * Displays the owner's past reservations (US 02.07.02).
+ *
+ * @param pastReservations The owner's past reservations.
+ * @param campsiteDB Database used to look up each reservation's campsite.
+ */
+@Composable
+fun PastReservations(
+    pastReservations: List<Reservation>,
     campsiteDB: CampsiteDB
+) {
+    OwnerReservationList(
+        reservations = pastReservations,
+        campsiteDB = campsiteDB,
+        emptyText = "You have no past reservations."
+    )
+}
+
+/**
+ * Displays the owner's cancelled and rejected reservations (US 02.07.03).
+ *
+ * @param cancelledReservations The owner's cancelled reservations.
+ * @param campsiteDB Database used to look up each reservation's campsite.
+ */
+@Composable
+fun CancelledReservations(
+    cancelledReservations: List<Reservation>,
+    campsiteDB: CampsiteDB
+) {
+    OwnerReservationList(
+        reservations = cancelledReservations,
+        campsiteDB = campsiteDB,
+        emptyText = "You have no cancelled reservations."
+    )
+}
+
+/**
+ * Shows a list of reservations in one rounded card.
+ * Used by all three tabs, so the list code is only written once.
+ *
+ * @param reservations Reservations to show.
+ * @param campsiteDB Database used to look up each reservation's campsite.
+ * @param emptyText Message shown when there are no reservations.
+ * @param onReject If not null, each row gets a Reject button that calls this after the owner confirms.
+ */
+@Composable
+private fun OwnerReservationList(
+    reservations: List<Reservation>,
+    campsiteDB: CampsiteDB,
+    emptyText: String,
+    onReject: ((Reservation) -> Unit)? = null
 ) {
     // Campsites we have looked up so far, by campsite ID
     var campsites by remember { mutableStateOf<Map<String, Campsite>>(emptyMap()) }
+    // The reservation the owner picked to reject (null = none picked)
+    var reservationToReject by remember { mutableStateOf<Reservation?>(null) }
 
     // Look up each campsite once (not on every redraw), so rows can show its name
-    LaunchedEffect(activeReservations) {
-        activeReservations
+    LaunchedEffect(reservations) {
+        reservations
             .map { it.campsiteID }
             .distinct()
             .filter { it !in campsites }
@@ -185,9 +261,9 @@ fun ActiveReservations(
             }
     }
 
-    if (activeReservations.isEmpty()) {
+    if (reservations.isEmpty()) {
         EmptyReservationsMessage(
-            text = "You have no active reservations."
+            text = emptyText
         )
     } else {
         Card(
@@ -196,7 +272,7 @@ fun ActiveReservations(
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             LazyColumn {
-                itemsIndexed(activeReservations) { index, reservation ->
+                itemsIndexed(reservations) { index, reservation ->
                     // A thin line between rows, but not above the first one
                     if (index > 0) {
                         HorizontalDivider(
@@ -206,70 +282,94 @@ fun ActiveReservations(
 
                     OwnerReservationRow(
                         reservation = reservation,
-                        campsiteName = campsites[reservation.campsiteID]?.name
+                        campsiteName = campsites[reservation.campsiteID]?.name,
+                        showRejectButton = onReject != null,
+                        onReject = { reservationToReject = reservation }
                     )
                 }
             }
         }
     }
+
+    // Ask the owner to confirm before rejecting
+    reservationToReject?.let { toReject ->
+        AlertDialog(
+            onDismissRequest = { reservationToReject = null },
+            title = { Text("Reject reservation?") },
+            text = { Text("The entrant will lose this reservation.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onReject?.invoke(toReject)
+                        reservationToReject = null
+                    }
+                ) {
+                    Text("Yes, reject")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { reservationToReject = null }) {
+                    Text("Keep it")
+                }
+            }
+        )
+    }
 }
 
 /**
- * Displays the owner's past reservations.
- *
- * Loading real past reservations is its own user story (US 02.07.02),
- * so this tab only shows a message for now.
- */
-@Composable
-fun PastReservations() {
-    EmptyReservationsMessage(
-        text = "Past reservations will appear here."
-    )
-}
-
-/**
- * Displays the owner's cancelled reservations.
- *
- * Loading real cancelled reservations is its own user story (US 02.07.03),
- * so this tab only shows a message for now.
- */
-@Composable
-fun CancelledReservations() {
-    EmptyReservationsMessage(
-        text = "Cancelled reservations will appear here."
-    )
-}
-
-/**
- * One reservation row: the campsite's name, with the dates in grey under it.
+ * One reservation row: the campsite's name with the dates in grey under it,
+ * and a red Reject button on the right if [showRejectButton] is true.
  *
  * @param reservation Reservation shown in this row.
  * @param campsiteName Name of the reservation's campsite, or null while it is loading.
+ * @param showRejectButton Whether to show the Reject button.
+ * @param onReject Called when the owner presses Reject.
  */
 @Composable
 private fun OwnerReservationRow(
     reservation: Reservation,
-    campsiteName: String?
+    campsiteName: String?,
+    showRejectButton: Boolean = false,
+    onReject: () -> Unit = {}
 ) {
     val dateFormat = remember { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()) }
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = 16.dp,
-                vertical = 12.dp
-            )
+                start = 16.dp,
+                end = 8.dp,
+                top = 12.dp,
+                bottom = 12.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = campsiteName ?: "Loading campsite...",
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = "${dateFormat.format(reservation.startDate)} - ${dateFormat.format(reservation.endDate)}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        // Name and dates take up all the space the button doesn't need
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = campsiteName ?: "Loading campsite...",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "${dateFormat.format(reservation.startDate)} - ${dateFormat.format(reservation.endDate)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (showRejectButton) {
+            TextButton(
+                onClick = onReject,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = DeclineRed
+                )
+            ) {
+                Text("Reject")
+            }
+        }
     }
 }
 

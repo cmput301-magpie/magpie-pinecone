@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.reservationClasses
 
 import android.util.Log
+import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 
@@ -143,7 +144,11 @@ class ReservationDB {
     }
 
     /**
-     * Fetches cancelled reservations by a specified [ownerID] from the database
+     * Fetches cancelled reservations by a specified [ownerID] from the database.
+     *
+     * Firestore saves the Kotlin property "isCancelled" under the field name "cancelled",
+     * so instead of asking Firestore for "isCancelled", we get all of the owner's
+     * reservations and keep only the cancelled ones here in Kotlin.
      */
     fun getCancelledReservationsByOwner(
         ownerID: String,
@@ -151,15 +156,18 @@ class ReservationDB {
     ) {
         reservationCollection
             .whereEqualTo("ownerID", ownerID)
-            .whereEqualTo("isCancelled", true)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { it.isCancelled }
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read cancelled reservations", e)
+                onResult(emptyList())
             }
     }
 
@@ -233,6 +241,32 @@ class ReservationDB {
             .addOnFailureListener { e ->
                 Log.e("ReservationDB", "Failed to read campsite reservations", e)
                 onResult(emptyList())
+            }
+    }
+
+    /**
+     * Checks whether [entrantID] has a non-cancelled reservation for [campsiteID], including past reservations.
+     * Used for reviewing eligibility, since only entrants that have reserved the campsite completely should
+     * be able to review it.
+     */
+    fun hasReservedCampsite(
+        entrantID: String,
+        campsiteID: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        reservationCollection
+            .whereEqualTo("entrantID", entrantID)
+            .whereEqualTo("campsiteID", campsiteID)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val reserved = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .any { !it.isCancelled }
+                onResult(reserved)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to check reservation", e)
+                onResult(false)
             }
     }
 }

@@ -34,6 +34,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.magpie_pinecone.backend.UserClasses.User
+import com.example.magpie_pinecone.ui.components.ProfileImage
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.AvatarLavender
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
@@ -61,7 +63,8 @@ fun SettingsScreen(
     onViewReservations: () -> Unit,
     onAppPolicy: () -> Unit,
     onNotifications: () -> Unit,
-    onComingSoon: () -> Unit
+    onComingSoon: () -> Unit,
+    curUser: User?
 ) {
     Column(
         modifier = Modifier
@@ -82,12 +85,17 @@ fun SettingsScreen(
                 .background(AvatarLavender),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Person,
-                contentDescription = null,
-                tint = PillPurple,
-                modifier = Modifier.size(56.dp)
-            )
+            if (curUser == null) {
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = null,
+                    tint = PillPurple,
+                    modifier = Modifier.size(56.dp)
+                )
+            } else {
+                ProfileImage(curUser.imageData, false, {})
+            }
+
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -131,6 +139,6 @@ private fun SettingsRow(icon: ImageVector, text: String, onClick: () -> Unit) {
 @Composable
 fun SettingsScreenPreview() {
     MagpiepineconeTheme {
-        SettingsScreen(onProfile = {}, onViewReservations = {}, onAppPolicy = {}, onNotifications = {}, onComingSoon = {})
+        SettingsScreen(onProfile = {}, onViewReservations = {}, onAppPolicy = {}, onNotifications = {}, onComingSoon = {}, curUser = null)
     }
 }

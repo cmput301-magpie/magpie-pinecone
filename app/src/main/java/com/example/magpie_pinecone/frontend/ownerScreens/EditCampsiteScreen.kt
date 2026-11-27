@@ -1,8 +1,6 @@
 package com.example.magpie_pinecone.frontend.ownerScreens
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,8 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
-import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
 import com.example.magpie_pinecone.backend.sharedDataClasses.ImageViewModel
-import com.example.magpie_pinecone.frontend.sharedComposables.ImageCarousel
+import com.example.magpie_pinecone.ui.components.ImageCarousel
 import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTextField
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
@@ -78,6 +75,10 @@ fun EditCampsiteScreen(
     onSubmit: (Campsite) -> Unit,
     imageViewModel: ImageViewModel = viewModel()  // This is in parameters so it can be modified easily in tests
 ) {
+
+    LaunchedEffect(campsite) {
+        imageViewModel.setImages(campsite.images)
+    }
 
     var name by remember { mutableStateOf(campsite.name) }
     var location by remember { mutableStateOf(campsite.location) }
@@ -174,6 +175,8 @@ fun EditCampsiteScreen(
                 campsite.maxOccupancy = maxOccupancy.toIntOrNull() ?: 0
                 // Tags are typed as "River, Lake" and saved as a list
                 campsite.tags = tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+                campsite.images = imageDataList
 
                 onSubmit(campsite)
             },

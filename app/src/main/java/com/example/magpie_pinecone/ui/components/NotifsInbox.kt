@@ -1,8 +1,5 @@
-package com.example.magpie_pinecone.frontend.sharedComposables
+package com.example.magpie_pinecone.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable

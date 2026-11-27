@@ -3,6 +3,7 @@ package com.example.magpie_pinecone.backend.entrantClasses
 import com.example.magpie_pinecone.backend.UserClasses.AccountType
 import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
 
 /**
  * Stores the data associated with an entrant user of the application.

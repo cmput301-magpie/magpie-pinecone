@@ -25,6 +25,7 @@ import com.example.magpie_pinecone.frontend.entrantScreens.EntrantViewReservatio
 import com.example.magpie_pinecone.frontend.entrantScreens.ProfileScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SearchCampsiteScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.EditProfileScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.WriteReviewScreen
 import kotlinx.serialization.Serializable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,6 +36,8 @@ import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
 import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
+import com.example.magpie_pinecone.backend.reviewClasses.Review
+import com.example.magpie_pinecone.backend.reviewClasses.ReviewDB
 import com.example.magpie_pinecone.backend.entrantClasses.EntrantHandler
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.ownerClasses.OwnerHandler
@@ -106,6 +109,8 @@ object NotificationSettings
 @Serializable
 object ComingSoon
 
+@Serializable
+object WriteReview
 @Composable
 fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val navController = rememberNavController()
@@ -160,6 +165,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
     val campsiteDB = remember { CampsiteDB() }
     val lotteryDB = remember { LotteryDB() }
     val reservationDB = remember { ReservationDB() }
+    val reviewDB = remember { ReviewDB() }
     val entrantHandler = remember { EntrantHandler() }
 
     var lotteries by remember {
@@ -175,13 +181,19 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
         mutableStateOf<List<Reservation>>(emptyList())
     }
 
+    // Review Variables for campsite on details screen
+    var campsiteReviews by remember { mutableStateOf<List<Review>>(emptyList()) }
+    var curEntrantReview by remember { mutableStateOf<Review?>(null) }  // The entrant's own review, if any
+    var canReview by remember { mutableStateOf(false) }  // Whether the entrant has reserved the campsite
+
     // NavigationSuiteScaffold picks an appropriate nav layout for the screen size.
     // Screen is vertical (i.e. phone screen) -> bottom navbar
     // Screen is horizontal (i.e. tablet screen) -> sidebar
     // Figma shows no nav bar on the Campsite Details and Reserve screens.
     val hideNavBar =
         currentDestination?.hasRoute(CampsiteDetails::class) == true ||
-                currentDestination?.hasRoute(CampsiteReserve::class) == true
+                currentDestination?.hasRoute(CampsiteReserve::class) == true ||
+                currentDestination?.hasRoute(WriteReview::class) == true
 
     NavigationSuiteScaffold(
         layoutType = if (hideNavBar) {
@@ -298,6 +310,24 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         }
                     }
 
+                    // Runs each time the CampsiteDetails screen is shown, updating reviews and rating avg
+                    LaunchedEffect(campsite.ID) {
+                        campsiteReviews = emptyList()  // Don't flash the previous campsite's reviews
+                        curEntrantReview = null
+                        canReview = false
+
+                        reviewDB.getReviewsByCampsite(campsite.ID) { campsiteReviews = it }
+                        reviewDB.getReview(campsite.ID, androidId) { curEntrantReview = it }
+                        reservationDB.hasReservedCampsite(androidId, campsite.ID) { canReview = it }
+
+                        // Re-read the campsite so the new average rating shows
+                        campsiteDB.readCampsite(campsite.ID) { freshCampsite ->
+                            if (freshCampsite != null && selectedCampsite?.ID == freshCampsite.ID) {
+                                selectedCampsite = freshCampsite
+                            }
+                        }
+                    }
+
                     CampsiteDetailsScreen(
                         campsite = campsite,
                         isWinner = false,
@@ -331,6 +361,12 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                                     }
                                 }
                             }
+                        },
+                        reviews = campsiteReviews,
+                        canReview = canReview,
+                        hasReviewed = curEntrantReview != null,
+                        onWriteReview = {
+                            navController.navigate(WriteReview)
                         }
                     )
                 }
@@ -377,6 +413,45 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         }
                     }
                 )
+            }
+
+            composable<WriteReview> {
+                val campsite = selectedCampsite
+                val entrant = curEntrant
+
+                if (campsite == null || entrant == null) {
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
+                } else {
+                    WriteReviewScreen(
+                        campsiteName = campsite.name.ifBlank { "Unnamed campsite" },
+                        initialRating = curEntrantReview?.rating ?: 0,
+                        initialComment = curEntrantReview?.comment ?: "",
+                        isEdit = curEntrantReview != null,
+                        onBack = { navController.popBackStack() },
+                        onSubmit = { rating, comment ->
+                            entrantHandler.postReview(
+                                reservationDB = reservationDB,
+                                reviewDB = reviewDB,
+                                campsite = campsite,
+                                entrant = entrant,
+                                rating = rating,
+                                comment = comment
+                            ) { success ->
+                                if (success) {
+                                    navController.popBackStack()   // Details screen reloads on return
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Couldn't post your review. Please try again.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    )
+                }
             }
 
             composable<CampsiteResult> {
@@ -460,7 +535,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     },
                     onComingSoon = {
                         navController.navigate(ComingSoon)
-                    }
+                    },
+                    curUser = curUser
                 )
             }
 
