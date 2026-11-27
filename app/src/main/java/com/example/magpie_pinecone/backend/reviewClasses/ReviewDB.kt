@@ -10,38 +10,6 @@ class ReviewDB {
     private val campsiteCollection = db.collection("campsites")
 
     /**
-     * Creates the document ID of a review for easy readability. There is one review per entrant
-     * per campsite, so posting again edits the existing review instead of adding a second one.
-     */
-    fun reviewDocumentId(campsiteID: String, entrantID: String): String {
-        return "${campsiteID}_$entrantID"
-    }
-
-    /**
-     * The new sum of all review ratings after a review is posted.
-     * A new review ([oldRating] is null) adds its rating. An edited review swaps its old rating
-     * for the new one.
-     */
-    fun updatedRatingTotal(total: Int, newRating: Int, oldRating: Int?): Int {
-        return total + newRating - (oldRating ?: 0)
-    }
-
-    /**
-     * The new number of reviews after a review is posted.
-     * Only a brand new review raises the count; editing a review leaves it the same.
-     */
-    fun updatedRatingCount(count: Int, isNewReview: Boolean): Int {
-        return if (isNewReview) count + 1 else count
-    }
-
-    /**
-     * The average rating, or 0.0 when there are no reviews (avoids dividing by zero).
-     */
-    fun averageRating(total: Int, count: Int): Double {
-        return if (count == 0) 0.0 else total.toDouble() / count
-    }
-
-    /**
      * Saves [review] to the database and updates the campsite's average rating in one transaction.
      * If the entrant already reviewed this campsite, the old review is replaced and only the
      * difference in rating is added to the total. [onResult] receives true on success, false on failure.
@@ -128,4 +96,36 @@ class ReviewDB {
                 onResult(null)
             }
     }
+}
+
+/**
+ * Creates the document ID of a review for easy readability. There is one review per entrant
+ * per campsite, so posting again edits the existing review instead of adding a second one.
+ */
+internal fun reviewDocumentId(campsiteID: String, entrantID: String): String {
+    return "${campsiteID}_$entrantID"
+}
+
+/**
+ * The new sum of all review ratings after a review is posted.
+ * A new review ([oldRating] is null) adds its rating. An edited review swaps its old rating
+ * for the new one.
+ */
+internal fun updatedRatingTotal(total: Int, newRating: Int, oldRating: Int?): Int {
+    return total + newRating - (oldRating ?: 0)
+}
+
+/**
+ * The new number of reviews after a review is posted.
+ * Only a brand new review raises the count; editing a review leaves it the same.
+ */
+internal fun updatedRatingCount(count: Int, isNewReview: Boolean): Int {
+    return if (isNewReview) count + 1 else count
+}
+
+/**
+ * The average rating, or 0.0 when there are no reviews (avoids dividing by zero).
+ */
+internal fun averageRating(total: Int, count: Int): Double {
+    return if (count == 0) 0.0 else total.toDouble() / count
 }
