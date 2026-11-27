@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,13 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,12 +40,11 @@ import com.example.magpie_pinecone.backend.UserClasses.User
 import com.example.magpie_pinecone.backend.deleteImageFromFirebase
 import com.example.magpie_pinecone.backend.uploadImageToFirebase
 import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
-import com.example.magpie_pinecone.frontend.sharedComposables.ProfileImage
+import com.example.magpie_pinecone.ui.components.ProfileImage
 import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTextField
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.AvatarLavender
-import com.example.magpie_pinecone.ui.theme.PillPurple
 
 /*
  * EditProfileScreen.kt contains all relevant functions for displaying the entrant profile edit screen.

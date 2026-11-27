@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.backend.UserClasses.User
-import com.example.magpie_pinecone.frontend.sharedComposables.ProfileImage
+import com.example.magpie_pinecone.ui.components.ProfileImage
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
 import com.example.magpie_pinecone.ui.theme.AvatarLavender
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme

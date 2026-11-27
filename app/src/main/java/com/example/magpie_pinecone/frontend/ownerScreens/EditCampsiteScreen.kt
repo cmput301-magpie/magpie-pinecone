@@ -1,8 +1,6 @@
 package com.example.magpie_pinecone.frontend.ownerScreens
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
-import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
 import com.example.magpie_pinecone.backend.sharedDataClasses.ImageViewModel
-import com.example.magpie_pinecone.frontend.sharedComposables.ImageCarousel
+import com.example.magpie_pinecone.ui.components.ImageCarousel
 import com.example.magpie_pinecone.ui.components.PillButton
 import com.example.magpie_pinecone.ui.components.PineconeTextField
 import com.example.magpie_pinecone.ui.components.PineconeTopBar
