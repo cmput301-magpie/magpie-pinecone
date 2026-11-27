@@ -144,7 +144,11 @@ class ReservationDB {
     }
 
     /**
-     * Fetches cancelled reservations by a specified [ownerID] from the database
+     * Fetches cancelled reservations by a specified [ownerID] from the database.
+     *
+     * Firestore saves the Kotlin property "isCancelled" under the field name "cancelled",
+     * so instead of asking Firestore for "isCancelled", we get all of the owner's
+     * reservations and keep only the cancelled ones here in Kotlin.
      */
     fun getCancelledReservationsByOwner(
         ownerID: String,
@@ -152,15 +156,18 @@ class ReservationDB {
     ) {
         reservationCollection
             .whereEqualTo("ownerID", ownerID)
-            .whereEqualTo("isCancelled", true)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { it.isCancelled }
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read cancelled reservations", e)
+                onResult(emptyList())
             }
     }
 

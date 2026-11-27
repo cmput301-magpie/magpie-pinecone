@@ -5,6 +5,7 @@ import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
 import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 import com.example.magpie_pinecone.backend.reservationClasses.Reservation
+import com.example.magpie_pinecone.backend.reservationClasses.ReservationDB
 
 /**
  * Provides actions for owners when interacting with the app.
@@ -53,8 +54,16 @@ class OwnerHandler() {
 
     /**
      * Rejects a Reservation made by an Entrant.
+     * The reservation is marked as cancelled and saved to the reservation database,
+     * so it moves to the owner's Cancelled tab.
      */
-    fun rejectReservation(reservation: Reservation): Unit { TODO() }
+    fun rejectReservation(
+        reservations: ReservationDB,
+        reservation: Reservation
+    ) {
+        reservation.isCancelled = true
+        reservations.updateReservation(reservation)
+    }
 
 //    /**
 //     * Sends a notification to an Entrant.

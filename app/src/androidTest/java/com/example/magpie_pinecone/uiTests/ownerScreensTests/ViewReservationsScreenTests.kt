@@ -53,11 +53,11 @@ class ViewReservationsScreenTests {
 
         // The Past tab shows its own message
         composeTestRule.onNodeWithText("Past").performClick()
-        composeTestRule.onNodeWithText("Past reservations will appear here.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("You have no past reservations.").assertIsDisplayed()
 
         // So does the cancelled reservations tab
         composeTestRule.onNodeWithText("Cancelled").performClick()
-        composeTestRule.onNodeWithText("Cancelled reservations will appear here.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("You have no cancelled reservations.").assertIsDisplayed()
     }
 
     @Test

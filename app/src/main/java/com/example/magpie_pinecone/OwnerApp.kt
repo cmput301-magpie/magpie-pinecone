@@ -102,6 +102,8 @@ fun OwnerApp(androidId: String) {
 
     // Reservation Variables
     var activeReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    var pastReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    var cancelledReservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
 
     val userDB = remember { UserDB() }
     // IDs of the entrants on the waitlist being viewed, and the users loaded from them
@@ -287,16 +289,36 @@ fun OwnerApp(androidId: String) {
                 }
             }
             composable<ViewReservations> {
-                // Grab active reservations everytime view reservations is loaded
+                // Grab all three lists everytime view reservations is loaded
                 LaunchedEffect(Unit) {
-                    reservationDB.getActiveReservationsByOwner(ownerID = androidId) {
-                        activeReservations = it
+                    // Active: leave out any that were cancelled or rejected
+                    reservationDB.getActiveReservationsByOwner(ownerID = androidId) { loaded ->
+                        activeReservations = loaded.filter { !it.isCancelled }
+                    }
+                    // Past: leave out cancelled ones (they have their own tab), newest first
+                    reservationDB.getPastReservationsByOwner(ownerID = androidId) { loaded ->
+                        pastReservations = loaded
+                            .filter { !it.isCancelled }
+                            .sortedByDescending { it.endDate }
+                    }
+                    // Cancelled: includes reservations the owner rejected
+                    reservationDB.getCancelledReservationsByOwner(ownerID = androidId) { loaded ->
+                        cancelledReservations = loaded
                     }
                 }
 
                 ViewReservationsScreen(
                     activeReservations = activeReservations,
+                    pastReservations = pastReservations,
+                    cancelledReservations = cancelledReservations,
                     campsiteDB = campsiteDB,
+                    onReject = { reservation ->
+                        // Mark it cancelled in the database
+                        ownerHandler.rejectReservation(reservationDB, reservation)
+                        // Move it from the Active tab to the Cancelled tab right away
+                        activeReservations = activeReservations - reservation
+                        cancelledReservations = cancelledReservations + reservation
+                    },
                     onBack = { navController.popBackStack() }
                 )
             }
