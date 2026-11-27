@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Cancel
@@ -39,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.magpie_pinecone.R
-import com.example.magpie_pinecone.frontend.sharedComposables.BackButton
 import com.example.magpie_pinecone.ui.theme.LavenderSurface
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import com.example.magpie_pinecone.ui.theme.OutlineLavender

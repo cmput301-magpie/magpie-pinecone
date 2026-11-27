@@ -1,4 +1,4 @@
-package com.example.magpie_pinecone.frontend.sharedComposables
+package com.example.magpie_pinecone.ui.components
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
