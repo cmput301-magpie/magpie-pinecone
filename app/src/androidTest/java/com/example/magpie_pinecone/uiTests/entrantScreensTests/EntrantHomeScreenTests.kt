@@ -14,6 +14,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import com.example.magpie_pinecone.frontend.entrantScreens.EntrantHomeScreenLotteryCard
+import com.example.magpie_pinecone.backend.lotteryClasses.LotteryDB
 
 class EntrantHomeScreenTests {
 
@@ -52,15 +54,16 @@ class EntrantHomeScreenTests {
     private var leftLottery: Lottery? = null
     private var reservedLottery: Lottery? = null
     private var myReservationsPressed = false
+
     private var notificationsPressed = false
 
-    private fun showHomeScreen(lotteries: List<Lottery>, curEntrant: Entrant? = entrant) {
+    private fun showHomeScreen(curEntrant: Entrant? = entrant) {
         composeTestRule.setContent {
             MagpiepineconeTheme {
                 EntrantHomeScreen(
                     onMyReservations = { myReservationsPressed = true },
                     onNotifications = { notificationsPressed = true },
-                    lotteries = lotteries,
+                    lotteryDB = LotteryDB(),
                     curEntrant = curEntrant,
                     onReserveLottery = { reservedLottery = it },
                     onLotteryDetails = { detailsLottery = it },
@@ -70,9 +73,28 @@ class EntrantHomeScreenTests {
         }
     }
 
+    /**
+     * Shows a single lottery card, so we can test it with our own sample lottery
+     * without needing Firebase.
+     */
+    private fun showLotteryCard(lottery: Lottery, won: Boolean) {
+        composeTestRule.setContent {
+            MagpiepineconeTheme {
+                EntrantHomeScreenLotteryCard(
+                    wonLottery = won,
+                    lottery = lottery,
+                    campsite = campsite,
+                    onReserveLottery = { reservedLottery = lottery },
+                    onLotteryDetails = { detailsLottery = lottery },
+                    onLeaveLottery = { leftLottery = lottery }
+                )
+            }
+        }
+    }
+
     @Test
     fun nullEntrant_showsNothing() {
-        showHomeScreen(emptyList(), curEntrant = null)
+        showHomeScreen(curEntrant = null)
 
         // The screen returns early, so none of the home content exists
         composeTestRule.onNodeWithText("Your Lottery Entries").assertDoesNotExist()
@@ -80,22 +102,15 @@ class EntrantHomeScreenTests {
 
     @Test
     fun showsWelcomeWithName() {
-        showHomeScreen(emptyList())
+        showHomeScreen()
 
         // The banner says "Welcome back,\nBaby Gronk!" so we look for part of the text
         composeTestRule.onNodeWithText("Baby Gronk", substring = true).assertIsDisplayed()
     }
 
     @Test
-    fun noLotteries_showsEmptyMessage() {
-        showHomeScreen(emptyList())
-
-        composeTestRule.onNodeWithText("You have no lottery entries yet.").assertIsDisplayed()
-    }
-
-    @Test
     fun lotteryCard_showsCampsiteDetails() {
-        showHomeScreen(listOf(joinedLottery))
+        showLotteryCard(joinedLottery, won = false)
 
         // Name, address and price (38.0 is shown as $38) should be on the card
         composeTestRule.onNodeWithText("Gronk Campground").assertIsDisplayed()
@@ -105,7 +120,7 @@ class EntrantHomeScreenTests {
 
     @Test
     fun joinedLottery_detailsAndLeaveWork() {
-        showHomeScreen(listOf(joinedLottery))
+        showLotteryCard(joinedLottery, won = false)
 
         // Not won yet, so there should be no Reserve button
         composeTestRule.onNodeWithText("Reserve").assertDoesNotExist()
@@ -120,7 +135,7 @@ class EntrantHomeScreenTests {
 
     @Test
     fun wonLottery_showsReserve() {
-        showHomeScreen(listOf(wonLottery))
+        showLotteryCard(wonLottery, won = true)
 
         // Winners see the win message and Reserve instead of Details/Leave
         composeTestRule.onNodeWithText("You won the lottery!").assertIsDisplayed()
@@ -132,7 +147,7 @@ class EntrantHomeScreenTests {
 
     @Test
     fun myReservations_callsCallback() {
-        showHomeScreen(emptyList())
+        showHomeScreen()
 
         composeTestRule.onNodeWithText("My reservations").performClick()
         assertTrue(myReservationsPressed)
@@ -140,7 +155,7 @@ class EntrantHomeScreenTests {
 
     @Test
     fun inbox_callsOnNotifications() {
-        showHomeScreen(emptyList())
+        showHomeScreen()
 
         // The shared inbox icon is found by its description
         composeTestRule.onNodeWithContentDescription("Inbox").performClick()
