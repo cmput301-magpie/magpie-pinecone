@@ -106,17 +106,22 @@ class ReservationDB {
     ) {
         val currentDate = Date()
 
+        // Only filter by owner in Firestore. Filtering by owner AND endDate needs a
+        // composite index, so we check the date here in Kotlin instead.
         reservationCollection
             .whereEqualTo("ownerID", ownerID)
-            .whereLessThan("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { it.endDate.before(currentDate) }   // Keep only reservations that have ended
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read owner's past reservations", e)
+                onResult(emptyList())
             }
     }
 
@@ -129,17 +134,22 @@ class ReservationDB {
     ) {
         val currentDate = Date()
 
+        // Only filter by owner in Firestore. Filtering by owner AND endDate needs a
+        // composite index, so we check the date here in Kotlin instead.
         reservationCollection
             .whereEqualTo("ownerID", ownerID)
-            .whereGreaterThanOrEqualTo("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { !it.endDate.before(currentDate) }   // Keep only reservations that haven't ended yet
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read owner's active reservations", e)
+                onResult(emptyList())
             }
     }
 
@@ -236,16 +246,16 @@ class ReservationDB {
     ) {
         val currentDate = Date()
 
+        // Only filter by campsite in Firestore. Filtering by campsite AND endDate needs a
+        // composite index, so we check the date here in Kotlin instead.
         reservationCollection
             .whereEqualTo("campsiteID", campsiteID)
-            .whereGreaterThanOrEqualTo("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
 
                 val reservations = snapshot.documents
                     .mapNotNull { it.toObject(Reservation::class.java) }
-                    .filter { !it.isCancelled }
-
+                    .filter { !it.isCancelled && !it.endDate.before(currentDate) }   // Not cancelled, not ended yet
                 onResult(reservations)
             }
             .addOnFailureListener { e ->
