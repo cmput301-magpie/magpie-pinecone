@@ -138,6 +138,10 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
         mutableStateOf(true)
     }
 
+    var savingNotificationPreference by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(Unit) {
         userDB.readUser(androidId) { fetchedUser ->
             curUser = fetchedUser
@@ -145,6 +149,11 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
 
         userDB.readEntrant(androidId) { fetchedEntrant ->
             curEntrant = fetchedEntrant
+
+            // Load the saved notification preference
+            if (fetchedEntrant != null) {
+                receiveNotifications = !fetchedEntrant.notifOptOut
+            }
         }
     }
 
@@ -458,8 +467,32 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
             composable<NotificationSettings> {
                 NotificationSettingsScreen(
                     receiveNotifications = receiveNotifications,
-                    onNotificationChange = {
-                        receiveNotifications = it
+                    onNotificationChange = { enabled ->
+                        if (curEntrant == null) {
+                            Toast.makeText(
+                                context,
+                                "Could not load notification settings.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else if (!savingNotificationPreference) {
+                            savingNotificationPreference = true
+
+                            // Update the switch only after Firestore confirms the change
+                            userDB.setNotifOptOut(androidId, !enabled) { success ->
+                                savingNotificationPreference = false
+
+                                if (success) {
+                                    receiveNotifications = enabled
+                                    curEntrant?.notifOptOut = !enabled
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Could not save notification settings.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
                     },
                     onBack = {
                         navController.popBackStack()

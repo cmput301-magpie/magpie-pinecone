@@ -3,6 +3,7 @@ package com.example.magpie_pinecone.backend.UserClasses
 import android.util.Log
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 /**
  * Provides actions for interfacing with the user database
@@ -70,7 +71,7 @@ class UserDB {
         }
 
         usersCollection.document(user.id)
-            .set(user)
+            .set(user, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("UserDB", "User updated: ${user.id}")
             }
@@ -96,6 +97,35 @@ class UserDB {
             }
             .addOnFailureListener { exception ->
                 Log.e("UserDB", "Failed to set rulesAccepted", exception)
+            }
+    }
+    /**
+     * Sets whether an entrant has opted out of receiving notifications.
+     *
+     * @param userID The ID of the entrant.
+     * @param optedOut Whether notifications are disabled.
+     * @param onResult Called with whether the update was successful.
+     */
+    fun setNotifOptOut(
+        userID: String,
+        optedOut: Boolean,
+        onResult: (Boolean) -> Unit
+    ) {
+        if (userID.isEmpty()) {
+            Log.e("UserDB", "Cannot set notifOptOut with empty ID")
+            onResult(false)
+            return
+        }
+
+        usersCollection.document(userID)
+            .update("notifOptOut", optedOut)
+            .addOnSuccessListener {
+                Log.d("UserDB", "notifOptOut set to $optedOut for: $userID")
+                onResult(true)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to set notifOptOut", exception)
+                onResult(false)
             }
     }
 
