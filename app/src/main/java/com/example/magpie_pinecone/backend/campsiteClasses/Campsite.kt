@@ -1,6 +1,7 @@
 package com.example.magpie_pinecone.backend.campsiteClasses
 import com.example.magpie_pinecone.backend.sharedDataClasses.ImageData
 import java.util.Date
+import java.util.Calendar
 import com.google.firebase.firestore.GeoPoint
 
 /**
@@ -35,10 +36,10 @@ class Campsite(
     var maxOccupancy: Int = 0,
     var price: Double = 0.0,
     var rating: Double = 0.0,
-    var images: List<ImageData> = emptyList(),
+    var images: MutableList<ImageData> = mutableListOf(),
     var rulesAndPolicy: String = "",
-    var availableDates: List<Date> = emptyList(),
-    var bookedDates: List<Date> = emptyList(),
+    var availableDates: MutableList<Date> = mutableListOf(),
+    var bookedDates: MutableList<Date> = mutableListOf(),
     var ownerId: String = "",
 //    var QRCode: QRCode,
     var description: String = "",
@@ -47,4 +48,15 @@ class Campsite(
     var tags: List<String> = emptyList(),
     var ratingTotal: Int = 0,
     var ratingCount: Int = 0    // Number of reviews; rating = ratingTotal / ratingCount
-)
+) {
+
+    fun addAvailableDates(availableDates: List<Date>){
+        var calendar = Calendar.getInstance()
+        availableDates = availableDates.map{ date ->
+            calendar = date
+            calendar.add(Calendar.DAY_OF_YEAR, 90)
+            calendar.time
+
+        }
+    }
+}

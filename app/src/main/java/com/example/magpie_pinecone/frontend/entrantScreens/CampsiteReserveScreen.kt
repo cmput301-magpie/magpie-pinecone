@@ -87,6 +87,8 @@ fun CampsiteReserveScreen(
     var availableDates by remember { mutableStateOf<List<Date>>(emptyList()) }
     var isLoaded by remember { mutableStateOf(false) }  // Whether the campsite has finished loading
     var selectedDateMillis by remember { mutableStateOf<Long?>(null) }  // Picked day (UTC midnight)
+    var bookedDates by remember { mutableStateOf<List<Date>>(emptyList()) }
+
 
     // Load the campsite's name, rules and available dates
     LaunchedEffect(campsiteId) {
