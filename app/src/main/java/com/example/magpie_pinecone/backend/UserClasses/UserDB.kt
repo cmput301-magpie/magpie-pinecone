@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 
 /**
  * Provides actions for interfacing with the user database
@@ -130,6 +131,38 @@ class UserDB {
     }
 
     /**
+     * Checks whether an entrant can receive notifications.
+     * Reads the latest preference from the user database.
+     *
+     * @param entrantId The ID of the entrant.
+     * @param onResult Called with whether notifications are allowed.
+     */
+    fun canReceiveNotifications(
+        entrantId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        if (entrantId.isBlank()) {
+            onResult(false)
+            return
+        }
+
+        usersCollection.document(entrantId)
+            .get(Source.SERVER)
+            .addOnSuccessListener { snapshot ->
+                onResult(
+                    snapshot.exists() && allowsNotifications(
+                        snapshot.get("accountType"),
+                        snapshot.get("notifOptOut")
+                    )
+                )
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UserDB", "Failed to check notification preference", exception)
+                onResult(false)
+            }
+    }
+
+    /**
      * Fetch a [user] from the database
      */
     fun readUser(
@@ -206,4 +239,16 @@ class UserDB {
             }
         }
     }
+}
+
+/**
+ * Checks whether the stored user preferences allow notifications.
+ * Missing notifOptOut defaults to notifications being enabled.
+ */
+internal fun allowsNotifications(
+    accountType: Any?,
+    notifOptOut: Any?
+): Boolean {
+    return accountType == AccountType.Entrant.name &&
+            (notifOptOut == null || notifOptOut == false)
 }
