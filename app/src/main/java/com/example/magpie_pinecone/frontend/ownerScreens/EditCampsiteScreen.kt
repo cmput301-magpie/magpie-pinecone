@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -78,6 +79,10 @@ fun EditCampsiteScreen(
     onSubmit: (Campsite) -> Unit,
     imageViewModel: ImageViewModel = viewModel()  // This is in parameters so it can be modified easily in tests
 ) {
+
+    LaunchedEffect(campsite) {
+        imageViewModel.setImages(campsite.images)
+    }
 
     var name by remember { mutableStateOf(campsite.name) }
     var location by remember { mutableStateOf(campsite.location) }
@@ -174,6 +179,8 @@ fun EditCampsiteScreen(
                 campsite.maxOccupancy = maxOccupancy.toIntOrNull() ?: 0
                 // Tags are typed as "River, Lake" and saved as a list
                 campsite.tags = tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+                campsite.images = imageDataList
 
                 onSubmit(campsite)
             },

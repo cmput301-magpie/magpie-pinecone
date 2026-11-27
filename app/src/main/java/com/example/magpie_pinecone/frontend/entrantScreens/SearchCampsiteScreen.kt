@@ -48,12 +48,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.campsiteClasses.CampsiteDB
 import com.example.magpie_pinecone.backend.campsiteClasses.localDateToUtcMillis
@@ -625,11 +628,24 @@ private fun SearchResultCard(
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
-            CampsiteImage(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp)
-            )
+
+            if (campsite.images.isEmpty()) {
+                CampsiteImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                )
+            } else {
+                AsyncImage(
+                    model = campsite.images[0].url,
+                    contentDescription = "Campsite thumbnail",
+                    placeholder = painterResource(android.R.drawable.ic_menu_gallery),
+                    error = painterResource(android.R.drawable.ic_menu_report_image),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth().height(160.dp)
+                )
+            }
+
 
             Spacer(modifier = Modifier.height(8.dp))
 

@@ -20,7 +20,7 @@ class CampsiteTests {
         assertEquals(0, campsite.maxOccupancy)
         assertEquals(0.0, campsite.price, 0.0)    // last number is the allowed difference for doubles
         assertEquals(0.0, campsite.rating, 0.0)
-        assertNull(campsite.imageUrl)
+        assertTrue(campsite.images.isEmpty())
         assertEquals("", campsite.rulesAndPolicy)
         assertTrue(campsite.availableDates.isEmpty())
         assertTrue(campsite.bookedDates.isEmpty())
@@ -45,7 +45,7 @@ class CampsiteTests {
             maxOccupancy = 6,
             price = 45.50,
             rating = 4.5,
-            imageUrl = "https://example.com/lakeview.jpg",
+            images = listOf(),
             rulesAndPolicy = "No campfires after 11pm",
             availableDates = listOf(day1),
             bookedDates = listOf(day2),
@@ -63,7 +63,7 @@ class CampsiteTests {
         assertEquals(6, campsite.maxOccupancy)
         assertEquals(45.50, campsite.price, 0.0)
         assertEquals(4.5, campsite.rating, 0.0)
-        assertEquals("https://example.com/lakeview.jpg", campsite.imageUrl)
+        assertTrue(campsite.images.isEmpty())
         assertEquals("No campfires after 11pm", campsite.rulesAndPolicy)
         assertEquals(listOf(day1), campsite.availableDates)
         assertEquals(listOf(day2), campsite.bookedDates)
@@ -86,7 +86,7 @@ class CampsiteTests {
         campsite.maxOccupancy = 4
         campsite.price = 30.0
         campsite.rating = 3.8
-        campsite.imageUrl = "https://example.com/hilltop.jpg"
+        campsite.images = listOf()
         campsite.rulesAndPolicy = "No pets"
         campsite.ownerId = "owner789"
         campsite.description = "Great view"
@@ -98,7 +98,7 @@ class CampsiteTests {
         assertEquals(4, campsite.maxOccupancy)
         assertEquals(30.0, campsite.price, 0.0)
         assertEquals(3.8, campsite.rating, 0.0)
-        assertEquals("https://example.com/hilltop.jpg", campsite.imageUrl)
+        assertTrue(campsite.images.isEmpty())
         assertEquals("No pets", campsite.rulesAndPolicy)
         assertEquals("owner789", campsite.ownerId)
         assertEquals("Great view", campsite.description)

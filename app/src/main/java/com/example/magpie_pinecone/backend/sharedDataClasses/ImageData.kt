@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
+import com.google.firebase.firestore.Exclude
 
 fun getImageAspectRatio(uri: Uri, context: Context): Float {
     val options = BitmapFactory.Options().apply {
@@ -24,7 +25,11 @@ fun getImageAspectRatio(uri: Uri, context: Context): Float {
     return if (width > 0 && height > 0) width.toFloat() / height.toFloat() else 4f / 3f
 }
 
-data class ImageData(var url: String?, val aspectRatio: Float, var localUri: Uri? = null) {
+data class ImageData(
+    var url: String? = null,
+    val aspectRatio: Float = 1f,
+    @get:Exclude @set:Exclude var localUri: Uri? = null
+) {
     init {
         require(aspectRatio > 0) { "Aspect ratio cannot be negative" }
     }
