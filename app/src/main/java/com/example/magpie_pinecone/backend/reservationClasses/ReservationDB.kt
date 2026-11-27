@@ -180,17 +180,22 @@ class ReservationDB {
     ) {
         val currentDate = Date()
 
+        // Only filter by entrant in Firestore. Filtering by entrant AND endDate needs a
+        // composite index, so we check the date here in Kotlin instead.
         reservationCollection
             .whereEqualTo("entrantID", entrantID)
-            .whereLessThan("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { it.endDate.before(currentDate) }   // Keep only reservations that have ended
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read past reservations", e)
+                onResult(emptyList())
             }
     }
 
@@ -203,17 +208,22 @@ class ReservationDB {
     ) {
         val currentDate = Date()
 
+        // Only filter by entrant in Firestore. Filtering by entrant AND endDate needs a
+        // composite index, so we check the date here in Kotlin instead
         reservationCollection
             .whereEqualTo("entrantID", entrantID)
-            .whereGreaterThanOrEqualTo("endDate", currentDate)
             .get()
             .addOnSuccessListener { snapshot ->
 
-                val reservations = snapshot.documents.mapNotNull { document ->
-                    document.toObject(Reservation::class.java)
-                }
+                val reservations = snapshot.documents
+                    .mapNotNull { it.toObject(Reservation::class.java) }
+                    .filter { !it.endDate.before(currentDate) }   // Keep only reservations that haven't ended yet
 
                 onResult(reservations)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReservationDB", "Failed to read active reservations", e)
+                onResult(emptyList())
             }
     }
 

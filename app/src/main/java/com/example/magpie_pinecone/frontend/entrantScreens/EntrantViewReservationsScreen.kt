@@ -58,7 +58,7 @@ import java.util.Locale
  * EntrantViewReservationsScreen displays the entrant's reservations, filtering by active and past reservations, and with an option to cancel active reservations.
  * ActiveEntrantReservations displays the entrant's active reservations, with an option to cancel.
  * PastEntrantReservations displays the entrant's past reservations.
- * ReservationRow displays one reservation's campsite name and dates, with a Cancel button.
+ * ReservationRow displays one reservation's campsite name and dates, with an optional Cancel button.
  * EmptyReservationsMessage displays a grey message when a tab has no reservations.
  * ShowEntrantViewReservationsScreenPreview displays a preview of EntrantViewReservationsScreen for reference.
  */
@@ -132,7 +132,7 @@ fun EntrantViewReservationsScreen(
         // Body, depending on the tab
         when (selectedTabIndex) {
             0 -> ActiveEntrantReservations(activeReservations, campsiteDB, onCancelled)
-            1 -> PastEntrantReservations()
+            1 -> PastEntrantReservations(campsiteDB)
         }
     }
 }
@@ -248,30 +248,92 @@ fun ActiveEntrantReservations(
 }
 
 /**
- * Displays the entrant's past reservations.
+ * Displays the entrant's past reservations in one rounded card (US 01.06.02).
+ * Past reservations can't be cancelled, so the rows have no Cancel button.
  *
- * Loading real past reservations is its own user story (US 01.06.02),
- * so this tab only shows a message for now.
+ * @param campsiteDB Database used to look up each reservation's campsite.
  */
 @Composable
-fun PastEntrantReservations() {
-    EmptyReservationsMessage(
-        text = "Past reservations will appear here."
-    )
-}
+fun PastEntrantReservations(
+    campsiteDB: CampsiteDB
+) {
+    val reservationDB = remember { ReservationDB() }
+    // Android ID is the user's ID (same as ProfileScreen)
+    val context = LocalContext.current
+    val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
+    var reservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    var isLoaded by remember { mutableStateOf(false) }   // Whether the list has finished loading
+    // Campsites we have looked up so far, by campsite ID
+    var campsites by remember { mutableStateOf<Map<String, Campsite>>(emptyMap()) }
+
+    // Load this entrant's past reservations, leaving out cancelled ones, newest first
+    LaunchedEffect(Unit) {
+        reservationDB.getPastReservationsByEntrant(androidId) { loaded ->
+            reservations = loaded
+                .filter { !it.isCancelled }
+                .sortedByDescending { it.endDate }
+            isLoaded = true
+        }
+    }
+
+    // Look up each campsite once (not on every redraw), so rows can show its name
+    LaunchedEffect(reservations) {
+        reservations
+            .map { it.campsiteID }
+            .distinct()
+            .filter { it !in campsites }
+            .forEach { campsiteId ->
+                campsiteDB.readCampsite(campsiteId) { campsite ->
+                    if (campsite != null) {
+                        campsites = campsites + (campsiteId to campsite)
+                    }
+                }
+            }
+    }
+
+    // Only say "none" after loading, so it doesn't flash on screen first
+    if (isLoaded && reservations.isEmpty()) {
+        EmptyReservationsMessage(
+            text = "You have no past reservations."
+        )
+    } else if (reservations.isNotEmpty()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            LazyColumn {
+                itemsIndexed(reservations) { index, reservation ->
+                    // A thin line between rows, but not above the first one
+                    if (index > 0) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    }
+
+                    // No onCancel, so this row has no Cancel button
+                    ReservationRow(
+                        reservation = reservation,
+                        campsiteName = campsites[reservation.campsiteID]?.name
+                    )
+                }
+            }
+        }
+    }
+}
 /**
  * One reservation row: campsite name and dates on the left, Cancel on the right.
  *
  * @param reservation Reservation shown in this row.
  * @param campsiteName Name of the reservation's campsite, or null while it is loading.
- * @param onCancel Called when the entrant presses Cancel.
+ * @param onCancel Called when the entrant presses Cancel. If null, no Cancel button is shown.
  */
 @Composable
 private fun ReservationRow(
     reservation: Reservation,
     campsiteName: String?,
-    onCancel: () -> Unit
+    onCancel: (() -> Unit)? = null
 ) {
     val dateFormat = remember { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()) }
 
@@ -300,13 +362,16 @@ private fun ReservationRow(
             )
         }
 
-        TextButton(
-            onClick = onCancel,
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = DeclineRed
-            )
-        ) {
-            Text("Cancel")
+        // Past reservations pass no onCancel, so they get no Cancel button
+        if (onCancel != null) {
+            TextButton(
+                onClick = onCancel,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = DeclineRed
+                )
+            ) {
+                Text("Cancel")
+            }
         }
     }
 }
