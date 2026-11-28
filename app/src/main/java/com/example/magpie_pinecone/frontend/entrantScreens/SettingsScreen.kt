@@ -54,13 +54,15 @@ import com.example.magpie_pinecone.ui.theme.PillPurple
  * Settings tab for entrants (US 01.11.01).
  * Each row just calls one of the functions passed in, so EntrantApp decides where it goes.
  *
- * @param onComingSoon Used by Notifications and Messages, which are not built yet.
+ * @param onNotifications Opens the notification settings.
+ * @param onComingSoon Used by Messages, which is not built yet.
  */
 @Composable
 fun SettingsScreen(
     onProfile: () -> Unit,
     onViewReservations: () -> Unit,
     onAppPolicy: () -> Unit,
+    onNotifications: () -> Unit,
     onComingSoon: () -> Unit,
     curUser: User?
 ) {
@@ -106,7 +108,7 @@ fun SettingsScreen(
         ) {
             SettingsRow(icon = Icons.Outlined.Person, text = "Profile", onClick = onProfile)
             SettingsRow(icon = Icons.Outlined.Schedule, text = "View Reservations", onClick = onViewReservations)
-            SettingsRow(icon = Icons.Outlined.Notifications, text = "Notifications", onClick = onComingSoon)
+            SettingsRow(icon = Icons.Outlined.Notifications, text = "Notifications", onClick = onNotifications)
             SettingsRow(icon = Icons.Outlined.Policy, text = "App Policy and Guidelines", onClick = onAppPolicy)
             SettingsRow(icon = Icons.Outlined.Email, text = "Messages", onClick = onComingSoon)
         }
@@ -137,6 +139,6 @@ private fun SettingsRow(icon: ImageVector, text: String, onClick: () -> Unit) {
 @Composable
 fun SettingsScreenPreview() {
     MagpiepineconeTheme {
-        SettingsScreen(onProfile = {}, onViewReservations = {}, onAppPolicy = {}, onComingSoon = {}, curUser = null)
+        SettingsScreen(onProfile = {}, onViewReservations = {}, onAppPolicy = {}, onNotifications = {}, onComingSoon = {}, curUser = null)
     }
 }

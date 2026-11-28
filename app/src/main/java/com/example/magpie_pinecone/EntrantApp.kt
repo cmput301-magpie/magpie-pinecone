@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.magpie_pinecone.frontend.entrantScreens.ScanQRCodeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
+import com.example.magpie_pinecone.frontend.entrantScreens.NotificationSettingsScreen
 import com.example.magpie_pinecone.ui.components.ComingSoonScreen
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
@@ -103,6 +104,9 @@ object EntrantViewReservations
 object EditProfile
 
 @Serializable
+object NotificationSettings
+
+@Serializable
 object ComingSoon
 
 @Serializable
@@ -135,6 +139,14 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
         mutableStateOf<Entrant?>(null)
     }
 
+    var receiveNotifications by remember {
+        mutableStateOf(true)
+    }
+
+    var savingNotificationPreference by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(Unit) {
         userDB.readUser(androidId) { fetchedUser ->
             curUser = fetchedUser
@@ -142,6 +154,11 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
 
         userDB.readEntrant(androidId) { fetchedEntrant ->
             curEntrant = fetchedEntrant
+
+            // Load the saved notification preference
+            if (fetchedEntrant != null) {
+                receiveNotifications = !fetchedEntrant.notifOptOut
+            }
         }
     }
 
@@ -197,7 +214,9 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         Text(destination.label)
                     },
                     selected = currentDestination?.hierarchy
-                        ?.any { it.route == destination.route } == true,
+                        ?.any { it.route == destination.route } == true ||
+                            (destination == EntrantDestination.SETTINGS &&
+                                    currentDestination?.hasRoute(NotificationSettings::class) == true),
                     onClick = {
                         navController.navigate(destination.route) {
                             popUpTo(EntrantDestination.HOME.route) {
@@ -511,10 +530,49 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             AppPolicyGuidelines
                         )
                     },
+                    onNotifications = {
+                        navController.navigate(NotificationSettings)
+                    },
                     onComingSoon = {
                         navController.navigate(ComingSoon)
                     },
                     curUser = curUser
+                )
+            }
+
+            composable<NotificationSettings> {
+                NotificationSettingsScreen(
+                    receiveNotifications = receiveNotifications,
+                    onNotificationChange = { enabled ->
+                        if (curEntrant == null) {
+                            Toast.makeText(
+                                context,
+                                "Could not load notification settings.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else if (!savingNotificationPreference) {
+                            savingNotificationPreference = true
+
+                            // Update the switch only after Firestore confirms the change
+                            userDB.setNotifOptOut(androidId, !enabled) { success ->
+                                savingNotificationPreference = false
+
+                                if (success) {
+                                    receiveNotifications = enabled
+                                    curEntrant?.notifOptOut = !enabled
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Could not save notification settings.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
 
@@ -535,7 +593,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                 )
             }
 
-            // Notifications and Messages from Settings (not done yet)
+            // Screens that are not implemented yet
             composable<ComingSoon> {
                 ComingSoonScreen(
                     title = "Coming soon",
