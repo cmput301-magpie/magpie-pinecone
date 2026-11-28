@@ -21,9 +21,14 @@ class EntrantHandler {
 
     /**
      * Takes in parameters lottery, lotteryDB, and entrant to allow entrant to join lottery waitlist
+     *
+     * The entrant is not added if the lottery waitlist is full.
+     *
+     * [onResult] passes true if the entrant is not on the waitlist, or false if the waitlist is full
+     * or if adding the entrant failed.
      */
-    fun joinWaitlist(lottery: Lottery, lotteryDB: LotteryDB, entrant: Entrant): Unit{
-        lotteryDB.addEntrant(lottery, entrant)
+    fun joinWaitlist(lottery: Lottery, lotteryDB: LotteryDB, entrant: Entrant, onResult: (Boolean) -> Unit = {}) {
+        lotteryDB.addEntrant(lottery, entrant, onResult)
     }
 
     /**
