@@ -76,6 +76,7 @@ import java.util.Date
  * @param canReview Whether the entrant has reserved this campsite and can write a review.
  * @param hasReviewed Whether the entrant already reviewed it (the button then says "Edit your review").
  * @param onWriteReview Opens the write-review screen.
+ * @param waitlistFull Whether the lottery's waitlist is full. "Enter lottery" then becomes a disabled "Waitlist full" button.
  */
 @Composable
 fun CampsiteDetailsScreen(
@@ -87,7 +88,8 @@ fun CampsiteDetailsScreen(
     reviews: List<Review> = emptyList(),
     canReview: Boolean = false,
     hasReviewed: Boolean = false,
-    onWriteReview: () -> Unit = {}
+    onWriteReview: () -> Unit = {},
+    waitlistFull: Boolean = false
 ) {
     CampsiteDetailsLayout(
         campsite = campsite,
@@ -114,9 +116,10 @@ fun CampsiteDetailsScreen(
         }
 
         PillButton(
-            text = "Enter lottery",
+            text = if (waitlistFull) "Waitlist full" else "Enter lottery",
             onClick = onSubmit,
             containerColor = PineconePurple,
+            enabled = !waitlistFull,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)

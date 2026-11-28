@@ -179,4 +179,12 @@ class OwnerHomeScreenTests {
         composeTestRule.onNodeWithText("Lottery").performClick()
         assertTrue(createLotteryPressed)
     }
+
+    @Test
+    fun lotteryCard_withoutCapacity_showsNoLimit() {
+        showOwnerHomeScreen(emptyList(), listOf(lottery.copy(waitlistCapacity = null)))
+        composeTestRule.onNodeWithText("My Lotteries").performClick()
+
+        composeTestRule.onNodeWithText("Waitlist capacity: No limit").assertIsDisplayed()
+    }
 }

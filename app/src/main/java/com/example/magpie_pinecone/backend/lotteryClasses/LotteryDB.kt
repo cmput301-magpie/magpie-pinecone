@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -249,9 +250,74 @@ class LotteryDB {
                 onResult(emptyList()) }
     }
 
-    fun addEntrant(lottery: Lottery, entrant: Entrant){
-//        Makes a waitlist of entrants subcollection then stores (sets) an entrant
-        lotteriesRef.document(lottery.id).collection("waitlistEntrants").document(entrant.id).set(entrant)
+    /**
+     * Gets the number of entrants in the waitlist of the lottery with [lotteryId] in the Firestore.
+     * [onResult] passes null if the count could not be read, so callers don't mistake a
+     * failed read for an empty waitlist.
+     */
+    fun getWaitlistCount(lotteryId: String, onResult: (Int?) -> Unit) {
+        lotteriesRef.document(lotteryId).collection("waitlistEntrants")
+            .count()
+            .get(AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                val waitlistCount = snapshot.count.toInt()
+                onResult(waitlistCount)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("LotteryDB", "Failed to count waitlist entrants", exception)
+                onResult(null)
+            }
+    }
+
+    /**
+     * Adds [entrant] to the waitlist of the [lottery], unless the waitlist is full.
+     *
+     * The capacity is read from Firestore and not from [lottery], because the lottery object
+     * on screen could be out of date if the owner just changed the capacity.
+     *
+     * [onResult] passes true if the entrant is on the waitlist, or false if it is full or something failed.
+     */
+    fun addEntrant(lottery: Lottery, entrant: Entrant, onResult: (Boolean) -> Unit = {}) {
+//        Makes a waitlist of entrants subcollection then stores (sets) an entrant if checks pass
+        val lotteryRef = lotteriesRef.document(lottery.id)
+        val entrantRef = lotteryRef.collection("waitlistEntrants").document(entrant.id)
+
+        fun write() {
+            entrantRef.set(entrant)
+                .addOnSuccessListener{ onResult(true) }
+                .addOnFailureListener { exception ->
+                    Log.e("LotteryDB", "Failed to add entrant to waitlist", exception)
+                    onResult(false)
+                }
+        }
+
+        entrantRef.get()
+            .addOnSuccessListener { lotterySnapshot ->
+                if (!lotterySnapshot.exists()) {
+                    onResult(false)
+                    return@addOnSuccessListener
+                }
+
+                val capacity = lotterySnapshot.getLong("waitlistCapacity")?.toInt()
+
+                // Capacity is null -> no limit -> add entrant
+                if (capacity == null) {
+                    write()
+                    return@addOnSuccessListener
+                }
+
+                getWaitlistCount(lottery.id) { count ->
+                    if (count == null || isWaitlistFull(count, capacity)) {
+                        onResult(false)
+                    } else {
+                        write()
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("LotteryDB", "Failed to read lottery capacity", exception)
+                onResult(false)
+            }
     }
 
     fun removeEntrant(lottery: Lottery, entrant: Entrant){
@@ -285,4 +351,29 @@ class LotteryDB {
     fun deleteLotteryWinner(lotteryWinner: LotteryWinner): Unit{
         lotteryWinnersRef.document(lotteryWinner.id).delete()
     }
+}
+
+/**
+ * Picks the lottery an entrant would enter from the campsite details screen.
+ *
+ * Only lotteries including campsite are considered. If several do, the one whose registration
+ * period is open [now] is picked, otherwise the first match is picked.
+ *
+ * Returns null if no lottery includes the campsite.
+ */
+fun pickLotteryForCampsite(
+    lotteries: List<Lottery>,
+    campsiteID: String,
+    now: Date = Date()
+): Lottery? {
+    val matching = lotteries.filter { lottery ->
+        lottery.campsites.any { it.ID == campsiteID }
+    }
+
+    return matching.firstOrNull { lottery ->
+        val start = lottery.registrationStartDate
+        val end = lottery.registrationEndDate
+        // Registration is over once "now" reaches the end date
+        start != null && end != null && !now.before(start) && now.before(end)
+    } ?: matching.firstOrNull()
 }

@@ -3,7 +3,10 @@ package com.example.magpie_pinecone.backendTests.lotteryClassesTests
 import com.example.magpie_pinecone.backend.campsiteClasses.Campsite
 import com.example.magpie_pinecone.backend.entrantClasses.Entrant
 import com.example.magpie_pinecone.backend.lotteryClasses.Lottery
+import com.example.magpie_pinecone.backend.lotteryClasses.isWaitlistFull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Date
@@ -24,7 +27,7 @@ class LotteryTests {
         assertEquals(null, lottery.bookingStartDate)
         assertEquals(null, lottery.bookingEndDate)
         assertEquals(1, lottery.numberOfWinners)
-        assertEquals(100, lottery.waitlistCapacity)
+        assertNull(lottery.waitlistCapacity)
         assertTrue(lottery.waitlist.isEmpty())
         assertTrue(lottery.winners.isEmpty())
     }
@@ -179,6 +182,29 @@ class LotteryTests {
 
         // The waitlist should stay the same (same people, same order)
         assertEquals(mutableListOf(e1, e2, e3), lottery.waitlist)
+    }
+
+    @Test
+    fun waitlist_withNoCapacity_isNeverFull() {
+        assertFalse(isWaitlistFull(count = 0, capacity = null))
+        assertFalse(isWaitlistFull(count = 100_000, capacity = null))
+    }
+
+    @Test
+    fun waitlist_belowCapacity_isNotFull() {
+        assertFalse(isWaitlistFull(count = 0, capacity = 3))
+        assertFalse(isWaitlistFull(count = 2, capacity = 3))
+    }
+
+    @Test
+    fun waitlist_atCapacity_isFull() {
+        assertTrue(isWaitlistFull(count = 3, capacity = 3))
+    }
+
+    @Test
+    fun waitlist_overCapacity_isFull() {
+        // Happens if the owner lowers the capacity below the current number of entrants when editing lottery
+        assertTrue(isWaitlistFull(count = 5, capacity = 3))
     }
 
 }
