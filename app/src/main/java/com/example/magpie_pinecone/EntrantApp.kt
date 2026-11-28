@@ -52,6 +52,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.example.magpie_pinecone.backend.lotteryClasses.isWaitlistFull
 import com.example.magpie_pinecone.frontend.entrantScreens.ScanQRCodeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.NotificationSettingsScreen
@@ -301,12 +302,24 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                     var lottery by remember {
                         mutableStateOf<Lottery?>(null)
                     }
+                    var waitlistCount by remember {
+                        mutableStateOf<Int?>(null)  // null = not loaded yet or unknown
+                    }
 
                     LaunchedEffect(campsite) {
                         lotteryDB.getLotteriesByOwner(
                             ownerId = campsite.ownerId
                         ) {
                             lottery = it.firstOrNull()
+                        }
+                    }
+
+                    // Once the lottery is loaded, count the lottery waitlist
+                    LaunchedEffect(lottery?.id) {
+                        waitlistCount = null
+                        val currentLottery = lottery
+                        if (currentLottery != null) {
+                            lotteryDB.getWaitlistCount(currentLottery.id) { waitlistCount = it }
                         }
                     }
 
@@ -327,6 +340,11 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                             }
                         }
                     }
+
+                    // Only call it full when the count is known, so the button isn't disabled by mistake
+                    val count = waitlistCount
+                    val waitlistFull = count != null &&
+                            lottery?.let { isWaitlistFull(count, it.waitlistCapacity) } == true
 
                     CampsiteDetailsScreen(
                         campsite = campsite,
@@ -352,12 +370,26 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                                             currentLottery,
                                             lotteryDB,
                                             entrant
-                                        )
-
-                                        navController.popBackStack(
-                                            EntrantDestination.HOME.route,
-                                            inclusive = false
-                                        )
+                                        ) { joined ->
+                                            if (joined) {
+                                                navController.popBackStack(
+                                                    EntrantDestination.HOME.route,
+                                                    inclusive = false
+                                                )
+                                            } else {
+                                                // Fail to join, stay on the screen and notify entrant.
+                                                Toast.makeText(
+                                                    context,
+                                                    "Couldn't join this lottery. Its waitlist may be full.",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                                // The waitlist might have added more entrants after
+                                                // the screen loaded, so we count the waitlist again.
+                                                lotteryDB.getWaitlistCount(currentLottery.id) {
+                                                    waitlistCount = it
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -367,7 +399,8 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         hasReviewed = curEntrantReview != null,
                         onWriteReview = {
                             navController.navigate(WriteReview)
-                        }
+                        },
+                        waitlistFull = waitlistFull
                     )
                 }
             }

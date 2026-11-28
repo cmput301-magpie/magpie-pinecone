@@ -1,6 +1,8 @@
 package com.example.magpie_pinecone.uiTests.entrantScreensTests
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -12,6 +14,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.performScrollTo
+import org.junit.Assert.assertFalse
 
 class CampsiteDetailsScreenTests {
 
@@ -34,7 +37,7 @@ class CampsiteDetailsScreenTests {
     private var enteredLottery = false
     private var reservePressed = false
 
-    private fun showDetailsScreen(isWinner: Boolean = false) {
+    private fun showDetailsScreen(isWinner: Boolean = false, waitlistFull: Boolean = false) {
         composeTestRule.setContent {
             MagpiepineconeTheme {
                 CampsiteDetailsScreen(
@@ -42,7 +45,8 @@ class CampsiteDetailsScreenTests {
                     onBack = { backPressed = true },
                     onSubmit = { enteredLottery = true },
                     isWinner = isWinner,
-                    onReserve = { reservePressed = true }
+                    onReserve = { reservePressed = true },
+                    waitlistFull = waitlistFull
                 )
             }
         }
@@ -89,5 +93,24 @@ class CampsiteDetailsScreenTests {
 
         composeTestRule.onNodeWithContentDescription("Back Button").performClick()
         assertTrue(backPressed)
+    }
+
+    @Test
+    fun waitlistNotFull_enterLotteryIsEnabled() {
+        showDetailsScreen()
+
+        composeTestRule.onNodeWithText("Enter lottery").assertIsEnabled()
+    }
+
+    @Test
+    fun waitlistFull_showsDisabledWaitlistFull() {
+        showDetailsScreen(waitlistFull = true)
+
+        // The enter button is replaced and cannot be pressed
+        composeTestRule.onNodeWithText("Waitlist full").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Enter lottery").assertDoesNotExist()
+
+        composeTestRule.onNodeWithText("Waitlist full").performClick()
+        assertFalse(enteredLottery)
     }
 }
