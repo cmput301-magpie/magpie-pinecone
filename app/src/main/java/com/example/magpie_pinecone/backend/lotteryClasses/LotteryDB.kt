@@ -352,3 +352,28 @@ class LotteryDB {
         lotteryWinnersRef.document(lotteryWinner.id).delete()
     }
 }
+
+/**
+ * Picks the lottery an entrant would enter from the campsite details screen.
+ *
+ * Only lotteries including campsite are considered. If several do, the one whose registration
+ * period is open [now] is picked, otherwise the first match is picked.
+ *
+ * Returns null if no lottery includes the campsite.
+ */
+fun pickLotteryForCampsite(
+    lotteries: List<Lottery>,
+    campsiteID: String,
+    now: Date = Date()
+): Lottery? {
+    val matching = lotteries.filter { lottery ->
+        lottery.campsites.any { it.ID == campsiteID }
+    }
+
+    return matching.firstOrNull { lottery ->
+        val start = lottery.registrationStartDate
+        val end = lottery.registrationEndDate
+        // Registration is over once "now" reaches the end date
+        start != null && end != null && !now.before(start) && now.before(end)
+    } ?: matching.firstOrNull()
+}

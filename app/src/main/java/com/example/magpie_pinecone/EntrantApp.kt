@@ -53,6 +53,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.magpie_pinecone.backend.lotteryClasses.isWaitlistFull
+import com.example.magpie_pinecone.backend.lotteryClasses.pickLotteryForCampsite
 import com.example.magpie_pinecone.frontend.entrantScreens.ScanQRCodeScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.SettingsScreen
 import com.example.magpie_pinecone.frontend.entrantScreens.NotificationSettingsScreen
@@ -310,7 +311,7 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         lotteryDB.getLotteriesByOwner(
                             ownerId = campsite.ownerId
                         ) {
-                            lottery = it.firstOrNull()
+                            lottery = pickLotteryForCampsite(it, campsite.ID)
                         }
                     }
 
@@ -320,6 +321,12 @@ fun EntrantApp(androidId: String, onProfileDeleted: () -> Unit) {
                         val currentLottery = lottery
                         if (currentLottery != null) {
                             lotteryDB.getWaitlistCount(currentLottery.id) { waitlistCount = it }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "This campsite doesn't have a lottery to enter yet.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
 
