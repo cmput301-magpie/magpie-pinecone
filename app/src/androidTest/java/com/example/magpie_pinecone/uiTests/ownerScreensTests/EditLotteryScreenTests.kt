@@ -18,6 +18,7 @@ import com.example.magpie_pinecone.frontend.ownerScreens.EditLotteryScreen
 import com.example.magpie_pinecone.ui.theme.MagpiepineconeTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import java.text.SimpleDateFormat
@@ -42,11 +43,11 @@ class EditLotteryScreenTests {
      * A lottery with everything filled in. A fresh copy is made for every test,
      * because submitting changes the lottery object.
      */
-    private fun filledLottery() = Lottery(
+    private fun filledLottery(waitlistCapacity: Int? = 50) = Lottery(
         id = "lottery1",
         campsites = mutableListOf(Campsite(ID = "site123", name = "Gronk Campground")),
         numberOfWinners = 3,
-        waitlistCapacity = 50,
+        waitlistCapacity = waitlistCapacity,
         registrationStartDate = date("01/01/2027"),
         registrationEndDate = date("01/31/2027"),
         bookingStartDate = date("02/01/2027"),
@@ -170,5 +171,57 @@ class EditLotteryScreenTests {
         // The calendar pop-up has OK and Cancel buttons
         composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
         composeTestRule.onNodeWithText("OK").assertIsDisplayed()
+    }
+
+    @Test
+    fun newLottery_hasNoWaitlistLimitByDefault() {
+        showEditLotteryScreen(Lottery(), isEdit = false)
+
+        // The switch is off, so the capacity box is hidden and the hint is shown
+        composeTestRule.onNodeWithText("Limit waitlist size").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Max. waitlist cap.").assertDoesNotExist()
+        composeTestRule
+            .onNodeWithText("No limit: any number of entrants can join the waitlist.")
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun lotteryWithoutLimit_submitsNullCapacity() {
+        showEditLotteryScreen(filledLottery(waitlistCapacity = null), isEdit = false)
+
+        // No capacity is needed, so the button is on
+        submitButton("Start Lottery").assertIsEnabled().performClick()
+
+        assertNull(submittedLottery!!.waitlistCapacity)
+    }
+
+    @Test
+    fun turningLimitOff_submitsNullCapacity() {
+        showEditLotteryScreen(filledLottery(), isEdit = true)  // Starts with a capacity of 50
+
+        composeTestRule.onNodeWithText("Limit waitlist size").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Max. waitlist cap.").assertDoesNotExist()
+
+        submitButton("Update Lottery").assertIsEnabled().performClick()
+
+        assertNull(submittedLottery!!.waitlistCapacity)
+    }
+
+    @Test
+    fun turningLimitOn_needsANumberBeforeSubmitting() {
+        showEditLotteryScreen(filledLottery(waitlistCapacity = null), isEdit = false)
+
+        composeTestRule.onNodeWithText("Limit waitlist size").performScrollTo().performClick()
+
+        // The box is empty, so a capacity is still missing
+        composeTestRule.onNodeWithText("Enter a capacity of at least 1").assertIsDisplayed()
+        submitButton("Start Lottery").assertIsNotEnabled()
+
+        // Typing an arbitrary number turns the button on and the lottery gets that capacity
+        composeTestRule.onNodeWithText("Max. waitlist cap.").performTextReplacement("10")
+        submitButton("Start Lottery").assertIsEnabled().performClick()
+
+        assertEquals(10, submittedLottery!!.waitlistCapacity)
     }
 }

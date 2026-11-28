@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
@@ -68,7 +69,7 @@ import java.util.TimeZone
  * Displays the screen where an owner starts a new lottery or updates an existing one.
  *
  * The owner ticks the campsites in the lottery, sets the number of winners
- * and the waitlist capacity, and picks the registration, booking and active
+ * and optionally a waitlist capacity, and picks the registration, booking and active
  * periods from a calendar. The button stays off until everything is valid.
  *
  * @param ownerId ID of the owner the lottery belongs to.
@@ -88,7 +89,10 @@ fun EditLotteryScreen(
     onSubmit: (Lottery) -> Unit,
 ) {
     var numberOfWinners by remember { mutableStateOf(lottery.numberOfWinners.toString()) }
-    var waitlistCapacity by remember { mutableStateOf(lottery.waitlistCapacity.toString()) }
+
+    // Limiting waitlist is optional - true = set capacity, false = no set capacity
+    var limitWaitlist by remember { mutableStateOf(lottery.waitlistCapacity != null) }
+    var waitlistCapacity by remember { mutableStateOf(lottery.waitlistCapacity?.toString() ?: "") }
 
     // Each period has a start and end date (null = not picked yet)
     var registrationStart by remember { mutableStateOf(lottery.registrationStartDate) }
@@ -109,7 +113,7 @@ fun EditLotteryScreen(
     // The button only turns on when everything is filled in correctly
     val canSubmit = selectedCampsites.isNotEmpty() &&
             winners != null && winners > 0 &&
-            capacity != null && capacity > 0 &&
+            (!limitWaitlist || (capacity != null && capacity > 0)) &&   // Only checked when a limit is set
             isValidRange(registrationStart, registrationEnd) &&
             isValidRange(bookingStart, bookingEnd) &&
             isValidRange(activeStart, activeEnd)
@@ -177,18 +181,47 @@ fun EditLotteryScreen(
                 )
             }
 
-            PineconeTextField(
-                value = waitlistCapacity,
-                onValueChange = { waitlistCapacity = it },
-                label = "Max. waitlist cap.",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-            if (capacity == null || capacity <= 0) {
-                FieldError(
-                    text = "Enter a capacity of at least 1"
+            // Tapping anywhere on the row flips the switch
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = limitWaitlist,
+                        onValueChange = { limitWaitlist = it },
+                        role = Role.Switch
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Limit waitlist size",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = limitWaitlist,
+                    onCheckedChange = null   // The whole row handles the click
                 )
             }
 
+            if (limitWaitlist) {
+                PineconeTextField(
+                    value = waitlistCapacity,
+                    onValueChange = { waitlistCapacity = it },
+                    label = "Max. waitlist cap.",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                if (capacity == null || capacity <= 0) {
+                    FieldError(
+                        text = "Enter a capacity of at least 1"
+                    )
+                }
+            } else {
+                Text(
+                    text = "No limit: any number of entrants can join the waitlist.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             DateRangeField(
                 label = "Registration period",
                 start = registrationStart,
@@ -224,7 +257,7 @@ fun EditLotteryScreen(
             onClick = {
                 lottery.ownerId = ownerId
                 lottery.numberOfWinners = winners ?: 0
-                lottery.waitlistCapacity = capacity ?: 0
+                lottery.waitlistCapacity = if (limitWaitlist) capacity else null  // null = no limit
                 lottery.registrationStartDate = registrationStart
                 lottery.registrationEndDate = registrationEnd
                 lottery.bookingStartDate = bookingStart

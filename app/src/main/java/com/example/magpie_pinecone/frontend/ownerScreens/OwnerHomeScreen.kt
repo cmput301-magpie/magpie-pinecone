@@ -293,7 +293,7 @@ fun LotteryCard(
             style = MaterialTheme.typography.bodyMedium
         )
         Text(
-            text = "Waitlist capacity: ${lottery.waitlistCapacity}",
+            text = "Waitlist capacity: ${lottery.waitlistCapacity ?: "No limit"}",
             style = MaterialTheme.typography.bodyMedium
         )
     }
